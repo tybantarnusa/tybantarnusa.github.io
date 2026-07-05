@@ -75,7 +75,8 @@
     padding: 8px 10px;
     font-size: 14px;
   }
-  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  /* pan-y lets a vertical scroll pass through; only horizontal drags adjust it. */
+  input[type="range"] { width: 100%; accent-color: var(--accent); touch-action: pan-y; }
   input[type="color"] {
     width: 44px; height: 34px; padding: 0;
     border: 1px solid var(--border);
