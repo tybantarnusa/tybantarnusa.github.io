@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collage Maker</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --border: #2a2f3a;
+    --accent: #5b8cff;
+    --accent-hover: #7aa2ff;
+    --text: #e6e9ef;
+    --muted: #9aa3b2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .layout {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .controls {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    width: 280px;
+    flex-shrink: 0;
+  }
+  .controls h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--muted);
+  }
+  .row { display: flex; gap: 10px; align-items: center; }
+  input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  input[type="color"] {
+    width: 44px; height: 34px; padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px; background: var(--bg); cursor: pointer;
+  }
+  .val { font-size: 13px; color: var(--muted); min-width: 44px; text-align: right; }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    width: 100%;
+    font-weight: 600;
+  }
+  button.primary:hover { background: var(--accent-hover); }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .seg { display: flex; gap: 6px; }
+  .seg button { flex: 1; }
+  .seg button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .seg button.active:hover { background: var(--accent-hover); }
+  .stage { flex: 1; min-width: 320px; }
+  .gridwrap {
+    max-width: 640px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .grid {
+    display: grid;
+    gap: 6px;
+    background: var(--border);
+    padding: 6px;
+    width: max-content;
+  }
+  .stage-actions { max-width: 640px; margin-top: 12px; }
+  .cell {
+    position: relative;
+    background: var(--panel);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    min-height: 40px;
+  }
+  .cell.filled { cursor: grab; touch-action: none; }
+  .cell.filled.dragging { cursor: grabbing; }
+  /* Simple mode: fit the whole image, no cropping or transforms. */
+  .cell.simple { cursor: pointer; touch-action: auto; }
+  .cell.simple img { object-fit: contain; transform: none !important; }
+  .cell.simple.filled { cursor: grab; touch-action: none; }
+  .cell.simple.filled.dragging { cursor: grabbing; opacity: 0.5; }
+  .cell.drop-target { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cell.base { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cell span {
+    color: var(--muted);
+    font-size: 13px;
+    pointer-events: none;
+    padding: 8px;
+    text-align: center;
+  }
+  .cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: center;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  .cell .tools {
+    position: absolute;
+    top: 4px; right: 4px;
+    display: none;
+    gap: 4px;
+  }
+  .cell:hover .tools { display: flex; }
+  /* Touch devices have no hover — keep the tools visible. */
+  @media (hover: none) {
+    .cell.filled .tools { display: flex; }
+  }
+  .cell .tools button {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    touch-action: manipulation;
+  }
+  .cell .tools button:hover { background: rgba(0,0,0,0.85); }
+  .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; }
+
+  @media (max-width: 720px) {
+    header { padding: 14px 16px; }
+    header p { display: none; }
+    .layout { flex-direction: column; padding: 16px; gap: 16px; }
+    /* Grid first, settings below it. */
+    .stage { order: -1; min-width: 0; width: 100%; }
+    .controls { width: 100%; }
+    .gridwrap { max-width: 100%; }
+    .stage-actions { max-width: 100%; }
+    footer { padding: 0 16px 24px; }
+    /* Bigger touch targets. */
+    .cell .tools button { width: 30px; height: 30px; font-size: 16px; }
+    input[type="number"] { padding: 10px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Collage Maker</h1>
+  <p>Choose a grid, drop in images, and export a single combined image — all in your browser.</p>
+</header>
+
+<div class="layout">
+  <aside class="controls" id="controls">
+    <h2>Mode</h2>
+    <div class="field">
+      <div class="seg">
+        <button id="modeSimple" class="active">Simple</button>
+        <button id="modeAdvanced">Advanced</button>
+      </div>
+    </div>
+
+    <h2>Grid</h2>
+    <div class="field">
+      <label>Columns</label>
+      <input type="number" id="cols" min="1" max="10" value="2">
+    </div>
+    <div class="field">
+      <label>Rows</label>
+      <input type="number" id="rows" min="1" max="10" value="2">
+    </div>
+
+    <h2>Style</h2>
+    <div class="field">
+      <label>Gap: <span id="gapVal">0</span> px</label>
+      <input type="range" id="gap" min="0" max="60" value="0">
+    </div>
+    <div class="field">
+      <label>Output width: <span id="widthVal">1200</span> px</label>
+      <input type="range" id="outWidth" min="400" max="4000" step="100" value="1200">
+    </div>
+    <div class="field">
+      <label>Background</label>
+      <div class="row">
+        <input type="color" id="bgColor" value="#000000">
+        <span class="val" id="bgVal">#000000</span>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:0">
+      <button id="clear" style="width:100%">Clear all</button>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="gridwrap"><div class="grid" id="grid"></div></div>
+    <div class="stage-actions">
+      <button class="primary" id="download" disabled>Download</button>
+    </div>
+  </main>
+</div>
+
+<footer>No uploads — everything runs locally on this page.</footer>
+
+<input type="file" id="filePicker" accept="image/*" style="display:none">
+
+<script>
+(function () {
+  const grid = document.getElementById('grid');
+  const gridwrap = document.querySelector('.gridwrap');
+  const colsInput = document.getElementById('cols');
+  const rowsInput = document.getElementById('rows');
+  const gapInput = document.getElementById('gap');
+  const gapVal = document.getElementById('gapVal');
+  const outWidth = document.getElementById('outWidth');
+  const widthVal = document.getElementById('widthVal');
+  const bgColor = document.getElementById('bgColor');
+  const bgVal = document.getElementById('bgVal');
+  const downloadBtn = document.getElementById('download');
+  const clearBtn = document.getElementById('clear');
+  const filePicker = document.getElementById('filePicker');
+  const modeSimpleBtn = document.getElementById('modeSimple');
+  const modeAdvancedBtn = document.getElementById('modeAdvanced');
+
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 5;
+
+  // Each cell holds null or { img, zoom, offsetX, offsetY }.
+  // offsetX/offsetY are pan expressed as a fraction of the cell's size.
+  let cells = [];
+  let activeCell = -1;
+  // Once the user drags the output-width slider, stop auto-defaulting it.
+  let userSetWidth = false;
+  let simpleMode = true;
+  // The cell data chosen as the base; null means auto (largest image).
+  let baseData = null;
+
+  // The largest source image (by pixel area).
+  function largestImage() {
+    let best = null, bestArea = 0;
+    for (const c of cells) {
+      if (!c) continue;
+      const area = c.img.naturalWidth * c.img.naturalHeight;
+      if (area > bestArea) { bestArea = area; best = c.img; }
+    }
+    return best;
+  }
+
+  // The image that drives the grid shape/size in simple mode:
+  // the user-chosen base if it still exists, otherwise the largest.
+  function baseImage() {
+    if (baseData && cells.indexOf(baseData) !== -1) return baseData.img;
+    return largestImage();
+  }
+
+  // Cell shape: square in advanced mode, base image's ratio in simple mode.
+  function currentAspect() {
+    if (!simpleMode) return 1;
+    const img = baseImage();
+    return img ? img.naturalWidth / img.naturalHeight : 1;
+  }
+
+  function clampInt(input) {
+    let v = parseInt(input.value, 10);
+    if (isNaN(v)) v = parseInt(input.min, 10);
+    v = Math.max(+input.min, Math.min(+input.max, v));
+    input.value = v;
+    return v;
+  }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function applyTransform(imgEl, data) {
+    imgEl.style.transform =
+      'translate(' + (data.offsetX * 100) + '%, ' + (data.offsetY * 100) + '%) ' +
+      'scale(' + data.zoom + ')';
+  }
+
+  function buildGrid() {
+    const cols = clampInt(colsInput);
+    const rows = clampInt(rowsInput);
+    const count = cols * rows;
+
+    const next = new Array(count).fill(null);
+    for (let i = 0; i < count && i < cells.length; i++) next[i] = cells[i];
+    cells = next;
+
+    const gapPx = parseInt(gapInput.value, 10);
+    grid.style.gap = gapPx + 'px';
+    grid.style.padding = gapPx + 'px';
+    grid.style.background = bgColor.value;
+
+    // Fit cells to the available width, but never below MIN_CELL — past that the
+    // grid grows beyond the wrapper and scrolls sideways instead of shrinking.
+    const MIN_CELL = 180;
+    const aspect = currentAspect();
+    const avail = (gridwrap.clientWidth || 640) - gapPx * (cols + 1);
+    let cellW = Math.floor(avail / cols);
+    if (!isFinite(cellW) || cellW < MIN_CELL) cellW = MIN_CELL;
+    // Keep a usable height too: widen landscape cells so the height stays >= MIN_CELL.
+    if (simpleMode && cellW / aspect < MIN_CELL) cellW = Math.ceil(MIN_CELL * aspect);
+
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
+    if (simpleMode) {
+      grid.style.gridTemplateRows = '';
+    } else {
+      grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + cellW + 'px)';
+    }
+
+    grid.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      grid.appendChild(makeCell(i, aspect));
+    }
+    updateDefaultWidth();
+    updateDownloadState();
+  }
+
+  // Default the output width to the widest source image times the column count.
+  function updateDefaultWidth() {
+    if (userSetWidth) return;
+    const cols = clampInt(colsInput);
+    let baseW = 0;
+    if (simpleMode) {
+      const img = baseImage();
+      if (img) baseW = img.naturalWidth;
+    } else {
+      for (const c of cells) {
+        if (c && c.img.naturalWidth > baseW) baseW = c.img.naturalWidth;
+      }
+    }
+    if (!baseW) return;
+    const target = baseW * cols;
+    if (target > +outWidth.max) outWidth.max = target;
+    outWidth.value = target;
+    widthVal.textContent = target;
+  }
+
+  function makeCell(i, aspect) {
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (simpleMode ? ' simple' : '');
+    cell.dataset.index = i;
+    if (simpleMode) cell.style.aspectRatio = String(aspect);
+    const data = cells[i];
+
+    if (data) {
+      cell.classList.add('filled');
+      if (simpleMode && data === baseData) cell.classList.add('base');
+      const img = document.createElement('img');
+      img.src = data.img.src;
+      if (!simpleMode) applyTransform(img, data);
+      cell.appendChild(img);
+
+      const tools = document.createElement('div');
+      tools.className = 'tools';
+
+      const base = document.createElement('button');
+      base.textContent = data === baseData ? '★' : '☆';
+      base.title = 'Use as base size';
+      base.addEventListener('click', function (e) {
+        e.stopPropagation();
+        baseData = (baseData === data) ? null : data;
+        buildGrid();
+      });
+
+      const reset = document.createElement('button');
+      reset.textContent = '⤴';
+      reset.title = 'Reset position & zoom';
+      reset.addEventListener('click', function (e) {
+        e.stopPropagation();
+        data.zoom = 1; data.offsetX = 0; data.offsetY = 0;
+        applyTransform(img, data);
+      });
+
+      const replace = document.createElement('button');
+      replace.textContent = '⟳';
+      replace.title = 'Replace image';
+      replace.addEventListener('click', function (e) {
+        e.stopPropagation();
+        activeCell = i;
+        filePicker.click();
+      });
+
+      const rm = document.createElement('button');
+      rm.textContent = '×';
+      rm.title = 'Remove';
+      rm.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (cells[i] === baseData) baseData = null;
+        cells[i] = null;
+        buildGrid();
+      });
+
+      if (simpleMode) tools.appendChild(base);
+      if (!simpleMode) tools.appendChild(reset);
+      tools.appendChild(replace);
+      tools.appendChild(rm);
+      cell.appendChild(tools);
+
+      if (!simpleMode) {
+        enablePanZoom(cell, img, i);
+        cell.addEventListener('dblclick', function () {
+          data.zoom = 1; data.offsetX = 0; data.offsetY = 0;
+          applyTransform(img, data);
+        });
+      } else {
+        enableReorder(cell, i);
+      }
+    } else {
+      const span = document.createElement('span');
+      span.textContent = '+ Add image';
+      cell.appendChild(span);
+      cell.addEventListener('click', function () {
+        activeCell = i;
+        filePicker.click();
+      });
+    }
+    return cell;
+  }
+
+  function enablePanZoom(cell, img, i) {
+    // Track active pointers so one finger pans and two fingers pinch-zoom.
+    const pointers = new Map();
+    let prevDist = 0, prevMidX = 0, prevMidY = 0;
+
+    function twoPointerState() {
+      const pts = [...pointers.values()];
+      return {
+        dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
+        midX: (pts[0].x + pts[1].x) / 2,
+        midY: (pts[0].y + pts[1].y) / 2
+      };
+    }
+
+    cell.addEventListener('pointerdown', function (e) {
+      const data = cells[i];
+      if (!data) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      cell.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      cell.classList.add('dragging');
+      if (pointers.size === 2) {
+        const s = twoPointerState();
+        prevDist = s.dist; prevMidX = s.midX; prevMidY = s.midY;
+      }
+    });
+
+    cell.addEventListener('pointermove', function (e) {
+      const data = cells[i];
+      if (!data || !pointers.has(e.pointerId)) return;
+      const rect = cell.getBoundingClientRect();
+      const p = pointers.get(e.pointerId);
+
+      if (pointers.size === 1) {
+        data.offsetX += (e.clientX - p.x) / rect.width;
+        data.offsetY += (e.clientY - p.y) / rect.height;
+        p.x = e.clientX; p.y = e.clientY;
+        applyTransform(img, data);
+      } else if (pointers.size >= 2) {
+        p.x = e.clientX; p.y = e.clientY;
+        const s = twoPointerState();
+        if (prevDist > 0) {
+          data.zoom = clamp(data.zoom * (s.dist / prevDist), MIN_ZOOM, MAX_ZOOM);
+          data.offsetX += (s.midX - prevMidX) / rect.width;
+          data.offsetY += (s.midY - prevMidY) / rect.height;
+          applyTransform(img, data);
+        }
+        prevDist = s.dist; prevMidX = s.midX; prevMidY = s.midY;
+      }
+    });
+
+    function endPointer(e) {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.delete(e.pointerId);
+      if (pointers.size < 2) prevDist = 0;
+      if (pointers.size === 0) cell.classList.remove('dragging');
+      try { cell.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    cell.addEventListener('pointerup', endPointer);
+    cell.addEventListener('pointercancel', endPointer);
+
+    cell.addEventListener('wheel', function (e) {
+      const data = cells[i];
+      if (!data) return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+      data.zoom = clamp(data.zoom * factor, MIN_ZOOM, MAX_ZOOM);
+      applyTransform(img, data);
+    }, { passive: false });
+  }
+
+  // Simple mode: drag a filled cell onto another cell to swap their images.
+  function enableReorder(cell, i) {
+    let pointerId = null, startX = 0, startY = 0, dragging = false;
+
+    function highlight(clientX, clientY) {
+      const el = document.elementFromPoint(clientX, clientY);
+      const target = el && el.closest('.cell');
+      grid.querySelectorAll('.cell.drop-target').forEach(function (c) {
+        if (c !== target) c.classList.remove('drop-target');
+      });
+      if (target && target !== cell) target.classList.add('drop-target');
+      return target;
+    }
+
+    cell.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pointerId = e.pointerId;
+      startX = e.clientX; startY = e.clientY;
+      dragging = false;
+    });
+
+    cell.addEventListener('pointermove', function (e) {
+      if (pointerId !== e.pointerId) return;
+      if (!dragging) {
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) < 8) return;
+        dragging = true;
+        cell.classList.add('dragging');
+        cell.setPointerCapture(e.pointerId);
+      }
+      highlight(e.clientX, e.clientY);
+    });
+
+    function finish(e) {
+      if (pointerId !== e.pointerId) return;
+      pointerId = null;
+      if (dragging) {
+        const target = highlight(e.clientX, e.clientY);
+        grid.querySelectorAll('.cell.drop-target').forEach(function (c) {
+          c.classList.remove('drop-target');
+        });
+        if (target && target !== cell) {
+          const j = parseInt(target.dataset.index, 10);
+          if (!isNaN(j) && j !== i) {
+            const tmp = cells[i]; cells[i] = cells[j]; cells[j] = tmp;
+            buildGrid();
+            return;
+          }
+        }
+      }
+      cell.classList.remove('dragging');
+    }
+    cell.addEventListener('pointerup', finish);
+    cell.addEventListener('pointercancel', finish);
+  }
+
+  function updateDownloadState() {
+    downloadBtn.disabled = !cells.some(Boolean);
+  }
+
+  filePicker.addEventListener('change', function () {
+    const file = filePicker.files && filePicker.files[0];
+    filePicker.value = '';
+    if (!file || activeCell < 0) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        cells[activeCell] = { img: img, zoom: 1, offsetX: 0, offsetY: 0 };
+        buildGrid();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function renderCanvas() {
+    const cols = clampInt(colsInput);
+    const rows = clampInt(rowsInput);
+    const gap = parseInt(gapInput.value, 10);
+    const totalW = parseInt(outWidth.value, 10);
+
+    const cellW = (totalW - gap * (cols + 1)) / cols;
+    const cellH = simpleMode ? cellW / currentAspect() : cellW;
+    const totalH = cellH * rows + gap * (rows + 1);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(totalW);
+    canvas.height = Math.round(totalH);
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = bgColor.value;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c;
+        const data = cells[idx];
+        if (!data) continue;
+        const cellX = gap + c * (cellW + gap);
+        const cellY = gap + r * (cellH + gap);
+        drawCell(ctx, data, cellX, cellY, cellW, cellH);
+      }
+    }
+    return canvas;
+  }
+
+  function drawCell(ctx, data, cellX, cellY, cellW, cellH) {
+    const img = data.img;
+    let finalW, finalH, dx, dy;
+
+    if (simpleMode) {
+      // object-fit: contain — whole image fits within the cell, centered.
+      const scale = Math.min(cellW / img.width, cellH / img.height);
+      finalW = img.width * scale;
+      finalH = img.height * scale;
+      dx = cellX + (cellW - finalW) / 2;
+      dy = cellY + (cellH - finalH) / 2;
+    } else {
+      // object-fit: cover, then translate (fraction of cell) + scale about center.
+      const coverScale = Math.max(cellW / img.width, cellH / img.height);
+      finalW = img.width * coverScale * data.zoom;
+      finalH = img.height * coverScale * data.zoom;
+      const centerX = cellX + cellW / 2 + data.offsetX * cellW;
+      const centerY = cellY + cellH / 2 + data.offsetY * cellH;
+      dx = centerX - finalW / 2;
+      dy = centerY - finalH / 2;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cellX, cellY, cellW, cellH);
+    ctx.clip();
+    ctx.drawImage(img, dx, dy, finalW, finalH);
+    ctx.restore();
+  }
+
+  downloadBtn.addEventListener('click', function () {
+    const canvas = renderCanvas();
+    canvas.toBlob(function (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'collage.png';
+      a.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  });
+
+  clearBtn.addEventListener('click', function () {
+    cells = cells.map(function () { return null; });
+    baseData = null;
+    buildGrid();
+  });
+
+  function setMode(simple) {
+    simpleMode = simple;
+    modeSimpleBtn.classList.toggle('active', simple);
+    modeAdvancedBtn.classList.toggle('active', !simple);
+    buildGrid();
+  }
+  modeSimpleBtn.addEventListener('click', function () { setMode(true); });
+  modeAdvancedBtn.addEventListener('click', function () { setMode(false); });
+
+  window.addEventListener('resize', buildGrid);
+
+  colsInput.addEventListener('change', buildGrid);
+  rowsInput.addEventListener('change', buildGrid);
+  gapInput.addEventListener('input', function () {
+    gapVal.textContent = gapInput.value;
+    buildGrid();
+  });
+  outWidth.addEventListener('input', function () {
+    userSetWidth = true;
+    widthVal.textContent = outWidth.value;
+  });
+  bgColor.addEventListener('input', function () {
+    bgVal.textContent = bgColor.value;
+    grid.style.background = bgColor.value;
+  });
+
+  setMode(true);
+})();
+</script>
+</body>
+</html>
