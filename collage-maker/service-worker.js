@@ -1,4 +1,4 @@
-const CACHE = 'collage-maker-v2';
+const CACHE = 'collage-maker-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -27,16 +27,38 @@ self.addEventListener('message', function (e) {
   if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// Cache-first: the app is fully static, so serve from cache and fall back to
-// the network (updating the cache) when something isn't stored yet.
 self.addEventListener('fetch', function (e) {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(e.request).then(function (res) {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+
+  const accept = req.headers.get('accept') || '';
+  const isPage = req.mode === 'navigate' || accept.indexOf('text/html') !== -1;
+
+  if (isPage) {
+    // Network-first for the page itself, so an online visit always gets the
+    // latest version; fall back to cache when offline.
+    e.respondWith(
+      fetch(req).then(function (res) {
         const copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
+        caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        return res;
+      }).catch(function () {
+        return caches.match(req).then(function (m) {
+          return m || caches.match('./index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  // Cache-first for static assets (icons, manifest); update the cache in the
+  // background when something isn't stored yet.
+  e.respondWith(
+    caches.match(req).then(function (cached) {
+      if (cached) return cached;
+      return fetch(req).then(function (res) {
+        const copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put(req, copy); });
         return res;
       }).catch(function () { return cached; });
     })
