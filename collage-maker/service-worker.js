@@ -1,4 +1,4 @@
-const CACHE = 'collage-maker-v1';
+const CACHE = 'collage-maker-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,6 @@ const ASSETS = [
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }));
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', function (e) {
@@ -19,9 +18,13 @@ self.addEventListener('activate', function (e) {
       return Promise.all(keys.map(function (k) {
         if (k !== CACHE) return caches.delete(k);
       }));
-    })
+    }).then(function () { return self.clients.claim(); })
   );
-  self.clients.claim();
+});
+
+// The page posts this once the user accepts an update.
+self.addEventListener('message', function (e) {
+  if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Cache-first: the app is fully static, so serve from cache and fall back to

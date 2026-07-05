@@ -141,7 +141,8 @@
   /* Simple mode: fit the whole image, no cropping or transforms. */
   .cell.simple { cursor: pointer; touch-action: auto; }
   .cell.simple img { object-fit: contain; transform: none !important; }
-  .cell.simple.filled { cursor: grab; touch-action: none; }
+  /* Allow the grid to scroll on touch; reordering starts on a long-press. */
+  .cell.simple.filled { cursor: grab; touch-action: pan-x pan-y; }
   .cell.simple.filled.dragging { cursor: grabbing; opacity: 0.5; }
   .cell.drop-target { outline: 2px solid var(--accent); outline-offset: -2px; }
   .cell.base { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -189,7 +190,31 @@
   }
   .cell .tools button:hover { background: rgba(0,0,0,0.85); }
   .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
-  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; }
+  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; line-height: 1.7; }
+  .update-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px 10px 16px;
+    font-size: 14px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    z-index: 50;
+  }
+  .update-bar button {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 14px;
+  }
+  .update-bar button:hover { background: var(--accent-hover); }
 
   @media (max-width: 720px) {
     header { padding: 14px 16px; }
@@ -263,7 +288,10 @@
   </main>
 </div>
 
-<footer>No uploads — everything runs locally on this page.</footer>
+<footer>
+  No uploads — everything runs locally on this page.<br>
+  Programmed with vibe by tybantarnusa ft. Claude
+</footer>
 
 <input type="file" id="filePicker" accept="image/*" style="display:none">
 
@@ -297,6 +325,13 @@
   let simpleMode = true;
   // The cell data chosen as the base; null means auto (largest image).
   let baseData = null;
+  // True only while a long-press reorder drag is in progress.
+  let reordering = false;
+
+  // Suppress the browser's touch scroll while a reorder drag is active.
+  document.addEventListener('touchmove', function (e) {
+    if (reordering) e.preventDefault();
+  }, { passive: false });
 
   // The largest source image (by pixel area).
   function largestImage() {
@@ -551,9 +586,17 @@
     }, { passive: false });
   }
 
-  // Simple mode: drag a filled cell onto another cell to swap their images.
+  function clearDropTargets() {
+    grid.querySelectorAll('.cell.drop-target').forEach(function (c) {
+      c.classList.remove('drop-target');
+    });
+  }
+
+  // Simple mode: long-press a filled cell (or just drag with a mouse), then drop
+  // it onto another cell to swap. A plain touch-drag scrolls the grid instead.
   function enableReorder(cell, i) {
-    let pointerId = null, startX = 0, startY = 0, dragging = false;
+    let pointerId = null, startX = 0, startY = 0;
+    let dragging = false, pressTimer = null, curX = 0, curY = 0, raf = null;
 
     function highlight(clientX, clientY) {
       const el = document.elementFromPoint(clientX, clientY);
@@ -565,40 +608,71 @@
       return target;
     }
 
+    // While dragging near a horizontal edge, keep scrolling so off-screen
+    // columns can be reached.
+    function autoScroll() {
+      if (!dragging) { raf = null; return; }
+      const r = gridwrap.getBoundingClientRect();
+      const edge = 48;
+      if (curX < r.left + edge) gridwrap.scrollLeft -= 12;
+      else if (curX > r.right - edge) gridwrap.scrollLeft += 12;
+      raf = requestAnimationFrame(autoScroll);
+    }
+
+    function beginDrag(e) {
+      dragging = true;
+      reordering = true;
+      cell.classList.add('dragging');
+      try { cell.setPointerCapture(e.pointerId); } catch (_) {}
+      if (navigator.vibrate) navigator.vibrate(15);
+      curX = e.clientX; curY = e.clientY;
+      if (!raf) raf = requestAnimationFrame(autoScroll);
+    }
+
+    function cancelPress() {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    }
+
     cell.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       pointerId = e.pointerId;
-      startX = e.clientX; startY = e.clientY;
+      startX = curX = e.clientX; startY = curY = e.clientY;
       dragging = false;
+      if (e.pointerType !== 'mouse') {
+        pressTimer = setTimeout(function () { pressTimer = null; beginDrag(e); }, 300);
+      }
     });
 
     cell.addEventListener('pointermove', function (e) {
       if (pointerId !== e.pointerId) return;
-      if (!dragging) {
-        if (Math.hypot(e.clientX - startX, e.clientY - startY) < 8) return;
-        dragging = true;
-        cell.classList.add('dragging');
-        cell.setPointerCapture(e.pointerId);
+      curX = e.clientX; curY = e.clientY;
+      if (dragging) { highlight(e.clientX, e.clientY); return; }
+      const moved = Math.hypot(e.clientX - startX, e.clientY - startY);
+      if (e.pointerType === 'mouse') {
+        if (moved > 6 && (e.buttons & 1)) beginDrag(e);
+      } else if (pressTimer && moved > 10) {
+        cancelPress();
       }
-      highlight(e.clientX, e.clientY);
     });
 
     function finish(e) {
       if (pointerId !== e.pointerId) return;
       pointerId = null;
+      cancelPress();
       if (dragging) {
         const target = highlight(e.clientX, e.clientY);
-        grid.querySelectorAll('.cell.drop-target').forEach(function (c) {
-          c.classList.remove('drop-target');
-        });
+        clearDropTargets();
+        dragging = false;
+        reordering = false;
+        cell.classList.remove('dragging');
         if (target && target !== cell) {
           const j = parseInt(target.dataset.index, 10);
           if (!isNaN(j) && j !== i) {
             const tmp = cells[i]; cells[i] = cells[j]; cells[j] = tmp;
             buildGrid();
-            return;
           }
         }
+        return;
       }
       cell.classList.remove('dragging');
     }
@@ -736,8 +810,42 @@
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('service-worker.js').catch(function () {});
+    navigator.serviceWorker.register('service-worker.js').then(function (reg) {
+      function offerUpdate(worker) {
+        showUpdateBar(function () { worker.postMessage('SKIP_WAITING'); });
+      }
+      if (reg.waiting && navigator.serviceWorker.controller) offerUpdate(reg.waiting);
+      reg.addEventListener('updatefound', function () {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function () {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) offerUpdate(nw);
+        });
+      });
+    }).catch(function () {});
+
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
   });
+}
+
+function showUpdateBar(onReload) {
+  if (document.getElementById('updateBar')) return;
+  const bar = document.createElement('div');
+  bar.id = 'updateBar';
+  bar.className = 'update-bar';
+  const label = document.createElement('span');
+  label.textContent = 'A new version is available.';
+  const btn = document.createElement('button');
+  btn.textContent = 'Reload';
+  btn.addEventListener('click', function () { btn.disabled = true; onReload(); });
+  bar.appendChild(label);
+  bar.appendChild(btn);
+  document.body.appendChild(bar);
 }
 </script>
 </body>
