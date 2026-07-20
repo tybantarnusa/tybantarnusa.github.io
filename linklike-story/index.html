@@ -29,10 +29,10 @@
       flex-direction: column;
       align-items: center;
       padding: 18px 24px;
+      overflow-x: hidden;   /* never let the page scroll horizontally on phones */
     }
 
     .wrap { width: 100%; max-width: 960px; }
-
     h1 {
       font-size: 44px;
       margin: 0 0 4px;
@@ -56,7 +56,9 @@
     /* Compact header + less scroll on small screens (phones) */
     @media (max-width: 600px) {
       body { padding: 2px 0; }
-      .wrap { max-width: none; }
+      .wrap { max-width: none; min-width: 0; overflow-x: hidden; }
+      .episode-row { width: 100%; max-width: 100%; overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch; }
       h1 { font-size: 48px; padding-left: 14px; }
       .subtitle { margin: 0 0 20px; font-size: 13px; padding-left: 14px; }
       /* episode view: back-btn & headings all share the 14px edge (no double inset) */
@@ -89,8 +91,7 @@
     }
     .menu-item:hover .num,
     .menu-item:hover .label { color: #fff; }
-    .menu-item .num { font-size: 28px; font-weight: 700; color: var(--accent-deep); }
-    .menu-item .num.num-text { font-size: 19px; line-height: 1.15; }
+    .menu-item .num { font-size: 28px; font-weight: 700; color: var(--accent-deep); white-space: normal; line-height: 1.1; }
     .menu-item .label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 
     /* Views */
@@ -124,12 +125,14 @@
       display: flex; flex-wrap: nowrap; gap: 16px;
       width: 100%;
       overflow-x: auto; padding-bottom: 12px;
-      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      -webkit-overflow-scrolling: touch;
       touch-action: pan-x;   /* let horizontal swipe scroll the row on phones */
     }
-    .episode-row::-webkit-scrollbar { height: 8px; }
-    .episode-row::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-    .episode-row::-webkit-scrollbar-track { background: var(--border); border-radius: 4px; }
+    .episode-row::-webkit-scrollbar { display: none; }  /* use custom draggable bar below (works on mobile) */
+    .ep-scrollbar { position: relative; height: 9px; margin: 4px 2px 2px; background: var(--border); border-radius: 5px; }
+    .ep-scrollbar-thumb { position: absolute; top: 0; left: 0; height: 100%; min-width: 28px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong)); border-radius: 5px;
+      touch-action: none; }
 
     .episode-card {
       position: relative;
@@ -139,7 +142,6 @@
       border-radius: 14px;
       overflow: hidden;
       cursor: pointer;
-      scroll-snap-align: start;
       border: 1px solid var(--border);
       transition: transform .15s ease, box-shadow .15s ease;
       user-select: none;
@@ -247,7 +249,7 @@
       <div class="menu-item" onclick="bukaPlaylist('103')"><div class="num">103</div><div class="label">Term</div></div>
       <div class="menu-item" onclick="bukaPlaylist('104')"><div class="num">104</div><div class="label">Term</div></div>
       <div class="menu-item" onclick="bukaPlaylist('105')"><div class="num">105</div><div class="label">Term</div></div>
-      <div class="menu-item" onclick="bukaPlaylist('dream')"><div class="num num-text">Dream Interlude</div><div class="label">2 videos</div></div>
+      <div class="menu-item" onclick="bukaPlaylist('dream')"><div class="num">Dream Interlude</div><div class="label"></div></div>
     </div>
 
     <!-- Episode list (sideways) -->
@@ -291,8 +293,8 @@
         { "id": "7jAK9XZnUW0", "title": "103rd Term Episode 1 \"I Want to Bloom!\"" },
         { "id": "zyfMgI6nLgw", "title": "103rd Term Episode 2 \"No Good⇒World’s Best!?\"" },
         { "id": "JZ_haZN6-GI", "title": "103rd Term Episode 3 \"Rain, Wind, and Sun\"" },
-        { "id": "53YXoZPU33Q", "type": "fes", "title": "103期 4月度 Fes×LIVE" },
         { "id": "zeBVo4StRiE", "title": "103rd Term Episode 4 \"My School Idol\"" },
+        { "id": "53YXoZPU33Q", "type": "fes", "title": "103期 4月度 Fes×LIVE" },
         { "id": "_7DlIHOD2lY", "title": "103rd Term Episode 5 \"Head up\"" },
         { "id": "935krFf2bBk", "title": "103rd Term Episode 6 \"Selfish on the ICE!!\"" },
         { "id": "FELdrefWAZk", "type": "fes", "title": "103期 5月度 Fes×LIVE" },
@@ -389,7 +391,7 @@
       }
 
       hint.textContent = (currentVideos.filter(v => v.type !== 'fes').length) + ' episode' + (currentVideos.filter(v => v.type !== 'fes').length > 1 ? 's' : '');
-      content.innerHTML = '<div class="episode-row"></div>';
+      content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
         const isFes = (v.type === 'fes');
@@ -456,6 +458,60 @@
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
+      });
+
+      // Custom draggable scrollbar (works on touch + mouse)
+      const sb = content.querySelector('.ep-scrollbar');
+      const sbThumb = content.querySelector('.ep-scrollbar-thumb');
+      function syncThumb() {
+        const max = row.scrollWidth - row.clientWidth;
+        const ratio = max > 0 ? row.scrollLeft / max : 0;
+        const trackW = sb.clientWidth - sbThumb.offsetWidth;
+        sbThumb.style.left = (ratio * trackW) + 'px';
+      }
+      function sizeThumb() {
+        const max = row.scrollWidth - row.clientWidth;
+        const w = max > 0 ? Math.max(28, row.clientWidth / row.scrollWidth * sb.clientWidth) : sb.clientWidth;
+        sbThumb.style.width = w + 'px';
+        syncThumb();
+      }
+      row.addEventListener('scroll', syncThumb, { passive: true });
+      // PC: let the mouse wheel scroll the row horizontally (falls through to page at the edges)
+      row.addEventListener('wheel', (e) => {
+        const max = row.scrollWidth - row.clientWidth;
+        if (max <= 0) return;
+        const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        const atStart = row.scrollLeft <= 0;
+        const atEnd = row.scrollLeft >= max - 1;
+        if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return;
+        e.preventDefault();
+        row.scrollLeft += delta;
+      }, { passive: false });
+      window.addEventListener('resize', sizeThumb);
+      requestAnimationFrame(sizeThumb);
+
+      let dragging = false, startX = 0, startLeft = 0;
+      function thumbToScroll(clientX) {
+        const max = row.scrollWidth - row.clientWidth;
+        const trackW = sb.clientWidth - sbThumb.offsetWidth;
+        const x = clientX - sb.getBoundingClientRect().left - sbThumb.offsetWidth / 2;
+        const ratio = trackW > 0 ? Math.min(1, Math.max(0, x / trackW)) : 0;
+        row.scrollLeft = ratio * max;
+      }
+      sbThumb.addEventListener('pointerdown', (e) => {
+        dragging = true; startX = e.clientX; startLeft = sbThumb.offsetLeft;
+        sbThumb.setPointerCapture(e.pointerId); e.preventDefault();
+      });
+      sbThumb.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        thumbToScroll(e.clientX);
+      });
+      sbThumb.addEventListener('pointerup', (e) => { dragging = false; });
+      sbThumb.addEventListener('pointercancel', () => { dragging = false; });
+      // tap/click anywhere on the track jumps there
+      sb.addEventListener('pointerdown', (e) => {
+        if (e.target === sbThumb) return;
+        thumbToScroll(e.clientX);
       });
     }
 
