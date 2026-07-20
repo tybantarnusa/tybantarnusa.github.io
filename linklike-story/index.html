@@ -34,7 +34,7 @@
 
     .wrap { width: 100%; max-width: 960px; }
     h1 {
-      font-size: 44px;
+      font-size: 30px;
       margin: 0 0 4px;
       letter-spacing: 0.5px;
       font-weight: 800;
@@ -46,21 +46,37 @@
       color: #4f93d6; /* fallback if gradient unsupported */
       filter: drop-shadow(0 1px 2px rgba(40,70,130,.18));
     }
+    /* Header band: dark blue->purple gradient so the title sits on a distinct background */
+    .site-header {
+      background: linear-gradient(90deg, #4f93d6, #6d4fc4);
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 36px;
+      box-shadow: 0 6px 20px rgba(79,147,214,.25);
+    }
+    .site-header h1 {
+      background: none; -webkit-text-fill-color: #fff; color: #fff;
+      -webkit-background-clip: border-box; background-clip: border-box;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.18));
+    }
+    .site-header .subtitle { color: rgba(255,255,255,.85); margin: 0; }
 
     .subtitle {
-      color: var(--muted);
-      margin: 0 0 40px;
-      font-size: 14px;
+      color: var(--accent-deep);
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: .3px;
     }
 
     /* Compact header + less scroll on small screens (phones) */
     @media (max-width: 600px) {
-      body { padding: 2px 0; }
+      body { padding: 0 0 24px; }
       .wrap { max-width: none; min-width: 0; overflow-x: hidden; }
       .episode-row { width: 100%; max-width: 100%; overscroll-behavior-x: contain;
         -webkit-overflow-scrolling: touch; }
-      h1 { font-size: 48px; padding-left: 14px; }
-      .subtitle { margin: 0 0 20px; font-size: 13px; padding-left: 14px; }
+      h1 { font-size: 26px; padding-left: 0; }
+      .subtitle { margin: 0 0 12px; font-size: 18px; padding-left: 0; font-weight: 500; }
       /* episode view: back-btn & headings all share the 14px edge (no double inset) */
       #episode-view { padding-left: 14px; padding-right: 14px; }
       .back-btn { margin-bottom: 14px; margin-left: 0; margin-right: 0; }
@@ -68,6 +84,8 @@
       #player-view .back-btn { margin-left: 14px; margin-right: 14px; }
       .view h2 { font-size: 19px; margin: 0 0 2px; padding-left: 0; }
       .view .hint { margin: 0 0 16px; padding-left: 0; }
+      /* summary box: keep off the screen edges on phones */
+      .summary-box { margin-left: 14px; margin-right: 14px; }
     }
 
     /* Period menu: stacked full-width buttons */
@@ -218,8 +236,14 @@
     .player.archive { background: #0b0b0b; }
     @media (max-width: 600px) {
       .player.drive { min-height: 300px; }
-      .wrap { padding: 32px 0; }
-      .wrap > *:not(.menu) { padding-left: 14px; padding-right: 14px; }  /* keep text off the edge */
+      .wrap { padding: 0; }
+      .wrap > *:not(.menu):not(.site-header) { padding-left: 14px; padding-right: 14px; }  /* keep text off the edge */
+      /* header band pinned to the very top, edge-to-edge on phones */
+      .site-header {
+        position: sticky; top: 0; z-index: 20;
+        margin: 0 0 16px; border-radius: 0;
+        padding: 16px 16px;
+      }
       /* but the player itself must touch the screen edges */
       #player-view { padding-left: 0; padding-right: 0; }
       .player, .player.drive, .player.fes, .player.drive.fes { border-radius: 0; }   /* video flush to screen edges */
@@ -233,14 +257,19 @@
     .player-meta .pm-ep { font-size: 16px; font-weight: 700; color: var(--accent-deep); letter-spacing: 1px; }
     .player-meta .pm-name { font-size: 20px; margin-top: 6px; line-height: 1.35; font-weight: 600; }
     .summary-box {
-      margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text);
+      margin-top: 16px; padding: 14px 16px;
+      background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+      border-radius: 12px; font-size: 14px; line-height: 1.55; color: var(--text);
     }
     .summary-box:empty { display: none; }
+    .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Link! Like! Activity Record</h1>
+    <header class="site-header">
+      <h1>Link! Like! Activity Record</h1>
+    </header>
 
     <!-- Period menu -->
     <div class="menu" id="menu">
@@ -565,7 +594,7 @@
       // Episode summary (hosted locally; hidden for Fes×LIVE which has no entry)
       const sumEl = document.getElementById('pm-summary');
       const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
-      sumEl.innerHTML = sumText ? sumText : '';
+      sumEl.innerHTML = sumText ? '<div class="sum-label">SUMMARY</div>' + sumText : '';
       // Fes×LIVE does not count as an episode in the progress counter
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
@@ -580,6 +609,7 @@
       if (ni < 0 || ni >= currentVideos.length) return;
       currentIndex = ni;
       renderPlayer();
+      location.hash = currentPeriod + '/' + currentIndex;
       window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
