@@ -28,16 +28,23 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 48px 24px;
+      padding: 18px 24px;
     }
 
     .wrap { width: 100%; max-width: 960px; }
 
     h1 {
-      font-size: 22px;
+      font-size: 44px;
       margin: 0 0 4px;
       letter-spacing: 0.5px;
-      color: var(--accent-deep);
+      font-weight: 800;
+      font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(90deg, #4f93d6, #6d4fc4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: #4f93d6; /* fallback if gradient unsupported */
+      filter: drop-shadow(0 1px 2px rgba(40,70,130,.18));
     }
 
     .subtitle {
@@ -48,12 +55,17 @@
 
     /* Compact header + less scroll on small screens (phones) */
     @media (max-width: 600px) {
-      body { padding: 20px 14px; }
-      h1 { font-size: 18px; }
-      .subtitle { margin: 0 0 20px; font-size: 13px; }
-      .back-btn { margin-bottom: 14px; }
-      .view h2 { font-size: 19px; margin: 0 0 2px; }
-      .view .hint { margin: 0 0 16px; }
+      body { padding: 2px 0; }
+      .wrap { max-width: none; }
+      h1 { font-size: 48px; padding-left: 14px; }
+      .subtitle { margin: 0 0 20px; font-size: 13px; padding-left: 14px; }
+      /* episode view: back-btn & headings all share the 14px edge (no double inset) */
+      #episode-view { padding-left: 14px; padding-right: 14px; }
+      .back-btn { margin-bottom: 14px; margin-left: 0; margin-right: 0; }
+      /* player view back-btn needs 14px so it lines up with player-top/meta (player-view has no padding) */
+      #player-view .back-btn { margin-left: 14px; margin-right: 14px; }
+      .view h2 { font-size: 19px; margin: 0 0 2px; padding-left: 0; }
+      .view .hint { margin: 0 0 16px; padding-left: 0; }
     }
 
     /* Period menu: stacked full-width buttons */
@@ -85,13 +97,15 @@
     .view { display: none; width: 100%; }
     .view.active { display: block; }
     .menu.active { display: none; }
+    /* Player view must span full width of .wrap (no inset from .wrap > * rule) */
+    #player-view { padding-left: 0; padding-right: 0; }
 
     .back-btn {
       background: linear-gradient(90deg, var(--accent), var(--accent-strong));
       border: 0;
       color: #fff;
-      padding: 9px 18px; border-radius: 10px;
-      cursor: pointer; font-size: 14px; font-weight: 600; margin-bottom: 24px;
+      padding: 6px 14px; border-radius: 9px;
+      cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: 16px;
       transition: filter .15s ease, transform .15s ease;
     }
     .back-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
@@ -108,8 +122,10 @@
     /* Episode row: large cards side by side, scroll sideways when narrow */
     .episode-row {
       display: flex; flex-wrap: nowrap; gap: 16px;
+      width: 100%;
       overflow-x: auto; padding-bottom: 12px;
       scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;   /* let horizontal swipe scroll the row on phones */
     }
     .episode-row::-webkit-scrollbar { height: 8px; }
     .episode-row::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
@@ -160,6 +176,9 @@
       font-size: 17px; margin-top: 7px; line-height: 1.35; font-weight: 600;
       text-shadow: 0 1px 4px rgba(0,0,0,.7);
     }
+    /* Fes×LIVE cards: red outline to stand out from episodes */
+    .episode-card.fes { border: 2px solid #e8546b; box-shadow: 0 0 0 1px rgba(232,84,107,.35); }
+    .episode-card.fes .ec-ep { color: #ff9bac; }
 
     /* Player view */
     .player-top {
@@ -186,15 +205,23 @@
       position: relative; width: 100%; aspect-ratio: 16/9;
       background: #000; border-radius: 14px; overflow: hidden;
     }
+    .player.fes { border: 3px solid #e8546b; box-shadow: 0 0 18px rgba(232,84,107,.45); }
     .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-    /* Drive embeds: keep 16:9 like the video, but a min-height so controls aren't clipped on phones */
-    .player.drive { aspect-ratio: 16/9; min-height: 360px; background: #1a2230; }
+    /* Drive embeds: pure 16:9 so Google's own controls stay proportional (no min-height stretch) */
+    .player.drive { aspect-ratio: 16/9; background: #1a2230; }
+    @media (max-width: 600px) {
+      .player.drive { min-height: 0; }
+    }
+    .player.drive.fes { border: 3px solid #e8546b; }
+    .player.archive { background: #0b0b0b; }
     @media (max-width: 600px) {
       .player.drive { min-height: 300px; }
-      .wrap { padding: 32px 0; }             /* full width on phones */
+      .wrap { padding: 32px 0; }
       .wrap > *:not(.menu) { padding-left: 14px; padding-right: 14px; }  /* keep text off the edge */
-      .player { border-radius: 0; }            /* video flush to screen edges */
-      .player.drive { border-radius: 0; }
+      /* but the player itself must touch the screen edges */
+      #player-view { padding-left: 0; padding-right: 0; }
+      .player, .player.drive, .player.fes, .player.drive.fes { border-radius: 0; }   /* video flush to screen edges */
+      .player-top, .player-meta, .back-btn { padding-left: 14px; padding-right: 14px; }  /* text stays off the very edge */
       h1 { font-size: 18px; padding-left: 14px; }
       .subtitle { padding-left: 14px; }
       .menu-item { margin-left: 14px; margin-right: 14px; }
@@ -203,6 +230,13 @@
     .player-meta { margin-top: 14px; }
     .player-meta .pm-ep { font-size: 16px; font-weight: 700; color: var(--accent-deep); letter-spacing: 1px; }
     .player-meta .pm-name { font-size: 20px; margin-top: 6px; line-height: 1.35; font-weight: 600; }
+    .summary-box {
+      margin-top: 16px; padding: 14px 16px;
+      background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+      border-radius: 12px; font-size: 14px; line-height: 1.55; color: var(--text);
+    }
+    .summary-box:empty { display: none; }
+    .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -240,6 +274,7 @@
         <div class="pm-ep" id="pm-ep"></div>
         <div class="pm-name" id="pm-name"></div>
       </div>
+      <div class="summary-box" id="pm-summary"></div>
     </div>
   </div>
 
@@ -290,18 +325,25 @@
       ],
       "104": [
         { "id": "cbD6ZGkkVMc", "title": "104th Term Episode 1 \"Song to the Future\"" },
+        { "id": "DWhkaktUp8M", "type": "fes", "title": "104期 OPENING! Fes×LIVE" },
         { "id": "O0VBpYABVZI", "title": "104th Term Episode 2 \"Watch me, I'll keep dancing\"" },
         { "id": "7eAiw613yW8", "title": "104th Term Episode 3 \"Ergo Mira-Cra Park!\"" },
         { "id": "iLoBZ9nWn0A", "title": "104th Term Episode 4 \"Beneath the same sky, Then and Now\"" },
         { "id": "Z_VgNraowyg", "title": "104th Term Episode 5 \"Imperfect and Incomplete\"" },
-        { "id": "K9KV85nQdSg", "title": "104th Term Episode 6 \"GLHF!!!\"" },
+        { "id": "Ss2oqfMXW18", "type": "fes", "title": "104期 1st Fes×LIVE TWINKLE STAR FESTIVAL!!" },
+        { "id": "K9KV85nQdSg", "title": "104th Term Episode 6 \"GLHF!!\"" },
         { "id": "XHwlQBfVyHE", "title": "104th Term Episode 7 \"Link to the FRIENDS!\"" },
         { "id": "b2e8jT_jQVA", "title": "104th Term Episode 8 \"Not a marionette\"" },
+        { "id": "eSyV6YuLct4", "type": "fes", "title": "104期 2nd Fes×LIVE AUTUMN LINKED CARNIVAL Part 1" },
+        { "id": "2YAAXyc4M6s", "type": "fes", "title": "104期 2nd Fes×LIVE AUTUMN LINKED CARNIVAL Part 2" },
         { "id": "m_2Ycv8S2go", "title": "104th Term Episode 9 \"Miracle the universe!\"" },
         { "id": "5_j8CzSG6EU", "title": "104th Term Episode 10 \"Believe your love. Believe your live.\"" },
         { "id": "fbwWPaLScsI", "title": "104th Term Episode 11 \"Bloom the Dream\"" },
+        { "id": "tv-Dsxreb0s", "type": "fes", "title": "104期 3rd Fes×LIVE Love Live! Finals Playoff Part 1" },
+        { "id": "w_Uh83sjPRU", "type": "fes", "title": "104期 3rd Fes×LIVE Love Live! Finals Playoff Part 2" },
         { "id": "Pu10BzPHP-M", "title": "104th Term Episode 12 \"A Bouquet for the You of Tomorrow\"" },
-        { "id": "1G0HHa39-OmHP6YWfMku0Nb13mPFAAVuo", "src": "drive", "title": "104th Term Episode 13 \"The Eventual Promised Cherry Blossoms\"" }
+        { "id": "hasu-104-13", "src": "archive", "title": "104th Term Episode 13 \"The Eventual Promised Cherry Blossoms\"" },
+        { "id": "LxTNiRHsB98", "type": "fes", "title": "104期 Final Fes×LIVE Renge Festival -102nd Graduation Live-" }
       ],
       "105": [
         { "id": "-sZHOIWGQGk", "title": "105th Term Episode 1 \"Brand New Stories!!\"" },
@@ -315,7 +357,7 @@
         { "id": "-wV7EAf_MX4", "title": "105th Term Episode 9 \"ALL Link to YOU\"" },
         { "id": "9VDUjJIxfso", "title": "105th Term Episode 10 \"Ergo Ruri.\"" },
         { "id": "6NYeu9IOGdQ", "title": "105th Term Episode 11 \"I want to bloom, with everyone!\"" },
-        { "id": "1whPXj2a_yy-nNjrflbiDjTJ39stSjwjd", "src": "drive", "title": "105th Term Episode 12 \"Our Everblooming Cherry Blossoms\"" }
+        { "id": "hasu-105-12", "src": "archive", "title": "105th Term Episode 12 \"Our Everblooming Cherry Blossoms\"" }
       ],
       "dream": [
         { "id": "VzLRAYU-y2k", "title": "Dream Interlude \"Water the flowers\"" },
@@ -326,6 +368,10 @@
     let currentPeriod = null;
     let currentVideos = [];
     let currentIndex = 0;
+    let summariesData = {};
+
+    // Load episode summaries once (hosted locally — see summaries.json)
+    fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; }).catch(() => { summariesData = {}; });
 
     function bukaPlaylist(kode) {
       currentPeriod = kode;
@@ -345,7 +391,7 @@
         return;
       }
 
-      hint.textContent = currentVideos.length + ' episode' + (currentVideos.length > 1 ? 's' : '');
+      hint.textContent = (currentVideos.filter(v => v.type !== 'fes').length) + ' episode' + (currentVideos.filter(v => v.type !== 'fes').length > 1 ? 's' : '');
       content.innerHTML = '<div class="episode-row"></div>';
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
@@ -384,32 +430,32 @@
           : null;
 
         const card = document.createElement('div');
-        card.className = 'episode-card';
-        if (v.src === 'drive') {
+        card.className = 'episode-card' + (isFes ? ' fes' : '');
+        if (v.src === 'drive' || v.src === 'archive') {
           if (arcThumb) {
             // Drive has no public thumbnail, but we can borrow the HamP story-arc art
             card.innerHTML =
               '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="">' +
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              '<div class="ec-name">' + name + '</div></div>';
+              (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
           } else {
             // No arc art available: styled fallback
             card.classList.add('thumb-fallback');
             card.innerHTML =
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              '<div class="ec-name">' + name + '</div></div>';
+              (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
           }
         } else if (arcThumb) {
           // try HamP art; if it fails to load, fall back to YouTube thumb
           card.innerHTML =
             '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\'">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            '<div class="ec-name">' + name + '</div></div>';
+            (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         } else {
           card.innerHTML =
             '<img class="thumb" loading="lazy" src="' + ytThumb + '" alt="">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            '<div class="ec-name">' + name + '</div></div>';
+            (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
@@ -442,21 +488,31 @@
           .trim();
       }
 
-      let embedSrc, embedAttrs;
+      let embedSrc, embedAttrs, playerKind;
       if (v.src === 'drive') {
         embedSrc = 'https://drive.google.com/file/d/' + v.id + '/preview';
         embedAttrs = 'allow="autoplay; fullscreen" allowfullscreen';
+        playerKind = 'drive';
+      } else if (v.src === 'archive') {
+        embedSrc = 'https://archive.org/embed/' + v.id;
+        embedAttrs = 'allow="autoplay; fullscreen" allowfullscreen webkitallowfullscreen';
+        playerKind = 'archive';
       } else {
         embedSrc = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1';
         embedAttrs = 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen';
+        playerKind = '';
       }
 
-      const playerClass = (v.src === 'drive') ? 'player drive' : 'player';
+      const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
         '" ' + embedAttrs + '></iframe></div>';
       document.getElementById('pm-ep').textContent = isFes ? 'FES×LIVE' : 'EPISODE ' + epNo;
       document.getElementById('pm-name').textContent = name;
+      // Episode summary (hosted locally; hidden for Fes×LIVE which has no entry)
+      const sumEl = document.getElementById('pm-summary');
+      const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
+      sumEl.innerHTML = sumText ? '<div class="sum-label">Summary</div>' + sumText : '';
       // Fes×LIVE does not count as an episode in the progress counter
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
