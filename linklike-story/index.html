@@ -112,6 +112,16 @@
     .menu-item .num { font-size: 28px; font-weight: 700; color: var(--accent-deep); white-space: normal; line-height: 1.1; }
     .menu-item .label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 
+    /* Term menu split into Main Story / Side Story sections */
+    .menu-section { display: block; }
+    .menu-section + .menu-section { margin-top: 20px; }
+    .menu-section .section-title {
+      font-size: 14px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--accent-deep);
+      margin: 0 0 12px; padding-left: 2px;
+    }
+    .menu-grid { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; }
+
     /* Views */
     .view { display: none; width: 100%; }
     .view.active { display: block; }
@@ -275,11 +285,23 @@
     <!-- Period menu -->
     <div class="menu" id="menu">
       <p class="subtitle">Select a term</p>
-      <div class="menu-item" onclick="bukaPlaylist('102')"><div class="num">102</div><div class="label">Term</div></div>
-      <div class="menu-item" onclick="bukaPlaylist('103')"><div class="num">103</div><div class="label">Term</div></div>
-      <div class="menu-item" onclick="bukaPlaylist('104')"><div class="num">104</div><div class="label">Term</div></div>
-      <div class="menu-item" onclick="bukaPlaylist('105')"><div class="num">105</div><div class="label">Term</div></div>
-      <div class="menu-item" onclick="bukaPlaylist('dream')"><div class="num">Dream Interlude</div><div class="label"></div></div>
+
+      <div class="menu-section">
+        <h3 class="section-title">Main Story</h3>
+        <div class="menu-grid">
+          <div class="menu-item" onclick="bukaPlaylist('103')"><div class="num">103</div><div class="label">Term</div></div>
+          <div class="menu-item" onclick="bukaPlaylist('104')"><div class="num">104</div><div class="label">Term</div></div>
+          <div class="menu-item" onclick="bukaPlaylist('105')"><div class="num">105</div><div class="label">Term</div></div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <h3 class="section-title">Side Story</h3>
+        <div class="menu-grid">
+          <div class="menu-item" onclick="bukaPlaylist('102')"><div class="num">102</div><div class="label">Voiced Novel</div></div>
+          <div class="menu-item" onclick="bukaPlaylist('dream')"><div class="num">Dream Interlude</div><div class="label"></div></div>
+        </div>
+      </div>
     </div>
 
     <!-- Episode list (sideways) -->
