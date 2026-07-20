@@ -410,7 +410,8 @@
       document.getElementById('episode-view').classList.add('active');
       document.getElementById('episode-title').textContent =
         (kode === 'dream') ? 'Dream Interlude' : 'Term ' + kode;
-      if (('#' + kode) !== location.hash) location.hash = kode;
+      const _curKode = (location.hash.replace(/^#/, '').split('/'))[0];
+      if (_curKode !== kode) location.hash = kode;
 
       const content = document.getElementById('episode-content');
       const hint = document.getElementById('episode-hint');
@@ -639,26 +640,43 @@
       if (e.key === 'ArrowRight') navEpisode(1);
     });
 
-    // Restore view from URL hash on load (so refresh stays on the same page/episode)
-    (function restoreFromHash() {
+    // Sync the visible view to the URL hash (called on load AND on browser back/forward)
+    function applyHash() {
       const h = location.hash.replace(/^#/, '');
-      if (!h) return;
+      if (!h) {
+        // No hash → ensure we're on the menu (used by kembaliKeMenu's replaceState)
+        document.getElementById('player-view').classList.remove('active');
+        document.getElementById('episode-view').classList.remove('active');
+        document.getElementById('menu').classList.remove('active');
+        return;
+      }
       const parts = h.split('/');
       const kode = parts[0];
-      if (!playlists[kode]) return;
+      if (!playlists[kode]) {
+        // unknown hash → drop back to menu
+        document.getElementById('player-view').classList.remove('active');
+        document.getElementById('episode-view').classList.remove('active');
+        document.getElementById('menu').classList.remove('active');
+        return;
+      }
       bukaPlaylist(kode);
       if (parts[1] !== undefined) {
         const idx = parseInt(parts[1], 10);
         if (!isNaN(idx) && idx >= 0 && idx < currentVideos.length) {
-          // open the player directly
           currentIndex = idx;
           document.getElementById('episode-view').classList.remove('active');
           document.getElementById('player-view').classList.add('active');
           renderPlayer();
           window.scrollTo({ top: 0, behavior: 'auto' });
         }
+      } else {
+        // hash is just a term → make sure we're on its episode list, not the player
+        document.getElementById('player-view').classList.remove('active');
+        document.getElementById('episode-view').classList.add('active');
       }
-    })();
+    }
+    window.addEventListener('popstate', applyHash);
+    applyHash();
   </script>
 </body>
 </html>
