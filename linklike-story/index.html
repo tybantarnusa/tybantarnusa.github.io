@@ -231,12 +231,9 @@
     .player-meta .pm-ep { font-size: 16px; font-weight: 700; color: var(--accent-deep); letter-spacing: 1px; }
     .player-meta .pm-name { font-size: 20px; margin-top: 6px; line-height: 1.35; font-weight: 600; }
     .summary-box {
-      margin-top: 16px; padding: 14px 16px;
-      background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
-      border-radius: 12px; font-size: 14px; line-height: 1.55; color: var(--text);
+      margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text);
     }
     .summary-box:empty { display: none; }
-    .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -512,7 +509,7 @@
       // Episode summary (hosted locally; hidden for Fes×LIVE which has no entry)
       const sumEl = document.getElementById('pm-summary');
       const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
-      sumEl.innerHTML = sumText ? '<div class="sum-label">Summary</div>' + sumText : '';
+      sumEl.innerHTML = sumText ? sumText : '';
       // Fes×LIVE does not count as an episode in the progress counter
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
