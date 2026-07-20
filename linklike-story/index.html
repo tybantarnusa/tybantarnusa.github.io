@@ -131,6 +131,7 @@
 
     .view h2 { font-size: 24px; margin: 0 0 4px; color: var(--accent-deep); }
     .view .hint { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
+    .note { margin: 14px 0 4px; font-size: 13px; color: var(--accent-deep); }
 
     .placeholder-box {
       background: var(--card); border: 1px dashed var(--accent);
@@ -287,6 +288,7 @@
       <h2 id="episode-title">Term</h2>
       <p class="hint" id="episode-hint"></p>
       <div id="episode-content"></div>
+      <div class="note" id="episode-note"></div>
     </div>
 
     <!-- Player view -->
@@ -420,6 +422,8 @@
       }
 
       hint.textContent = (currentVideos.filter(v => v.type !== 'fes').length) + ' episode' + (currentVideos.filter(v => v.type !== 'fes').length > 1 ? 's' : '');
+      document.getElementById('episode-note').textContent =
+        (kode === '105') ? 'Fes×LIVE will be added here in the future.' : '';
       content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
