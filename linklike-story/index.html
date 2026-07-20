@@ -114,7 +114,7 @@
 
     /* Term menu split into Main Story / Side Story sections */
     .menu-section { display: block; }
-    .menu-section + .menu-section { margin-top: 20px; }
+    .menu-section + .menu-section { margin-top: 12px; }
     .menu-section .section-title {
       font-size: 14px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1.5px; color: var(--accent-deep);
@@ -262,6 +262,8 @@
       h1 { font-size: 18px; padding-left: 14px; }
       .subtitle { padding-left: 14px; }
       .menu-item { margin-left: 14px; margin-right: 14px; }
+      /* keep section titles off the left edge on phones (align with cards) */
+      .menu-section .section-title { padding-left: 14px; }
     }
 
     .player-meta { margin-top: 14px; }
