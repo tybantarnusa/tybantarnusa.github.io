@@ -313,6 +313,25 @@
     }
     .summary-box:empty { display: none; }
     .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+    .ads-notice {
+      margin: 10px 0 0; padding: 8px 34px 8px 12px;
+      background: rgba(255,255,255,.55); border-radius: 8px;
+      font-size: 12px; color: var(--muted); text-align: center; line-height: 1.4;
+      position: relative;
+    }
+    .ads-notice .an-close {
+      position: absolute; top: 2px; right: 4px;
+      background: none; border: 0; color: var(--muted);
+      font-size: 18px; cursor: pointer; padding: 4px 8px; line-height: 1; border-radius: 6px;
+    }
+    .ads-notice .an-close:hover { background: rgba(0,0,0,.05); color: var(--text); }
+    .ads-notice.an-hide {
+      animation: anSlideUp .35s ease forwards;
+    }
+    @keyframes anSlideUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
   </style>
 </head>
 <body>
@@ -388,6 +407,7 @@
         <button class="nav-btn" id="next-btn" onclick="navEpisode(1)">Next &#8594;</button>
       </div>
       <div id="player-slot"></div>
+      <div class="ads-notice" id="ads-notice" style="display:none">Ads come from the official Hasunosora channel. This website is non-profit.<button class="an-close" onclick="dismissAdsNotice(event)">&times;</button></div>
       <div class="player-meta">
         <div class="pm-ep" id="pm-ep"></div>
         <div class="pm-name" id="pm-name"></div>
@@ -491,7 +511,7 @@
     let summariesData = {};
 
     // Load episode summaries once (hosted locally — see summaries.json)
-    fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; }).catch(() => { summariesData = {}; });
+    fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; if (document.getElementById('player-view').classList.contains('active')) updatePlayerMeta(); }).catch(() => { summariesData = {}; });
 
     function bukaPlaylist(kode) {
       currentPeriod = kode;
@@ -721,7 +741,7 @@
         embedAttrs = 'allow="autoplay; fullscreen" allowfullscreen webkitallowfullscreen';
         playerKind = 'archive';
       } else {
-        embedSrc = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&rel=0';
+        embedSrc = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&rel=0&modestbranding=1';
         embedAttrs = 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen';
         playerKind = '';
       }
@@ -731,6 +751,19 @@
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
         '" ' + embedAttrs + '></iframe></div>';
+      document.getElementById('ads-notice').style.display = (currentPeriod === '103' && !isFes) ? '' : 'none';
+      const adsEl = document.getElementById('ads-notice');
+      adsEl.classList.remove('an-hide');
+      if (adsEl._adsTimer) clearTimeout(adsEl._adsTimer);
+      delete adsEl._adsTimer;
+      if (currentPeriod === '103') {
+        adsEl._adsTimer = setTimeout(() => {
+          if (adsEl.style.display !== 'none') {
+            adsEl.classList.add('an-hide');
+            adsEl.addEventListener('animationend', () => { adsEl.style.display = 'none'; }, { once: true });
+          }
+        }, 3000);
+      }
       updatePlayerMeta();
     }
 
@@ -868,6 +901,16 @@
     function clearContinueWatching() {
       localStorage.removeItem('linklike-progress');
       document.getElementById('continue-watching').style.display = 'none';
+    }
+
+    function dismissAdsNotice(e) {
+      if (e) e.stopPropagation();
+      const el = document.getElementById('ads-notice');
+      if (el._adsTimer) { clearTimeout(el._adsTimer); el._adsTimer = null; }
+      if (el.style.display !== 'none') {
+        el.classList.add('an-hide');
+        el.addEventListener('animationend', () => { el.style.display = 'none'; }, { once: true });
+      }
     }
 
     // Keyboard navigation inside player view
