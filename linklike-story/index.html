@@ -803,16 +803,19 @@
       }
 
       const isFes = (v.type === 'fes');
+      const epMatch = isFes ? null : v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
+      const epNo = epMatch ? parseInt(epMatch[1], 10) : null;
+      const showAds = (currentPeriod === '103' && !isFes && epNo !== null && epNo <= 10);
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
         '" ' + embedAttrs + '></iframe></div>';
-      document.getElementById('ads-notice').style.display = (currentPeriod === '103' && !isFes) ? '' : 'none';
+      document.getElementById('ads-notice').style.display = showAds ? '' : 'none';
       const adsEl = document.getElementById('ads-notice');
       adsEl.classList.remove('an-hide');
       if (adsEl._adsTimer) clearTimeout(adsEl._adsTimer);
       delete adsEl._adsTimer;
-      if (currentPeriod === '103') {
+      if (showAds) {
         adsEl._adsTimer = setTimeout(() => {
           if (adsEl.style.display !== 'none') {
             adsEl.classList.add('an-hide');
