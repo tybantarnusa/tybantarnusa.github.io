@@ -612,6 +612,7 @@
         }
         const filteredIdx = targetIdx >= 0 ? currentVideos.findIndex(v => v.id === allVideos[targetIdx].id) : 0;
         currentIndex = filteredIdx >= 0 ? filteredIdx : 0;
+        saveProgress();
         if (document.getElementById('player-view').classList.contains('active')) {
           renderPlayer();
         } else {
