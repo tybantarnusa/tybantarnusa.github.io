@@ -260,6 +260,7 @@
       width: 100%; height: 100%;
       object-fit: cover;
       object-position: center 38%;
+      border-radius: 14px;
       transform: scale(1.5);        /* stronger zoom to fully fill card, cut dark bars */
       transform-origin: center 38%;
     }
@@ -273,6 +274,7 @@
       background: linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.6) 55%, rgba(0,0,0,0) 100%);
       color: #fff;
       display: flex; flex-direction: column; justify-content: flex-end;
+      border-radius: 0 0 14px 14px;
     }
     .episode-card .ec-ep {
       font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #bcd4f2;
@@ -282,8 +284,18 @@
       font-size: 17px; margin-top: 7px; line-height: 1.35; font-weight: 600;
       text-shadow: 0 1px 4px rgba(0,0,0,.7);
     }
-    /* Fes×LIVE cards: red outline to stand out from episodes */
-    .episode-card.fes { border: 2px solid #e8546b; box-shadow: 0 0 0 1px rgba(232,84,107,.35); }
+    /* Fes×LIVE cards: rainbow SSR-style border with glow */
+    .episode-card.fes {
+      border: 3px solid transparent; box-shadow: 0 4px 24px rgba(255,107,107,.2), 0 0 0 1px rgba(255,107,107,.12);
+      background:
+        conic-gradient(from 0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) border-box,
+        linear-gradient(#3a1e3a, #3a1e3a) padding-box;
+      background-clip: border-box, padding-box;
+    }
+    .episode-card.fes:hover {
+      box-shadow: 0 8px 32px rgba(255,107,107,.4), 0 0 0 2px rgba(255,107,107,.25);
+      transform: translateY(-3px);
+    }
     .episode-card.fes .ec-ep { color: #ff9bac; }
 
     /* Player view */
@@ -316,14 +328,21 @@
       position: relative; width: 100%; aspect-ratio: 16/9;
       background: #000; border-radius: 14px; overflow: hidden;
     }
-    .player.fes { border: 3px solid #e8546b; box-shadow: 0 0 18px rgba(232,84,107,.45); }
+    .player.fes {
+      border: 3px solid transparent;
+      box-shadow: 0 0 18px rgba(255,107,107,.3);
+      background:
+        conic-gradient(from 0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) border-box,
+        linear-gradient(#000, #000) padding-box;
+      background-clip: border-box, padding-box;
+    }
     .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     /* Drive embeds: pure 16:9 so Google's own controls stay proportional (no min-height stretch) */
     .player.drive { aspect-ratio: 16/9; background: #1a2230; }
     @media (max-width: 600px) {
       .player.drive { min-height: 0; }
     }
-    .player.drive.fes { border: 3px solid #e8546b; }
+    .player.drive.fes { border: 3px solid transparent; background: conic-gradient(from 0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) border-box, linear-gradient(#1a2230, #1a2230) padding-box; background-clip: border-box, padding-box; }
     .player.archive { background: #0b0b0b; }
     @media (max-width: 600px) {
       .player.drive { min-height: 300px; }
@@ -532,6 +551,14 @@
         { "id": "LxTNiRHsB98", "type": "fes", "title": "104th Term Fes×LIVE -Rengesai- (102nd Graduation Live)" }
       ],
       "105": [
+        // Planned Fes×LIVE (videos TBD):
+        //   Apr 2025 - after Ep1  - OPENING! Fes×LIVE               [added ✓]
+        //   Jun 2025 - after Ep3  - 1st Term Fes×LIVE (-Nadeshiko-sai-)
+        //   Aug 2025 - after Ep5  - 2nd Term Fes×LIVE
+        //   Oct 2025 - after Ep7  - 3rd Term Fes×LIVE (-Rindou-sai-)
+        //   Dec 2025 - after Ep9  - 4th Term Fes×LIVE
+        //   Jan 2026 - after Ep10 - Fes×ReC:LIVE ~Road to Bloom~     [added ✓]
+        //   Mar 2026 - after Ep12 - Final Term Fes×LIVE STAGE
         { "id": "-sZHOIWGQGk", "title": "105th Term Episode 1 \"Brand New Stories!!\"" },
         { "id": "CCuUGUfthVA", "type": "fes", "title": "105th Term OPENING! Fes×LIVE" },
         { "id": "BlZ5XSeOoMU", "title": "105th Term Episode 2 \"Dream Match!\"" },
@@ -619,7 +646,11 @@
           saveProgress();
           renderPlayer();
         } else {
+          const oldRow = document.querySelector('.episode-row');
+          const savedScroll = oldRow ? oldRow.scrollLeft : 0;
           renderEpisodeList();
+          const newRow = document.querySelector('.episode-row');
+          if (newRow) newRow.scrollLeft = savedScroll;
         }
         return;
       }
@@ -627,7 +658,11 @@
       if (document.getElementById('player-view').classList.contains('active')) {
         updatePlayerMeta();
       } else {
+        const oldRow = document.querySelector('.episode-row');
+        const savedScroll = oldRow ? oldRow.scrollLeft : 0;
         renderEpisodeList();
+        const newRow = document.querySelector('.episode-row');
+        if (newRow) newRow.scrollLeft = savedScroll;
       }
     }
 
@@ -853,7 +888,7 @@
       sumEl.innerHTML = sumText ? '<div class="sum-label">SUMMARY</div>' + sumText : '';
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
-      document.getElementById('player-counter').textContent = isFes ? '' : (epPos + ' / ' + epCount);
+      document.getElementById('player-counter').textContent = isFes ? 'Fes×LIVE' : (epPos + ' / ' + epCount);
       document.getElementById('prev-btn').disabled = (currentIndex === 0);
       document.getElementById('next-btn').disabled = (currentIndex === currentVideos.length - 1);
     }
