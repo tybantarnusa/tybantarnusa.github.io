@@ -480,11 +480,11 @@
         { "id": "zyfMgI6nLgw", "title": "103rd Term Episode 2 \"No Good⇒World’s Best!?\"" },
         { "id": "JZ_haZN6-GI", "title": "103rd Term Episode 3 \"Rain, Wind, and Sun\"" },
         { "id": "zeBVo4StRiE", "title": "103rd Term Episode 4 \"My School Idol\"" },
-        { "id": "53YXoZPU33Q", "type": "fes", "title": "Term 103 April Fes×LIVE" },
         { "id": "_7DlIHOD2lY", "title": "103rd Term Episode 5 \"Head up\"" },
         { "id": "935krFf2bBk", "title": "103rd Term Episode 6 \"Selfish on the ICE!!\"" },
-        { "id": "FELdrefWAZk", "type": "fes", "title": "Term 103 May Fes×LIVE" },
+        { "id": "53YXoZPU33Q", "type": "fes", "title": "Term 103 April Fes×LIVE" },
         { "id": "s8OpSRvG4fM", "title": "103rd Term Episode 7 \"Senpai and Kouhai\"" },
+        { "id": "FELdrefWAZk", "type": "fes", "title": "Term 103 May Fes×LIVE" },
         { "id": "_NbU1zXeOuI", "title": "103rd Term Episode 8 \"The Heart of That Day, the Heart of Tomorrow\"" },
         { "id": "oA9bFPPvv_Y", "type": "fes", "title": "Term 103 June Fes×LIVE" },
         { "id": "9Lzn7aDqUf0", "title": "103rd Term Episode 9 \"The Ruri Escape\"" },
@@ -508,19 +508,20 @@
         { "id": "LtTzDz1FY-w", "title": "103rd Term Episode 18 \"The Inevitable Fourth Cherry Blossom\"" },
         { "id": "HJI9_jJYUtw", "type": "fes", "title": "Term 103 March Fes×LIVE" }
       ],
+
       "104": [
         { "id": "cbD6ZGkkVMc", "title": "104th Term Episode 1 \"Song to the Future\"" },
         { "id": "DWhkaktUp8M", "type": "fes", "title": "Term 104 OPENING! Fes×LIVE" },
         { "id": "O0VBpYABVZI", "title": "104th Term Episode 2 \"Watch me, I'll keep dancing\"" },
         { "id": "7eAiw613yW8", "title": "104th Term Episode 3 \"Ergo Mira-Cra Park!\"" },
         { "id": "iLoBZ9nWn0A", "title": "104th Term Episode 4 \"Beneath the same sky, Then and Now\"" },
-        { "id": "Z_VgNraowyg", "title": "104th Term Episode 5 \"Imperfect and Incomplete\"" },
         { "id": "Ss2oqfMXW18", "type": "fes", "title": "Term 104 1st Fes×LIVE TWINKLE STAR FESTIVAL!!" },
+        { "id": "Z_VgNraowyg", "title": "104th Term Episode 5 \"Imperfect and Incomplete\"" },
         { "id": "K9KV85nQdSg", "title": "104th Term Episode 6 \"GLHF!!\"" },
         { "id": "XHwlQBfVyHE", "title": "104th Term Episode 7 \"Link to the FRIENDS!\"" },
-        { "id": "b2e8jT_jQVA", "title": "104th Term Episode 8 \"Not a marionette\"" },
         { "id": "eSyV6YuLct4", "type": "fes", "title": "Term 104 2nd Fes×LIVE AUTUMN LINKED CARNIVAL Part 1" },
         { "id": "2YAAXyc4M6s", "type": "fes", "title": "Term 104 2nd Fes×LIVE AUTUMN LINKED CARNIVAL Part 2" },
+        { "id": "b2e8jT_jQVA", "title": "104th Term Episode 8 \"Not a marionette\"" },
         { "id": "m_2Ycv8S2go", "title": "104th Term Episode 9 \"Miracle the universe!\"" },
         { "id": "5_j8CzSG6EU", "title": "104th Term Episode 10 \"Believe your love. Believe your live.\"" },
         { "id": "fbwWPaLScsI", "title": "104th Term Episode 11 \"Bloom the Dream\"" },
@@ -565,7 +566,7 @@
       navigator.serviceWorker.register('service-worker.js').catch(() => {});
     }
 
-    // Load episode summaries once (hosted locally — see summaries.json)
+    // Load episode summaries once (hosted locally, see summaries.json)
     fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; if (document.getElementById('player-view').classList.contains('active')) updatePlayerMeta(); }).catch(() => { summariesData = {}; });
 
     function bukaPlaylist(kode) {
@@ -597,7 +598,7 @@
       applyFesFilter();
       const inView = !!currentId && currentVideos.some(v => v.id === currentId);
       if (!inView) {
-        // Current video was filtered out — find nearest non-fes video
+        // Current video was filtered out, find nearest non-fes video
         const origIdx = allVideos.findIndex(v => v.id === currentId);
         let targetIdx = -1;
         // Search forward first (next episode after Fes×LIVE)
@@ -605,7 +606,7 @@
           if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
         }
         if (targetIdx === -1) {
-          // No forward match — search backward
+          // No forward match, search backward
           for (let i = origIdx - 1; i >= 0; i--) {
             if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
           }
@@ -682,7 +683,7 @@
         const ytThumb = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
         const localThumb = arc ? 'thumbs/' + arc + '.webp' : null;
         const remoteThumb = arc ? 'https://storage.googleapis.com/llll-card/story/monthly/image_record_monthly_' + arc + '.webp' : null;
-        // local copy first, then HamP remote, then YouTube — so it still works if HamP vanishes
+        // local copy first, then HamP remote, then YouTube so it still works if HamP vanishes
         const arcThumb = localThumb
           ? localThumb + '" onerror="this.onerror=null;this.src=\'' + remoteThumb + '\';this.onerror=function(){this.onerror=null;this.src=\'' + ytThumb + '\'};"'
           : null;
@@ -881,7 +882,7 @@
       renderContinueWatching();
     }
 
-    /* Continue Watching — save/load progress via localStorage */
+    /* Continue Watching: save/load progress via localStorage */
     function saveProgress() {
       if (!currentPeriod || !currentVideos[currentIndex]) return;
       const v = currentVideos[currentIndex];
@@ -951,7 +952,7 @@
       bukaPlaylist(period);
       let idx = currentVideos.findIndex(v => v.id === videoId);
       if (idx < 0) {
-        // Maybe filtered out by Fes toggle — auto-enable it
+        // Maybe filtered out by Fes toggle, auto-enable it
         const inAll = allVideos.findIndex(v => v.id === videoId);
         if (inAll >= 0 && !showFes) {
           showFes = true;
