@@ -264,6 +264,11 @@
       transform: scale(1.5);        /* stronger zoom to fully fill card, cut dark bars */
       transform-origin: center 38%;
     }
+    .episode-card .thumb.thumb-yt {
+      object-position: center center;
+      transform-origin: center center;
+    }
+    .episode-card.fes .thumb { transform: translateY(-12px) scale(1.5); }
     .episode-card.thumb-fallback {
       background-color: #4a86d4;
       background-image: linear-gradient(135deg, #4a86d4 0%, #2a5a9c 100%);
@@ -377,7 +382,7 @@
     .summary-box:empty { display: none; }
     .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
     .setlist { display: flex; flex-direction: column; gap: 6px; }
-    .sl-song { counter-increment: song-num; padding: 8px 12px 8px 36px; background: var(--bg); border-radius: 8px; font-size: 14px; line-height: 1.4; font-weight: 600; position: relative; } .sl-song::before { content: 'M' counter(song-num); position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: #f472b6; opacity: .7; } .sl-mc { text-align: left; padding: 5px 8px; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; opacity: .5; }
+    .sl-song { counter-increment: song-num; padding: 8px 12px 8px 36px; background: var(--bg); border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; } .sl-song::before { content: 'M' counter(song-num); position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: #f472b6; opacity: .7; } .sl-mc { text-align: left; padding: 5px 8px; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; opacity: .5; }
     .sl-toggle { cursor: pointer; user-select: none; } .sl-toggle:hover { opacity: .8; } .sl-arrow { font-size: 10px; margin-left: 6px; } .setlist { display: none; counter-reset: song-num; } .sl-toggle.sl-open + .setlist { display: flex; flex-direction: column; gap: 3px; } .ads-notice {
       margin: 10px 0 0; padding: 8px 34px 8px 12px;
       background: rgba(255,255,255,.55); border-radius: 8px;
@@ -752,7 +757,7 @@
             (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         } else {
           card.innerHTML =
-            '<img class="thumb" loading="lazy" src="' + ytThumb + '" alt="">' +
+            '<img class="thumb thumb-yt" loading="lazy" src="' + ytThumb + '" alt="">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
             (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         }
@@ -889,7 +894,7 @@
       const sumEl = document.getElementById('pm-summary');
       let setlistHtml = '';
       if (isFes && v.setlist) {
-        setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') ? 'mc' : 'song') + '">' + s + '</div>').join('') + '</div>';
+        setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : 'song') + '">' + s + '</div>').join('') + '</div>';
       } else {
         const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
         setlistHtml = sumText ? '<div class="sum-label">SUMMARY</div>' + sumText : '';
