@@ -19,6 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
   <style>
     :root {
       --bg: #eef4fb;
@@ -31,6 +32,34 @@
       --muted: #5b6b82;
       --border: #c9dcf0;
     }
+
+    body.dark-mode {
+      --bg: #131824;
+      --card: #1e2538;
+      --card-hover: #28304a;
+      --accent: #4f93d6;
+      --accent-strong: #7b6fde;
+      --accent-deep: #5ea5e8;
+      --text: #d0dbea;
+      --muted: #8095b0;
+      --border: #2d3750;
+    }
+    body.dark-mode .ads-notice { background: rgba(0,0,0,.35); }
+    .dm-btn {
+      background: rgba(255,255,255,.15); border: 0; color: #fff;
+      font-size: 0; cursor: pointer; padding: 0; line-height: 1;
+      width: 36px; height: 36px; border-radius: 50%;
+      transition: background .2s, transform .2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .dm-btn::after {
+      content: '\1F319'; font-size: 18px; line-height: 1;
+    }
+    body.dark-mode .dm-btn::after {
+      content: '\2600\FE0F';
+    }
+    .dm-btn:hover { background: rgba(255,255,255,.28); transform: scale(1.1); }
 
     * { box-sizing: border-box; }
 
@@ -352,7 +381,10 @@
 <body>
   <div class="wrap">
     <header class="site-header" onclick="kembaliKeMenu()">
-      <h1>Link! Like! Activity Record</h1>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h1 style="margin:0">Link! Like! Activity Record</h1>
+        <button class="dm-btn" id="dm-btn" onclick="event.stopPropagation();toggleDarkMode()" title="Toggle dark mode"></button>
+      </div>
     </header>
 
     <!-- Period menu -->
@@ -524,6 +556,14 @@
     let showFes = JSON.parse(localStorage.getItem('linklike-showfes')) ?? true;
     let currentIndex = 0;
     let summariesData = {};
+
+    // Dark mode init
+    if (localStorage.getItem('linklike-darkmode') === '1') document.body.classList.add('dark-mode');
+
+    // Register service worker for PWA installability
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    }
 
     // Load episode summaries once (hosted locally — see summaries.json)
     fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; if (document.getElementById('player-view').classList.contains('active')) updatePlayerMeta(); }).catch(() => { summariesData = {}; });
@@ -926,6 +966,11 @@
         el.classList.add('an-hide');
         el.addEventListener('animationend', () => { el.style.display = 'none'; }, { once: true });
       }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      try { localStorage.setItem('linklike-darkmode', document.body.classList.contains('dark-mode') ? '1' : '0'); } catch(e) {}
     }
 
     // Keyboard navigation inside player view
