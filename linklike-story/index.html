@@ -503,9 +503,6 @@
       const hasFes = allVideos.some(v => v.type === 'fes');
       document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
       document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
-      // Clear Continue Watching when user picks a new term
-      localStorage.removeItem('linklike-progress');
-      document.getElementById('continue-watching').style.display = 'none';
       document.getElementById('menu').classList.add('active');
       document.getElementById('episode-view').classList.add('active');
       document.getElementById('episode-title').textContent =
