@@ -123,6 +123,20 @@
     }
     .menu-grid { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; }
 
+    /* Continue Watching card */
+    .cw-card {
+      display: flex; gap: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      height: 72px; cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .cw-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,147,214,.2); }
+    .cw-thumb { width: 100px; height: 100%; flex-shrink: 0; background: #4a86d4; overflow: hidden; }
+    .cw-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .cw-info { flex: 1; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+    .cw-term { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-deep); }
+    .cw-title { font-size: 13px; font-weight: 600; line-height: 1.2; }
+
     /* Views */
     .view { display: none; width: 100%; }
     .view.active { display: block; }
@@ -277,6 +291,7 @@
       h1 { font-size: 18px; padding-left: 14px; }
       .subtitle { padding-left: 14px; }
       .menu-item { margin-left: 14px; margin-right: 14px; }
+      .cw-card { margin-left: 14px; margin-right: 14px; }
       /* keep section titles off the left edge on phones (align with cards) */
       .menu-section .section-title { padding-left: 14px; }
     }
@@ -302,6 +317,18 @@
     <!-- Period menu -->
     <div class="menu" id="menu">
       <p class="subtitle">Select a term</p>
+
+      <!-- Continue Watching -->
+      <div class="menu-section" id="continue-watching" style="display:none">
+        <h3 class="section-title">Continue Watching</h3>
+        <div class="cw-card" id="cw-card" onclick="bukaDariProgress()">
+          <div class="cw-thumb" id="cw-thumb"><img id="cw-img" alt=""></div>
+          <div class="cw-info">
+            <div class="cw-term" id="cw-term"></div>
+            <div class="cw-title" id="cw-title"></div>
+          </div>
+        </div>
+      </div>
 
       <div class="menu-section">
         <h3 class="section-title">Main Story</h3>
@@ -451,7 +478,7 @@
     let currentPeriod = null;
     let currentVideos = [];
     let allVideos = [];
-    let showFes = true;
+    let showFes = JSON.parse(localStorage.getItem('linklike-showfes')) ?? true;
     let currentIndex = 0;
     let summariesData = {};
 
@@ -468,6 +495,9 @@
       const hasFes = allVideos.some(v => v.type === 'fes');
       document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
       document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
+      // Clear Continue Watching when user picks a new term
+      localStorage.removeItem('linklike-progress');
+      document.getElementById('continue-watching').style.display = 'none';
       document.getElementById('menu').classList.add('active');
       document.getElementById('episode-view').classList.add('active');
       document.getElementById('episode-title').textContent =
@@ -482,6 +512,7 @@
       showFes = e.target.checked;
       document.getElementById('fes-checkbox').checked = showFes;
       document.getElementById('fes-checkbox-player').checked = showFes;
+      try { localStorage.setItem('linklike-showfes', JSON.stringify(showFes)); } catch(e) {}
       const currentId = currentVideos[currentIndex]?.id;
       applyFesFilter();
       const inView = !!currentId && currentVideos.some(v => v.id === currentId);
@@ -669,6 +700,7 @@
       renderPlayer();
       location.hash = currentPeriod + '/' + index;
       window.scrollTo({ top: 0, behavior: 'auto' });
+      saveProgress();
     }
 
     function renderPlayer() {
@@ -733,6 +765,7 @@
       renderPlayer();
       location.hash = currentPeriod + '/' + currentIndex;
       window.scrollTo({ top: 0, behavior: 'auto' });
+      saveProgress();
     }
 
     function kembaliKeEpisode() {
@@ -748,6 +781,83 @@
       document.getElementById('player-view').classList.remove('active');
       document.getElementById('menu').classList.remove('active');
       history.replaceState(null, '', location.pathname + location.search);
+      renderContinueWatching();
+    }
+
+    /* Continue Watching — save/load progress via localStorage */
+    function saveProgress() {
+      if (!currentPeriod || !currentVideos[currentIndex]) return;
+      const v = currentVideos[currentIndex];
+      const data = { period: currentPeriod, index: currentIndex, id: v.id, title: v.title, type: v.type || '', timestamp: Date.now() };
+      try { localStorage.setItem('linklike-progress', JSON.stringify(data)); } catch(e) {}
+    }
+
+    function renderContinueWatching() {
+      const cw = document.getElementById('continue-watching');
+      try {
+        const raw = localStorage.getItem('linklike-progress');
+        if (!raw) { cw.style.display = 'none'; return; }
+        const data = JSON.parse(raw);
+        const list = playlists[data.period];
+        if (!list || !list.some(v => v.id === data.id)) { cw.style.display = 'none'; return; }
+        const v = list.find(item => item.id === data.id);
+        const isFes = v.type === 'fes';
+        // Build episode label
+        let epLabel;
+        if (isFes) { epLabel = 'FES×LIVE'; }
+        else {
+          const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
+          epLabel = m ? 'EPISODE ' + m[1] : '';
+        }
+        const periodLabel = (data.period === 'dream') ? 'Dream Interlude' : 'Term ' + data.period;
+        // Title without prefix
+        const cleanTitle = v.title
+          .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
+          .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
+          .replace(/\s*\[ENG SUB\]$/i, '')
+          .trim();
+        document.getElementById('cw-term').textContent = periodLabel + (isFes ? ' · ' + epLabel : ' · ' + epLabel);
+        document.getElementById('cw-title').textContent = isFes ? v.title : cleanTitle;
+        // Thumbnail
+        const cwImg = document.getElementById('cw-img');
+        let epNo = null;
+        if (!isFes) {
+          const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
+          epNo = m ? m[1] : null;
+        }
+        let arc = null;
+        if (data.period === 'dream') { arc = (v.title.includes('Water') ? '200001' : '200002'); }
+        else if (!isFes && (data.period === '103' || data.period === '104' || data.period === '105')) {
+          arc = data.period + '0' + String(epNo).padStart(2, '0');
+        }
+        const localThumb = arc ? 'thumbs/' + arc + '.webp' : null;
+        const remoteThumb = arc ? 'https://storage.googleapis.com/llll-card/story/monthly/image_record_monthly_' + arc + '.webp' : null;
+        const ytThumb = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
+        if (localThumb) {
+          cwImg.src = localThumb;
+          cwImg.onerror = function() { this.onerror = null; this.src = remoteThumb || ytThumb; };
+        } else {
+          cwImg.src = ytThumb;
+        }
+        // Save period+index for click handler
+        document.getElementById('cw-card').dataset.period = data.period;
+        document.getElementById('cw-card').dataset.index = data.index;
+        cw.style.display = '';
+      } catch(e) { cw.style.display = 'none'; }
+    }
+
+    function bukaDariProgress() {
+      const cw = document.getElementById('cw-card');
+      const period = cw.dataset.period;
+      const index = parseInt(cw.dataset.index, 10);
+      if (!period || isNaN(index)) return;
+      bukaPlaylist(period);
+      currentIndex = Math.min(index, currentVideos.length - 1);
+      document.getElementById('episode-view').classList.remove('active');
+      document.getElementById('player-view').classList.add('active');
+      renderPlayer();
+      location.hash = period + '/' + currentIndex;
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
     // Keyboard navigation inside player view
@@ -765,6 +875,7 @@
         document.getElementById('player-view').classList.remove('active');
         document.getElementById('episode-view').classList.remove('active');
         document.getElementById('menu').classList.remove('active');
+        renderContinueWatching();
         return;
       }
       const parts = h.split('/');
@@ -774,6 +885,7 @@
         document.getElementById('player-view').classList.remove('active');
         document.getElementById('episode-view').classList.remove('active');
         document.getElementById('menu').classList.remove('active');
+        renderContinueWatching();
         return;
       }
       bukaPlaylist(kode);
