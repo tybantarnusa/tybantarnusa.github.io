@@ -53,7 +53,10 @@
       padding: 22px 24px;
       margin-bottom: 36px;
       box-shadow: 0 6px 20px rgba(79,147,214,.25);
+      cursor: pointer;
+      transition: filter .15s ease;
     }
+    .site-header:hover { filter: brightness(1.08); }
     .site-header h1 {
       background: none; -webkit-text-fill-color: #fff; color: #fff;
       -webkit-background-clip: border-box; background-clip: border-box;
@@ -80,8 +83,6 @@
       /* episode view: back-btn & headings all share the 14px edge (no double inset) */
       #episode-view { padding-left: 14px; padding-right: 14px; }
       .back-btn { margin-bottom: 14px; margin-left: 0; margin-right: 0; }
-      /* player view back-btn needs 14px so it lines up with player-top/meta (player-view has no padding) */
-      #player-view .back-btn { margin-left: 14px; margin-right: 14px; }
       .view h2 { font-size: 19px; margin: 0 0 2px; padding-left: 0; }
       .view .hint { margin: 0 0 16px; padding-left: 0; }
       /* summary box: keep off the screen edges on phones */
@@ -139,6 +140,15 @@
     }
     .back-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
+    .episode-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .toggle-switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .toggle-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: relative; width: 38px; height: 20px; background: var(--border); border-radius: 10px; transition: background .2s; flex-shrink: 0; }
+    .toggle-slider::after { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px; background: #fff; border-radius: 50%; transition: left .2s; }
+    .toggle-switch input:checked + .toggle-slider { background: linear-gradient(90deg, var(--accent), var(--accent-strong)); }
+    .toggle-switch input:checked + .toggle-slider::after { left: 20px; }
+    .toggle-label { font-size: 13px; color: var(--muted); }
+    .player-fes-toggle { display: flex; justify-content: flex-end; margin-bottom: 10px; }
     .view h2 { font-size: 24px; margin: 0 0 4px; color: var(--accent-deep); }
     .view .hint { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
     .note { margin: 14px 0 4px; font-size: 13px; color: var(--accent-deep); }
@@ -212,6 +222,11 @@
     .episode-card.fes .ec-ep { color: #ff9bac; }
 
     /* Player view */
+    .player-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; gap: 12px;
+    }
+    .player-bar .back-btn { margin-bottom: 0; }
     .player-top {
       position: relative;
       display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
@@ -258,7 +273,7 @@
       /* but the player itself must touch the screen edges */
       #player-view { padding-left: 0; padding-right: 0; }
       .player, .player.drive, .player.fes, .player.drive.fes { border-radius: 0; }   /* video flush to screen edges */
-      .player-top, .player-meta, .back-btn { padding-left: 14px; padding-right: 14px; }  /* text stays off the very edge */
+      .player-bar, .player-top, .player-meta { padding-left: 14px; padding-right: 14px; }  /* text stays off the very edge */
       h1 { font-size: 18px; padding-left: 14px; }
       .subtitle { padding-left: 14px; }
       .menu-item { margin-left: 14px; margin-right: 14px; }
@@ -280,7 +295,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header class="site-header">
+    <header class="site-header" onclick="kembaliKeMenu()">
       <h1>Link! Like! Activity Record</h1>
     </header>
 
@@ -309,7 +324,14 @@
     <!-- Episode list (sideways) -->
     <div class="view" id="episode-view">
       <button class="back-btn" onclick="kembaliKeMenu()">&larr; Back</button>
-      <h2 id="episode-title">Term</h2>
+      <div class="episode-header">
+        <h2 id="episode-title">Term</h2>
+        <label class="toggle-switch" id="fes-toggle-episode">
+          <input type="checkbox" id="fes-checkbox" checked onchange="toggleFes(event)">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Include Fes×LIVE</span>
+        </label>
+      </div>
       <p class="hint" id="episode-hint"></p>
       <div id="episode-content"></div>
       <div class="note" id="episode-note"></div>
@@ -317,11 +339,18 @@
 
     <!-- Player view -->
     <div class="view" id="player-view">
-      <button class="back-btn" onclick="kembaliKeEpisode()">&larr; Back to episodes</button>
+      <div class="player-bar">
+        <button class="back-btn" onclick="kembaliKeEpisode()">&larr; Back to episodes</button>
+        <label class="toggle-switch" id="fes-toggle-player">
+          <input type="checkbox" id="fes-checkbox-player" checked onchange="toggleFes(event)">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Include Fes×LIVE</span>
+        </label>
+      </div>
       <div class="player-top">
         <button class="nav-btn" id="prev-btn" onclick="navEpisode(-1)">&#8592; Prev</button>
-        <button class="nav-btn" id="next-btn" onclick="navEpisode(1)">Next &#8594;</button>
         <span class="counter" id="player-counter"></span>
+        <button class="nav-btn" id="next-btn" onclick="navEpisode(1)">Next &#8594;</button>
       </div>
       <div id="player-slot"></div>
       <div class="player-meta">
@@ -421,6 +450,8 @@
 
     let currentPeriod = null;
     let currentVideos = [];
+    let allVideos = [];
+    let showFes = true;
     let currentIndex = 0;
     let summariesData = {};
 
@@ -429,7 +460,14 @@
 
     function bukaPlaylist(kode) {
       currentPeriod = kode;
-      currentVideos = playlists[kode] || [];
+      allVideos = playlists[kode] || [];
+      document.getElementById('fes-checkbox').checked = showFes;
+      document.getElementById('fes-checkbox-player').checked = showFes;
+      applyFesFilter();
+      // Hide Fes×LIVE toggle for terms without any Fes×LIVE content
+      const hasFes = allVideos.some(v => v.type === 'fes');
+      document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
+      document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
       document.getElementById('menu').classList.add('active');
       document.getElementById('episode-view').classList.add('active');
       document.getElementById('episode-title').textContent =
@@ -437,18 +475,69 @@
       const _curKode = (location.hash.replace(/^#/, '').split('/'))[0];
       if (_curKode !== kode) location.hash = kode;
 
+      renderEpisodeList();
+    }
+
+    function toggleFes(e) {
+      showFes = e.target.checked;
+      document.getElementById('fes-checkbox').checked = showFes;
+      document.getElementById('fes-checkbox-player').checked = showFes;
+      const currentId = currentVideos[currentIndex]?.id;
+      applyFesFilter();
+      const inView = !!currentId && currentVideos.some(v => v.id === currentId);
+      if (!inView) {
+        // Current video was filtered out — find nearest non-fes video
+        const origIdx = allVideos.findIndex(v => v.id === currentId);
+        let targetIdx = -1;
+        // Search forward first (next episode after Fes×LIVE)
+        for (let i = origIdx + 1; i < allVideos.length; i++) {
+          if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
+        }
+        if (targetIdx === -1) {
+          // No forward match — search backward
+          for (let i = origIdx - 1; i >= 0; i--) {
+            if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
+          }
+        }
+        const filteredIdx = targetIdx >= 0 ? currentVideos.findIndex(v => v.id === allVideos[targetIdx].id) : 0;
+        currentIndex = filteredIdx >= 0 ? filteredIdx : 0;
+        if (document.getElementById('player-view').classList.contains('active')) {
+          renderPlayer();
+        } else {
+          renderEpisodeList();
+        }
+        return;
+      }
+      currentIndex = currentVideos.findIndex(v => v.id === currentId);
+      if (document.getElementById('player-view').classList.contains('active')) {
+        updatePlayerMeta();
+      } else {
+        renderEpisodeList();
+      }
+    }
+
+    function applyFesFilter() {
+      currentVideos = showFes ? allVideos : allVideos.filter(v => v.type !== 'fes');
+    }
+
+    function renderEpisodeList() {
       const content = document.getElementById('episode-content');
       const hint = document.getElementById('episode-hint');
 
       if (currentVideos.length === 0) {
-        hint.textContent = 'The video list will be added here later.';
-        content.innerHTML = '<div class="placeholder-box">No videos for this term yet.</div>';
+        hint.textContent = allVideos.length > 0 ? 'All Fes×LIVE hidden.' : 'The video list will be added here later.';
+        content.innerHTML = '<div class="placeholder-box">' + (allVideos.length > 0 ? 'Fes×LIVE are hidden. Check "Include Fes×LIVE" to show them.' : 'No videos for this term yet.') + '</div>';
         return;
       }
 
-      hint.textContent = (currentVideos.filter(v => v.type !== 'fes').length) + ' episode' + (currentVideos.filter(v => v.type !== 'fes').length > 1 ? 's' : '');
+      const epCount = currentVideos.filter(v => v.type !== 'fes').length;
+      const fesCount = currentVideos.filter(v => v.type === 'fes').length;
+      const parts = [];
+      if (epCount > 0) parts.push(epCount + ' episode' + (epCount > 1 ? 's' : ''));
+      if (fesCount > 0) parts.push(fesCount + ' Fes×LIVE');
+      hint.textContent = parts.join(', ') || '';
       document.getElementById('episode-note').textContent =
-        (kode === '105') ? 'Fes×LIVE will be added here in the future.' : '';
+        (currentPeriod === '105') ? 'Fes×LIVE will be added here in the future.' : '';
       content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
@@ -469,13 +558,13 @@
 
         // Thumbnail arc (HamP story art)
         let arc = null;
-        if (kode === 'dream') {
+        if (currentPeriod === 'dream') {
           arc = (i === 0) ? '200001' : '200002';
-        } else if (kode === '103' || kode === '104' || kode === '105') {
-          if (kode === '104' && epNo === '13') {
+        } else if (currentPeriod === '103' || currentPeriod === '104' || currentPeriod === '105') {
+          if (currentPeriod === '104' && epNo === '13') {
             arc = '105012'; // 104 ep13 is the shared finale arc
           } else {
-            arc = kode + '0' + String(epNo).padStart(2, '0');
+            arc = currentPeriod + '0' + String(epNo).padStart(2, '0');
           }
         }
         const ytThumb = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
@@ -584,20 +673,6 @@
 
     function renderPlayer() {
       const v = currentVideos[currentIndex];
-      const isFes = (v.type === 'fes');
-      let epNo, name;
-      if (isFes) {
-        epNo = null;
-        name = v.title;
-      } else {
-        const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
-        epNo = m ? m[1] : (currentIndex + 1);
-        name = v.title
-          .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
-          .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
-          .replace(/\s*\[ENG SUB\]$/i, '')
-          .trim();
-      }
 
       let embedSrc, embedAttrs, playerKind;
       if (v.src === 'drive') {
@@ -614,21 +689,39 @@
         playerKind = '';
       }
 
+      const isFes = (v.type === 'fes');
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
         '" ' + embedAttrs + '></iframe></div>';
+      updatePlayerMeta();
+    }
+
+    function updatePlayerMeta() {
+      const v = currentVideos[currentIndex];
+      if (!v) return;
+      const isFes = (v.type === 'fes');
+      let epNo, name;
+      if (isFes) {
+        epNo = null;
+        name = v.title;
+      } else {
+        const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
+        epNo = m ? m[1] : (currentIndex + 1);
+        name = v.title
+          .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
+          .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
+          .replace(/\s*\[ENG SUB\]$/i, '')
+          .trim();
+      }
       document.getElementById('pm-ep').textContent = isFes ? 'FES×LIVE' : 'EPISODE ' + epNo;
       document.getElementById('pm-name').textContent = name;
-      // Episode summary (hosted locally; hidden for Fes×LIVE which has no entry)
       const sumEl = document.getElementById('pm-summary');
       const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
       sumEl.innerHTML = sumText ? '<div class="sum-label">SUMMARY</div>' + sumText : '';
-      // Fes×LIVE does not count as an episode in the progress counter
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
       document.getElementById('player-counter').textContent = isFes ? '' : (epPos + ' / ' + epCount);
-
       document.getElementById('prev-btn').disabled = (currentIndex === 0);
       document.getElementById('next-btn').disabled = (currentIndex === currentVideos.length - 1);
     }
