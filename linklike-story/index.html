@@ -945,7 +945,19 @@
       const videoId = cw.dataset.videoid;
       if (!period || !videoId) return;
       bukaPlaylist(period);
-      const idx = currentVideos.findIndex(v => v.id === videoId);
+      let idx = currentVideos.findIndex(v => v.id === videoId);
+      if (idx < 0) {
+        // Maybe filtered out by Fes toggle — auto-enable it
+        const inAll = allVideos.findIndex(v => v.id === videoId);
+        if (inAll >= 0 && !showFes) {
+          showFes = true;
+          document.getElementById('fes-checkbox').checked = true;
+          document.getElementById('fes-checkbox-player').checked = true;
+          try { localStorage.setItem('linklike-showfes', JSON.stringify(true)); } catch(e) {}
+          applyFesFilter();
+          idx = currentVideos.findIndex(v => v.id === videoId);
+        }
+      }
       if (idx < 0) { kembaliKeMenu(); return; }
       currentIndex = idx;
       document.getElementById('episode-view').classList.remove('active');
