@@ -932,9 +932,9 @@
         } else {
           cwImg.src = ytThumb;
         }
-        // Save period+index for click handler
+        // Save period+videoId for click handler
         document.getElementById('cw-card').dataset.period = data.period;
-        document.getElementById('cw-card').dataset.index = data.index;
+        document.getElementById('cw-card').dataset.videoid = data.id;
         cw.style.display = '';
       } catch(e) { cw.style.display = 'none'; }
     }
@@ -942,10 +942,12 @@
     function bukaDariProgress() {
       const cw = document.getElementById('cw-card');
       const period = cw.dataset.period;
-      const index = parseInt(cw.dataset.index, 10);
-      if (!period || isNaN(index)) return;
+      const videoId = cw.dataset.videoid;
+      if (!period || !videoId) return;
       bukaPlaylist(period);
-      currentIndex = Math.min(index, currentVideos.length - 1);
+      const idx = currentVideos.findIndex(v => v.id === videoId);
+      if (idx < 0) { kembaliKeMenu(); return; }
+      currentIndex = idx;
       document.getElementById('episode-view').classList.remove('active');
       document.getElementById('player-view').classList.add('active');
       renderPlayer();
