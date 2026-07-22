@@ -524,11 +524,11 @@
         { "id": "5tXMOM4eZ3o", "type": "fes", "setlist": ["Natsumeki Pain", "MC", "Take It Over", "Sugao no Pixel", "Identity", "MC", "Do! Do! Do!", "Tsukimakase", "Fortune Movie", "Interlude", "Dream Believers", "MC"], "title": "103rd Term September Fes×LIVE" },
         { "id": "Ep8KJ22oZRo", "title": "103rd Term Episode 12 \"Heavy Expectations!\"" },
         { "id": "u0TSsGOwfUM", "type": "fes", "start": 57, "setlist": ["Runway (Sayaka)", "MC", "Trick & Cute", "MC", "Identity", "Take It Over", "Sugao no Pixel", "MC", "Dream Believers", "MC"], "title": "103rd Term October Fes×LIVE Part 1" },
-        { "id": "H3xoF80sDyc", "type": "fes", "start": 57, "setlist": ["MC (Kozue)", "Nonfiction Hero Show", "KNOT", "Senpen Banka", "MC"], "title": "103rd Term October Fes×LIVE Part 2" },
+        { "id": "H3xoF80sDyc", "type": "fes", "start": 57, "setlist": ["MC (Kozue)", "Nonfiction Hero Show", "KNOT", "Senpen Banka", "MC"], "title": "103rd Term October Fes×LIVE Part 2 (Love Live! District Qualifier)" },
         { "id": "qOqAsgtSFsU", "title": "103rd Term Episode 13 \"Caught Up\"" },
         { "id": "h7mqZyhX-Y4", "type": "fes", "start": 57, "setlist": ["On your mark", "MC", "KNOT", "Do! Do! Do!", "Holiday∞Holiday", "MC", "Interlude", "Tsubasa La Liberte", "MC"], "title": "103rd Term November Fes×LIVE" },
         { "id": "1AJp2IAIe-E", "title": "103rd Term Episode 14 \"Link! Like!\"" },
-        { "id": "T0-5Unz8L2A", "type": "fes", "start": 57, "setlist": ["On your mark", "MC", "Identity", "Sparkly Spot", "Reflection in the mirror", "MC", "Link to the FUTURE", "MC"], "title": "103rd Term December Fes×LIVE" },
+        { "id": "T0-5Unz8L2A", "type": "fes", "start": 57, "setlist": ["On your mark", "MC", "Identity", "Sparkly Spot", "Reflection in the mirror", "MC", "Link to the FUTURE", "MC"], "title": "103rd Term December Fes×LIVE (Love Live! Regional Qualifier)" },
         { "id": "GO76pYV3Gxw", "title": "103rd Term Episode 15 \"Dream Believers\"" },
         { "id": "yIrJMGtFcTI", "title": "103rd Term Episode 16 \"Special Thanks\"" },
         { "id": "SMYGaFf4yLo", "type": "fes", "start": 57, "setlist": ["Yup! Yup! Yup!", "MC", "Ao to Shabon", "Milk", "Special Thanks", "MC", "Eien no Euphoria", "MC"], "title": "103rd Term January Fes×LIVE" },
@@ -549,7 +549,7 @@
         { "id": "K9KV85nQdSg", "title": "104th Term Episode 6 \"GLHF!!\"" },
         { "id": "XHwlQBfVyHE", "title": "104th Term Episode 7 \"Link to the FRIENDS!\"" },
         { "id": "eSyV6YuLct4", "type": "fes", "start": 57, "setlist": ["Tsukuyomi Kurage", "Proof", "Fanfare!!!", "MC", "Now or Never", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL" },
-        { "id": "2YAAXyc4M6s", "type": "fes", "start": 298, "setlist": ["MC (Kozue)", "Link to the FUTURE (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL ~Love Live! Regional Qualifier Entry~" },
+        { "id": "2YAAXyc4M6s", "type": "fes", "start": 298, "setlist": ["MC (Kozue)", "Link to the FUTURE (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL ~Love Live! District Qualifier Entry~" },
         { "id": "b2e8jT_jQVA", "title": "104th Term Episode 8 \"Not a marionette\"" },
         { "id": "m_2Ycv8S2go", "title": "104th Term Episode 9 \"Miracle the universe!\"" },
         { "id": "5_j8CzSG6EU", "title": "104th Term Episode 10 \"Believe your love. Believe your live.\"" },
@@ -778,25 +778,25 @@
             card.innerHTML =
               '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="">' +
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
+              '<div class="ec-name">' + name + '</div>' + '</div>';
           } else {
             
             card.classList.add('thumb-fallback');
             card.innerHTML =
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
+              '<div class="ec-name">' + name + '</div>' + '</div>';
           }
         } else if (arcThumb) {
           
           card.innerHTML =
             '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
+            '<div class="ec-name">' + name + '</div>' + '</div>';
         } else {
           card.innerHTML =
             '<img class="thumb thumb-yt" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
+            '<div class="ec-name">' + name + '</div>' + '</div>';
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
