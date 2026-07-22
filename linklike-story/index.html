@@ -44,7 +44,7 @@
       --muted: #8095b0;
       --border: #2d3750;
     }
-    body.dark-mode .sl-toggle { cursor: pointer; user-select: none; } .sl-toggle:hover { opacity: .8; } .sl-arrow { font-size: 10px; margin-left: 6px; } .setlist { display: none; counter-reset: song-num; } .sl-toggle.sl-open + .setlist { display: flex; flex-direction: column; gap: 3px; } .ads-notice { background: rgba(0,0,0,.35); }
+    body.dark-mode .sl-toggle { cursor: pointer; user-select: none; } .sl-toggle:hover { opacity: .8; } .sl-arrow { font-size: 10px; margin-left: 6px; } .setlist { display: none; counter-reset: song-num; } .sl-toggle.sl-open + .setlist { display: flex; flex-direction: column; gap: 3px; } body.dark-mode .ads-notice { background: rgba(255,255,255,.1); color: #eaf1fb; border: 1px solid rgba(255,255,255,.22); }
     .dm-btn {
       background: rgba(255,255,255,.15); border: 0; color: #fff;
       font-size: 0; cursor: pointer; padding: 0; line-height: 1;
@@ -73,7 +73,7 @@
       flex-direction: column;
       align-items: center;
       padding: 18px 24px;
-      overflow-x: hidden;   /* never let the page scroll horizontally on phones */
+      overflow-x: hidden;   
     }
 
     .wrap { width: 100%; max-width: 960px; }
@@ -87,10 +87,10 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      color: #4f93d6; /* fallback if gradient unsupported */
+      color: #4f93d6; 
       filter: drop-shadow(0 1px 2px rgba(40,70,130,.18));
     }
-    /* Header band: dark blue->purple gradient so the title sits on a distinct background */
+    
     .site-header {
       background: linear-gradient(90deg, #4f93d6, #6d4fc4);
       border-radius: 14px;
@@ -116,7 +116,7 @@
       letter-spacing: .3px;
     }
 
-    /* Compact header + less scroll on small screens (phones) */
+    
     @media (max-width: 600px) {
       body { padding: 0 0 24px; }
       .wrap { max-width: none; min-width: 0; overflow-x: hidden; }
@@ -124,16 +124,16 @@
         -webkit-overflow-scrolling: touch; }
       h1 { font-size: 26px; padding-left: 0; }
       .subtitle { margin: 0 0 12px; font-size: 18px; padding-left: 0; font-weight: 500; }
-      /* episode view: back-btn & headings all share the 14px edge (no double inset) */
+      
       #episode-view { padding-left: 14px; padding-right: 14px; }
       .back-btn { margin-bottom: 14px; margin-left: 0; margin-right: 0; }
       .view h2 { font-size: 19px; margin: 0 0 2px; padding-left: 0; }
       .view .hint { margin: 0 0 16px; padding-left: 0; }
-      /* summary box: keep off the screen edges on phones */
+      
       .summary-box { margin-left: 14px; margin-right: 14px; }
     }
 
-    /* Period menu: stacked full-width buttons */
+    
     .menu { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; }
 
     .menu-item {
@@ -157,7 +157,7 @@
     .menu-item .num { font-size: 28px; font-weight: 700; color: var(--accent-deep); white-space: normal; line-height: 1.1; }
     .menu-item .label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 
-    /* Term menu split into Main Story / Side Story sections */
+    
     .menu-section { display: block; }
     .menu-section + .menu-section { margin-top: 12px; }
     .menu-section .section-title {
@@ -167,7 +167,7 @@
     }
     .menu-grid { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; }
 
-    /* Continue Watching card */
+    
     .cw-card {
       display: flex; gap: 0; background: var(--card);
       border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
@@ -176,7 +176,7 @@
     }
     .cw-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,147,214,.2); }
     .cw-thumb { width: 100px; height: 100%; flex-shrink: 0; background: #4a86d4; overflow: hidden; }
-    .cw-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .cw-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
     .cw-info { flex: 1; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
     .cw-term { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-deep); }
     .cw-title { font-size: 13px; font-weight: 600; line-height: 1.2; }
@@ -188,11 +188,11 @@
     }
     .cw-clear:hover { background: rgba(0,0,0,.06); color: var(--text); }
 
-    /* Views */
+    
     .view { display: none; width: 100%; }
     .view.active { display: block; }
     .menu.active { display: none; }
-    /* Player view must span full width of .wrap (no inset from .wrap > * rule) */
+    
     #player-view { padding-left: 0; padding-right: 0; }
 
     .back-btn {
@@ -224,15 +224,15 @@
       color: var(--muted); font-size: 15px;
     }
 
-    /* Episode row: large cards side by side, scroll sideways when narrow */
+    
     .episode-row {
       display: flex; flex-wrap: nowrap; gap: 16px;
       width: 100%;
       overflow-x: auto; padding-bottom: 12px;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;   /* let horizontal swipe scroll the row on phones */
+      touch-action: pan-x;   
     }
-    .episode-row::-webkit-scrollbar { display: none; }  /* use custom draggable bar below (works on mobile) */
+    .episode-row::-webkit-scrollbar { display: none; }  
     .ep-scrollbar { position: relative; height: 9px; margin: 4px 2px 2px; background: var(--border); border-radius: 5px; }
     .ep-scrollbar-thumb { position: absolute; top: 0; left: 0; height: 100%; min-width: 28px;
       background: linear-gradient(90deg, var(--accent), var(--accent-strong)); border-radius: 5px;
@@ -261,7 +261,7 @@
       object-fit: cover;
       object-position: center 38%;
       border-radius: 14px;
-      transform: scale(1.5);        /* stronger zoom to fully fill card, cut dark bars */
+      transform: scale(1.5);        
       transform-origin: center 38%;
     }
     .episode-card .thumb.thumb-yt {
@@ -289,13 +289,15 @@
       font-size: 17px; margin-top: 7px; line-height: 1.35; font-weight: 600;
       text-shadow: 0 1px 4px rgba(0,0,0,.7);
     }
-    /* Fes×LIVE cards: rainbow SSR-style border with glow */
+    
     .episode-card.fes {
-      border: 3px solid transparent; box-shadow: 0 4px 24px rgba(255,107,107,.2), 0 0 0 1px rgba(255,107,107,.12);
+      border: 3px solid transparent; border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(255,107,107,.2), 0 0 0 1px rgba(255,107,107,.12);
       background:
-        conic-gradient(from 0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) border-box,
-        linear-gradient(#3a1e3a, #3a1e3a) padding-box;
-      background-clip: border-box, padding-box;
+        linear-gradient(#3a1e3a, #3a1e3a) padding-box,
+        conic-gradient(from 0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) border-box;
+      background-clip: padding-box, border-box;
+      -webkit-background-clip: padding-box, border-box;
     }
     .episode-card.fes:hover {
       box-shadow: 0 8px 32px rgba(255,107,107,.4), 0 0 0 2px rgba(255,107,107,.25);
@@ -303,7 +305,7 @@
     }
     .episode-card.fes .ec-ep { color: #ff9bac; }
 
-    /* Player view */
+    
     .player-bar {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; gap: 12px;
@@ -342,7 +344,7 @@
       background-clip: border-box, padding-box;
     }
     .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-    /* Drive embeds: pure 16:9 so Google's own controls stay proportional (no min-height stretch) */
+    
     .player.drive { aspect-ratio: 16/9; background: #1a2230; }
     @media (max-width: 600px) {
       .player.drive { min-height: 0; }
@@ -352,22 +354,22 @@
     @media (max-width: 600px) {
       .player.drive { min-height: 300px; }
       .wrap { padding: 0; }
-      .wrap > *:not(.menu):not(.site-header) { padding-left: 14px; padding-right: 14px; }  /* keep text off the edge */
-      /* header band pinned to the very top, edge-to-edge on phones */
+      .wrap > *:not(.menu):not(.site-header) { padding-left: 14px; padding-right: 14px; }  
+      
       .site-header {
         position: sticky; top: 0; z-index: 20;
         margin: 0 0 16px; border-radius: 0;
         padding: 16px 16px;
       }
-      /* but the player itself must touch the screen edges */
+      
       #player-view { padding-left: 0; padding-right: 0; }
-      .player, .player.drive, .player.fes, .player.drive.fes { border-radius: 0; }   /* video flush to screen edges */
-      .player-bar, .player-top, .player-meta { padding-left: 14px; padding-right: 14px; }  /* text stays off the very edge */
+      .player, .player.drive, .player.fes, .player.drive.fes { border-radius: 0; }   
+      .player-bar, .player-top, .player-meta { padding-left: 14px; padding-right: 14px; }  
       h1 { font-size: 18px; padding-left: 14px; }
       .subtitle { padding-left: 14px; }
       .menu-item { margin-left: 14px; margin-right: 14px; }
       .cw-card { margin-left: 14px; margin-right: 14px; }
-      /* keep section titles off the left edge on phones (align with cards) */
+      
       .menu-section .section-title { padding-left: 14px; }
     }
 
@@ -413,11 +415,11 @@
       </div>
     </header>
 
-    <!-- Period menu -->
+    
     <div class="menu" id="menu">
       <p class="subtitle">Select a term</p>
 
-      <!-- Continue Watching -->
+      
       <div class="menu-section" id="continue-watching" style="display:none">
         <h3 class="section-title">Continue Watching</h3>
         <div class="cw-card" id="cw-card" onclick="bukaDariProgress()">
@@ -448,7 +450,7 @@
       </div>
     </div>
 
-    <!-- Episode list (sideways) -->
+    
     <div class="view" id="episode-view">
       <button class="back-btn" onclick="kembaliKeMenu()">&larr; Back</button>
       <div class="episode-header">
@@ -464,7 +466,7 @@
       <div class="note" id="episode-note"></div>
     </div>
 
-    <!-- Player view -->
+    
     <div class="view" id="player-view">
       <div class="player-bar">
         <button class="back-btn" onclick="kembaliKeEpisode()">&larr; Back to episodes</button>
@@ -509,66 +511,66 @@
         { "id": "zeBVo4StRiE", "title": "103rd Term Episode 4 \"My School Idol\"" },
         { "id": "_7DlIHOD2lY", "title": "103rd Term Episode 5 \"Head up\"" },
         { "id": "935krFf2bBk", "title": "103rd Term Episode 6 \"Selfish on the ICE!!\"" },
-        { "id": "53YXoZPU33Q", "type": "fes", "setlist": ["Suisai Sekai", "AWOKE", "MC", "Scapegoat", "Oka Ranman", "MC"], "title": "103rd Term April Fes×LIVE" },
+        { "id": "53YXoZPU33Q", "type": "fes", "start": 57, "setlist": ["Suisai Sekai", "AWOKE", "MC", "Scapegoat", "Oka Ranman", "MC"], "title": "103rd Term April Fes×LIVE" },
         { "id": "s8OpSRvG4fM", "title": "103rd Term Episode 7 \"Senpai and Kouhai\"" },
-        { "id": "FELdrefWAZk", "type": "fes", "setlist": ["Scapegoat", "AWOKE", "Oka Ranman", "Suisai Sekai", "MC", "Holiday∞Holiday", "Tragic Drops", "MC"], "title": "103rd Term May Fes×LIVE" },
+        { "id": "FELdrefWAZk", "type": "fes", "start": 57, "setlist": ["Scapegoat", "AWOKE", "Oka Ranman", "Suisai Sekai", "MC", "Holiday∞Holiday", "Tragic Drops", "MC"], "title": "103rd Term May Fes×LIVE" },
         { "id": "_NbU1zXeOuI", "title": "103rd Term Episode 8 \"The Heart of That Day, the Heart of Tomorrow\"" },
-        { "id": "oA9bFPPvv_Y", "type": "fes", "setlist": ["DEEPNESS", "MC", "Holiday∞Holiday", "Suisai Sekai", "Tragic Drops", "AWOKE", "MC", "Dream Believers", "MC"], "title": "103rd Term June Fes×LIVE" },
+        { "id": "oA9bFPPvv_Y", "type": "fes", "start": 57, "setlist": ["DEEPNESS", "MC", "Holiday∞Holiday", "Suisai Sekai", "Tragic Drops", "AWOKE", "MC", "Dream Believers", "MC"], "title": "103rd Term June Fes×LIVE" },
         { "id": "9Lzn7aDqUf0", "title": "103rd Term Episode 9 \"The Ruri Escape\"" },
-        { "id": "D90eVXNlvZI", "type": "fes", "setlist": ["Reflection in the mirror", "Sparkly Spot", "MC", "Genyou Yakou", "Mirage Voyage", "MC", "Eien no Euphoria", "MC"], "title": "103rd Term July Fes×LIVE" },
+        { "id": "D90eVXNlvZI", "type": "fes", "start": 57, "setlist": ["Reflection in the mirror", "Sparkly Spot", "MC", "Genyou Yakou", "Mirage Voyage", "MC", "Eien no Euphoria", "MC"], "title": "103rd Term July Fes×LIVE" },
         { "id": "_wjxCkfAsTU", "title": "103rd Term Episode 10 \"Ruri-Megu with Fanfare\"" },
-        { "id": "P1cekJDE69c", "type": "fes", "setlist": ["Do! Do! Do!", "Hakuchuu à la Mode", "MC (Mira-Cra Park!)", "Mirage Voyage", "Genyou Yakou", "Kokon Touzai", "MC", "Natsumeki Pain", "Eien no Euphoria", "MC"], "title": "103rd Term August Fes×LIVE" },
+        { "id": "P1cekJDE69c", "type": "fes", "start": 57, "setlist": ["Do! Do! Do!", "Hakuchuu à la Mode", "MC (Mira-Cra Park!)", "Mirage Voyage", "Genyou Yakou", "Kokon Touzai", "MC", "Natsumeki Pain", "Eien no Euphoria", "MC"], "title": "103rd Term August Fes×LIVE" },
         { "id": "97CsqCXuDBw", "title": "103rd Term Episode 11 \"For the School Idol Club! (?)\"" },
         { "id": "5tXMOM4eZ3o", "type": "fes", "setlist": ["Natsumeki Pain", "MC", "Take It Over", "Sugao no Pixel", "Identity", "MC", "Do! Do! Do!", "Tsukimakase", "Fortune Movie", "Interlude", "Dream Believers", "MC"], "title": "103rd Term September Fes×LIVE" },
         { "id": "Ep8KJ22oZRo", "title": "103rd Term Episode 12 \"Heavy Expectations!\"" },
-        { "id": "u0TSsGOwfUM", "type": "fes", "setlist": ["Runway (Sayaka)", "MC", "Trick & Cute", "MC", "Identity", "Take It Over", "Sugao no Pixel", "MC", "Dream Believers", "MC"], "title": "103rd Term October Fes×LIVE Part 1" },
-        { "id": "H3xoF80sDyc", "type": "fes", "setlist": ["MC (Kozue)", "Nonfiction Hero Show", "KNOT", "Senpen Banka", "MC"], "title": "103rd Term October Fes×LIVE Part 2" },
+        { "id": "u0TSsGOwfUM", "type": "fes", "start": 57, "setlist": ["Runway (Sayaka)", "MC", "Trick & Cute", "MC", "Identity", "Take It Over", "Sugao no Pixel", "MC", "Dream Believers", "MC"], "title": "103rd Term October Fes×LIVE Part 1" },
+        { "id": "H3xoF80sDyc", "type": "fes", "start": 57, "setlist": ["MC (Kozue)", "Nonfiction Hero Show", "KNOT", "Senpen Banka", "MC"], "title": "103rd Term October Fes×LIVE Part 2" },
         { "id": "qOqAsgtSFsU", "title": "103rd Term Episode 13 \"Caught Up\"" },
-        { "id": "h7mqZyhX-Y4", "type": "fes", "setlist": ["On your mark", "MC", "KNOT", "Do! Do! Do!", "Holiday∞Holiday", "MC", "Interlude", "Tsubasa La Liberte", "MC"], "title": "103rd Term November Fes×LIVE" },
+        { "id": "h7mqZyhX-Y4", "type": "fes", "start": 57, "setlist": ["On your mark", "MC", "KNOT", "Do! Do! Do!", "Holiday∞Holiday", "MC", "Interlude", "Tsubasa La Liberte", "MC"], "title": "103rd Term November Fes×LIVE" },
         { "id": "1AJp2IAIe-E", "title": "103rd Term Episode 14 \"Link! Like!\"" },
-        { "id": "T0-5Unz8L2A", "type": "fes", "setlist": ["On your mark", "MC", "Identity", "Sparkly Spot", "Reflection in the mirror", "MC", "Link to the FUTURE", "MC"], "title": "103rd Term December Fes×LIVE" },
+        { "id": "T0-5Unz8L2A", "type": "fes", "start": 57, "setlist": ["On your mark", "MC", "Identity", "Sparkly Spot", "Reflection in the mirror", "MC", "Link to the FUTURE", "MC"], "title": "103rd Term December Fes×LIVE" },
         { "id": "GO76pYV3Gxw", "title": "103rd Term Episode 15 \"Dream Believers\"" },
         { "id": "yIrJMGtFcTI", "title": "103rd Term Episode 16 \"Special Thanks\"" },
-        { "id": "SMYGaFf4yLo", "type": "fes", "setlist": ["Yup! Yup! Yup!", "MC", "Ao to Shabon", "Milk", "Special Thanks", "MC", "Eien no Euphoria", "MC"], "title": "103rd Term January Fes×LIVE" },
+        { "id": "SMYGaFf4yLo", "type": "fes", "start": 57, "setlist": ["Yup! Yup! Yup!", "MC", "Ao to Shabon", "Milk", "Special Thanks", "MC", "Eien no Euphoria", "MC"], "title": "103rd Term January Fes×LIVE" },
         { "id": "TbtO0cJAP68", "title": "103rd Term Episode 17 \"Ruri thinks.\"" },
-        { "id": "fZYtvAziw7w", "type": "fes", "setlist": ["Happy Shijou Shugi!", "Pleasure Feather", "Colorfulness", "MC", "Trick & Cute", "Dream Believers", "MC"], "title": "103rd Term February Fes×LIVE" },
+        { "id": "fZYtvAziw7w", "type": "fes", "start": 57, "setlist": ["Happy Shijou Shugi!", "Pleasure Feather", "Colorfulness", "MC", "Trick & Cute", "Dream Believers", "MC"], "title": "103rd Term February Fes×LIVE" },
         { "id": "LtTzDz1FY-w", "title": "103rd Term Episode 18 \"The Inevitable Fourth Cherry Blossom\"" },
-        { "id": "HJI9_jJYUtw", "type": "fes", "setlist": ["Dream Believers", "MC", "On your mark", "Tsubasa La Liberte", "MC", "Dakishimeru Hanabira", "MC", "Legato"], "title": "103rd Term March Fes×LIVE" }
+        { "id": "HJI9_jJYUtw", "type": "fes", "start": 57, "setlist": ["Dream Believers", "MC", "On your mark", "Tsubasa La Liberte", "MC", "Dakishimeru Hanabira", "MC", "Legato"], "title": "103rd Term March Fes×LIVE" }
       ],
 
       "104": [
         { "id": "cbD6ZGkkVMc", "title": "104th Term Episode 1 \"Song to the Future\"" },
-        { "id": "DWhkaktUp8M", "type": "fes", "setlist": ["On your mark (104th Ver.)", "MC", "Identity (104th Ver.)", "Sparkly Spot (104th Ver.)", "Reflection in the mirror (104th Ver.)", "MC", "Dream Believers (104th Ver.)", "MC"], "title": "104th Term OPENING! Fes×LIVE" },
+        { "id": "DWhkaktUp8M", "type": "fes", "start": 593, "setlist": ["On your mark (104th Ver.)", "MC", "Identity (104th Ver.)", "Sparkly Spot (104th Ver.)", "Reflection in the mirror (104th Ver.)", "MC", "Dream Believers (104th Ver.)", "MC"], "title": "104th Term OPENING! Fes×LIVE" },
         { "id": "O0VBpYABVZI", "title": "104th Term Episode 2 \"Watch me, I'll keep dancing\"" },
         { "id": "7eAiw613yW8", "title": "104th Term Episode 3 \"Ergo Mira-Cra Park!\"" },
         { "id": "iLoBZ9nWn0A", "title": "104th Term Episode 4 \"Beneath the same sky, Then and Now\"" },
-        { "id": "Ss2oqfMXW18", "type": "fes", "setlist": ["Nonfiction Hero Show (104th Ver.)", "Tragic Drops (104th Ver.)", "Aoku Haruka", "MC", "Mira-Creation", "Ladybug", "Tsukiyomi Kurage", "MC", "Eien no Euphoria (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE TWINKLE STAR FESTIVAL!!" },
+        { "id": "Ss2oqfMXW18", "type": "fes", "start": 245, "setlist": ["Nonfiction Hero Show (104th Ver.)", "Tragic Drops (104th Ver.)", "Aoku Haruka", "MC", "Mira-Creation", "Ladybug", "Tsukuyomi Kurage", "MC", "Eien no Euphoria (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE TWINKLE STAR FESTIVAL!!" },
         { "id": "Z_VgNraowyg", "title": "104th Term Episode 5 \"Imperfect and Incomplete\"" },
         { "id": "K9KV85nQdSg", "title": "104th Term Episode 6 \"GLHF!!\"" },
         { "id": "XHwlQBfVyHE", "title": "104th Term Episode 7 \"Link to the FRIENDS!\"" },
-        { "id": "eSyV6YuLct4", "type": "fes", "setlist": ["Tsukiyomi Kurage", "Proof", "Fanfare!!!", "MC", "Now or Never", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL" },
-        { "id": "2YAAXyc4M6s", "type": "fes", "setlist": ["MC (Kozue)", "Link to the FUTURE (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL ~Love Live! Regional Qualifier Entry~" },
+        { "id": "eSyV6YuLct4", "type": "fes", "start": 57, "setlist": ["Tsukuyomi Kurage", "Proof", "Fanfare!!!", "MC", "Now or Never", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL" },
+        { "id": "2YAAXyc4M6s", "type": "fes", "start": 298, "setlist": ["MC (Kozue)", "Link to the FUTURE (104th Ver.)", "MC"], "title": "104th Term Fes×LIVE AUTUMN LINKED CARNIVAL ~Love Live! Regional Qualifier Entry~" },
         { "id": "b2e8jT_jQVA", "title": "104th Term Episode 8 \"Not a marionette\"" },
         { "id": "m_2Ycv8S2go", "title": "104th Term Episode 9 \"Miracle the universe!\"" },
         { "id": "5_j8CzSG6EU", "title": "104th Term Episode 10 \"Believe your love. Believe your live.\"" },
         { "id": "fbwWPaLScsI", "title": "104th Term Episode 11 \"Bloom the Dream\"" },
-        { "id": "tv-Dsxreb0s", "type": "fes", "setlist": ["Edelied", "AURORA FLOWER"], "title": "104th Term Fes×LIVE Love Live! Finals Playoff" },
-        { "id": "w_Uh83sjPRU", "type": "fes", "setlist": ["KEY of Like!", "Joushou Kiryuu", "Bird Cage", "Hanamusubi", "MC", "Dream Believers (104th Ver.)"], "title": "104th Term Fes×LIVE Love Live! Finals Playoff Exhibition" },
+        { "id": "tv-Dsxreb0s", "type": "fes", "start": 597, "setlist": ["Edelied", "AURORA FLOWER"], "title": "104th Term Fes×LIVE Love Live! Finals Playoff" },
+        { "id": "w_Uh83sjPRU", "type": "fes", "start": 296, "setlist": ["KEY of Like!", "Joushou Kiryuu", "Bird Cage", "Hanamusubi", "MC", "Dream Believers (104th Ver.)"], "title": "104th Term Fes×LIVE Love Live! Finals Playoff Exhibition" },
         { "id": "Pu10BzPHP-M", "title": "104th Term Episode 12 \"A Bouquet for the You of Tomorrow\"" },
         { "id": "hasu-104-13", "src": "archive", "title": "104th Term Episode 13 \"The Eventual Promised Cherry Blossoms\"" },
-        { "id": "LxTNiRHsB98", "type": "fes", "setlist": ["Zenhoui Kyun♡", "COMPASS", "Yumewazurai", "MC", "Dream Believers (SAKURA Ver.)", "MC", "Itsudemo, Itsumademo", "MC", "365 Days"], "title": "104th Term Fes×LIVE -Rengesai- (102nd Graduation Live)" }
+        { "id": "LxTNiRHsB98", "type": "fes", "start": 597, "setlist": ["Zenhoui Kyun♡", "COMPASS", "Yumewazurai", "MC", "Dream Believers (SAKURA Ver.)", "MC", "Itsudemo, Itsumademo", "MC", "365 Days"], "title": "104th Term Fes×LIVE -Rengesai- (102nd Graduation Live)" }
       ],
       "105": [
-        // Planned Fes×LIVE (videos TBD):
-        //   Apr 2025 - after Ep1  - OPENING! Fes×LIVE               [added ✓]
-        //   Jun 2025 - after Ep3  - 1st Term Fes×LIVE (-Nadeshiko-sai-)
-        //   Aug 2025 - after Ep5  - 2nd Term Fes×LIVE
-        //   Oct 2025 - after Ep7  - 3rd Term Fes×LIVE (-Rindou-sai-)
-        //   Dec 2025 - after Ep9  - 4th Term Fes×LIVE
-        //   Jan 2026 - after Ep10 - Fes×ReC:LIVE ~Road to Bloom~     [added ✓]
-        //   Mar 2026 - after Ep12 - Final Term Fes×LIVE STAGE
+        
+        
+        
+        
+        
+        
+        
+        
         { "id": "-sZHOIWGQGk", "title": "105th Term Episode 1 \"Brand New Stories!!\"" },
-        { "id": "CCuUGUfthVA", "type": "fes", "setlist": ["Celebration!", "WAWO!", "Ampere", "Retrofuture", "MC", "Dream Believers (105th Ver.)", "MC"], "title": "105th Term OPENING! Fes×LIVE" },
+        { "id": "CCuUGUfthVA", "type": "fes", "start": 597, "setlist": ["Celebration!", "WAWO!", "Ampere", "Retrofuture", "MC", "Dream Believers (105th Ver.)", "MC"], "title": "105th Term OPENING! Fes×LIVE" },
         { "id": "BlZ5XSeOoMU", "title": "105th Term Episode 2 \"Dream Match!\"" },
         { "id": "ZVzdlyl1gU0", "title": "105th Term Episode 3 \"Flowers dance, yearning for the stars\"" },
         { "id": "0OgN0slD_zU", "title": "105th Term Episode 4 \"Chasing My Sunshine\"" },
@@ -584,6 +586,7 @@
       ],
       "dream": [
         { "id": "VzLRAYU-y2k", "title": "Dream Interlude \"Water the flowers\"" },
+        { "id": "EdB_cM6AoEk", "type": "fes", "setlist": ["Perennial"], "title": "Perennial / Live Performance Video" },
         { "id": "LLuRLXd41YM", "title": "Dream Interlude \"Be Cera-fish\"" }
       ]
     };
@@ -594,16 +597,22 @@
     let showFes = JSON.parse(localStorage.getItem('linklike-showfes')) ?? true;
     let currentIndex = 0;
     let summariesData = {};
+    function ytThumbUrl(id){ return 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg'; }
+    function ytThumbFallback(img){
+      const s = img.src;
+      if (s.indexOf('maxresdefault') >= 0) img.src = s.replace('maxresdefault','sddefault');
+      else if (s.indexOf('sddefault') >= 0) img.src = s.replace('sddefault','hqdefault');
+    }
 
-    // Dark mode init
+    
     if (localStorage.getItem('linklike-darkmode') === '1') document.body.classList.add('dark-mode');
 
-    // Register service worker for PWA installability
+    
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(() => {});
     }
 
-    // Load episode summaries once (hosted locally, see summaries.json)
+    
     fetch('summaries.json').then(r => r.ok ? r.json() : {}).then(d => { summariesData = d || {}; if (document.getElementById('player-view').classList.contains('active')) updatePlayerMeta(); }).catch(() => { summariesData = {}; });
 
     function bukaPlaylist(kode) {
@@ -612,7 +621,7 @@
       document.getElementById('fes-checkbox').checked = showFes;
       document.getElementById('fes-checkbox-player').checked = showFes;
       applyFesFilter();
-      // Hide Fes×LIVE toggle for terms without any Fes×LIVE content
+      
       const hasFes = allVideos.some(v => v.type === 'fes');
       document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
       document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
@@ -635,15 +644,14 @@
       applyFesFilter();
       const inView = !!currentId && currentVideos.some(v => v.id === currentId);
       if (!inView) {
-        // Current video was filtered out, find nearest non-fes video
         const origIdx = allVideos.findIndex(v => v.id === currentId);
         let targetIdx = -1;
-        // Search forward first (next episode after Fes×LIVE)
+        
         for (let i = origIdx + 1; i < allVideos.length; i++) {
           if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
         }
         if (targetIdx === -1) {
-          // No forward match, search backward
+          
           for (let i = origIdx - 1; i >= 0; i--) {
             if (allVideos[i].type !== 'fes') { targetIdx = i; break; }
           }
@@ -651,8 +659,9 @@
         const filteredIdx = targetIdx >= 0 ? currentVideos.findIndex(v => v.id === allVideos[targetIdx].id) : 0;
         currentIndex = filteredIdx >= 0 ? filteredIdx : 0;
         if (document.getElementById('player-view').classList.contains('active')) {
-          saveProgress();
           renderPlayer();
+          saveProgress();
+          if ((location.hash.replace(/^#/, '').split('/')[0]) === currentPeriod) history.replaceState(null, '', '#' + currentPeriod + '/' + currentIndex);
         } else {
           const oldRow = document.querySelector('.episode-row');
           const savedScroll = oldRow ? oldRow.scrollLeft : 0;
@@ -665,6 +674,7 @@
       currentIndex = currentVideos.findIndex(v => v.id === currentId);
       if (document.getElementById('player-view').classList.contains('active')) {
         updatePlayerMeta();
+        if ((location.hash.replace(/^#/, '').split('/')[0]) === currentPeriod) history.replaceState(null, '', '#' + currentPeriod + '/' + currentIndex);
       } else {
         const oldRow = document.querySelector('.episode-row');
         const savedScroll = oldRow ? oldRow.scrollLeft : 0;
@@ -676,6 +686,28 @@
 
     function applyFesFilter() {
       currentVideos = showFes ? allVideos : allVideos.filter(v => v.type !== 'fes');
+    }
+
+    const TERM_SEQ = ['103', '104', '105'];
+    function nextTermOf(k) { const i = TERM_SEQ.indexOf(k); return (i >= 0 && i < TERM_SEQ.length - 1) ? TERM_SEQ[i + 1] : null; }
+    function prevTermOf(k) { const i = TERM_SEQ.indexOf(k); return (i > 0) ? TERM_SEQ[i - 1] : null; }
+    function goToTerm(term, index) {
+      currentPeriod = term;
+      allVideos = playlists[term] || [];
+      applyFesFilter();
+      currentIndex = (index === 'last') ? Math.max(0, currentVideos.length - 1) : (index || 0);
+      const hasFes = allVideos.some(v => v.type === 'fes');
+      document.getElementById('fes-checkbox').checked = showFes;
+      document.getElementById('fes-checkbox-player').checked = showFes;
+      document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
+      document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
+      document.getElementById('episode-view').classList.remove('active');
+      document.getElementById('menu').classList.add('active');
+      document.getElementById('player-view').classList.add('active');
+      if ((location.hash.replace(/^#/, '').split('/')[0]) !== term) history.replaceState(null, '', '#' + term + '/' + currentIndex);
+      renderPlayer();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      saveProgress();
     }
 
     function renderEpisodeList() {
@@ -700,13 +732,15 @@
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
         const isFes = (v.type === 'fes');
+        const allIdx = allVideos.findIndex(x => x.id === v.id);
+        const epPosAll = allIdx >= 0 ? allVideos.slice(0, allIdx + 1).filter(x => x.type !== 'fes').length : (i + 1);
         let epNo, name;
         if (isFes) {
           epNo = null;
           name = v.title;
         } else {
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
-          epNo = m ? m[1] : (i + 1);
+          epNo = m ? m[1] : epPosAll;
           name = v.title
             .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
             .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
@@ -714,50 +748,53 @@
             .trim();
         }
 
-        // Thumbnail arc (HamP story art)
+        
         let arc = null;
-        if (currentPeriod === 'dream') {
-          arc = (i === 0) ? '200001' : '200002';
-        } else if (currentPeriod === '103' || currentPeriod === '104' || currentPeriod === '105') {
+        if (isFes) {
+          arc = 'fes-' + v.id;
+        } else if (currentPeriod === 'dream') {
+          if (!isFes) arc = (i === 0) ? '200001' : '200002';
+        } else if (currentPeriod === '102' || currentPeriod === '103' || currentPeriod === '104' || currentPeriod === '105') {
           if (currentPeriod === '104' && epNo === '13') {
-            arc = '105012'; // 104 ep13 is the shared finale arc
+            arc = '105012'; 
           } else {
-            arc = currentPeriod + '0' + String(epNo).padStart(2, '0');
+            arc = currentPeriod + '0' + String(epNo ?? epPosAll).padStart(2, '0');
           }
         }
-        const ytThumb = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
-        const localThumb = arc ? 'thumbs/' + arc + '.webp' : null;
+        const ytThumb = ytThumbUrl(v.id);
+        const localExt = (arc.indexOf('fes-') === 0 || arc.indexOf('102') === 0) ? '.jpg' : '.webp';
+        const localThumb = arc ? 'thumbs/' + arc + localExt : null;
         const remoteThumb = arc ? 'https://storage.googleapis.com/llll-card/story/monthly/image_record_monthly_' + arc + '.webp' : null;
-        // local copy first, then HamP remote, then YouTube so it still works if HamP vanishes
+        
         const arcThumb = localThumb
-          ? localThumb + '" onerror="this.onerror=null;this.src=\'' + remoteThumb + '\';this.onerror=function(){this.onerror=null;this.src=\'' + ytThumb + '\'};"'
+          ? localThumb + '" onerror="this.onerror=null;this.src=\'' + remoteThumb + '\';this.onerror=function(){ytThumbFallback(this)}"'
           : null;
 
         const card = document.createElement('div');
         card.className = 'episode-card' + (isFes ? ' fes' : '');
         if (v.src === 'drive' || v.src === 'archive') {
           if (arcThumb) {
-            // Drive has no public thumbnail, but we can borrow the HamP story-arc art
+            
             card.innerHTML =
               '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="">' +
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
               (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
           } else {
-            // No arc art available: styled fallback
+            
             card.classList.add('thumb-fallback');
             card.innerHTML =
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
               (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
           }
         } else if (arcThumb) {
-          // try HamP art; if it fails to load, fall back to YouTube thumb
+          
           card.innerHTML =
-            '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\'">' +
+            '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
             (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         } else {
           card.innerHTML =
-            '<img class="thumb thumb-yt" loading="lazy" src="' + ytThumb + '" alt="">' +
+            '<img class="thumb thumb-yt" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
             (isFes ? '' : '<div class="ec-name">' + name + '</div>') + '</div>';
         }
@@ -765,7 +802,7 @@
         row.appendChild(card);
       });
 
-      // Custom draggable scrollbar (works on touch + mouse)
+      
       const sb = content.querySelector('.ep-scrollbar');
       const sbThumb = content.querySelector('.ep-scrollbar-thumb');
       function syncThumb() {
@@ -781,7 +818,7 @@
         syncThumb();
       }
       row.addEventListener('scroll', syncThumb, { passive: true });
-      // PC: let the mouse wheel scroll the row horizontally (falls through to page at the edges)
+      
       row.addEventListener('wheel', (e) => {
         const max = row.scrollWidth - row.clientWidth;
         if (max <= 0) return;
@@ -813,7 +850,7 @@
       });
       sbThumb.addEventListener('pointerup', (e) => { dragging = false; });
       sbThumb.addEventListener('pointercancel', () => { dragging = false; });
-      // tap/click anywhere on the track jumps there
+      
       sb.addEventListener('pointerdown', (e) => {
         if (e.target === sbThumb) return;
         thumbToScroll(e.clientX);
@@ -851,7 +888,7 @@
       const isFes = (v.type === 'fes');
       const epMatch = isFes ? null : v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
       const epNo = epMatch ? parseInt(epMatch[1], 10) : null;
-      const showAds = (currentPeriod === '103' && !isFes && epNo !== null && epNo <= 10);
+      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && v.id === 'EdB_cM6AoEk');
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
@@ -877,12 +914,14 @@
       if (!v) return;
       const isFes = (v.type === 'fes');
       let epNo, name;
+      const allIdx = allVideos.findIndex(x => x.id === v.id);
+      const epPosAll = allIdx >= 0 ? allVideos.slice(0, allIdx + 1).filter(x => x.type !== 'fes').length : (currentIndex + 1);
       if (isFes) {
         epNo = null;
         name = v.title;
       } else {
         const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
-        epNo = m ? m[1] : (currentIndex + 1);
+        epNo = m ? m[1] : epPosAll;
         name = v.title
           .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
           .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
@@ -896,36 +935,65 @@
       if (isFes && v.setlist) {
         setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : 'song') + '">' + s + '</div>').join('') + '</div>';
       } else {
-        const sumText = (!isFes && epNo != null) ? summariesData[currentPeriod + '-' + epNo] : null;
+        let sumKey = null;
+        if (currentPeriod === 'dream') {
+          const epPos = epPosAll;
+          sumKey = 'dream-' + epPos;
+        } else if (epNo != null) {
+          sumKey = currentPeriod + '-' + epNo;
+        }
+        const sumText = (!isFes && sumKey) ? summariesData[sumKey] : null;
         setlistHtml = sumText ? '<div class="sum-label">SUMMARY</div>' + sumText : '';
       }
       sumEl.innerHTML = setlistHtml;
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
       document.getElementById('player-counter').textContent = isFes ? 'Fes×LIVE' : (epPos + ' / ' + epCount);
-      document.getElementById('prev-btn').disabled = (currentIndex === 0);
-      document.getElementById('next-btn').disabled = (currentIndex === currentVideos.length - 1);
+      const nb = document.getElementById('next-btn');
+      const pb = document.getElementById('prev-btn');
+      pb.disabled = (currentIndex === 0);
+      if (currentIndex === 0) {
+        const pt = prevTermOf(currentPeriod);
+        pb.textContent = pt ? ('← Term ' + pt) : '← Prev';
+        pb.disabled = !pt;
+      } else {
+        pb.textContent = '← Prev';
+      }
+      nb.disabled = (currentIndex === currentVideos.length - 1);
+      if (currentIndex === currentVideos.length - 1) {
+        const nt = nextTermOf(currentPeriod);
+        nb.textContent = nt ? ('Term ' + nt + ' →') : 'Next →';
+        nb.disabled = !nt;
+      } else {
+        nb.textContent = 'Next →';
+      }
     }
 
     function navEpisode(step) {
       const ni = currentIndex + step;
-      if (ni < 0 || ni >= currentVideos.length) return;
-      currentIndex = ni;
-      renderPlayer();
-      location.hash = currentPeriod + '/' + currentIndex;
-      window.scrollTo({ top: 0, behavior: 'auto' });
-      saveProgress();
+      if (ni >= 0 && ni < currentVideos.length) {
+        currentIndex = ni;
+        renderPlayer();
+        location.hash = currentPeriod + '/' + currentIndex;
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        saveProgress();
+        return;
+      }
+      if (currentPeriod === 'dream') return;
+      const nt = step > 0 ? nextTermOf(currentPeriod) : prevTermOf(currentPeriod);
+      if (!nt) return;
+      goToTerm(nt, step > 0 ? 0 : 'last');
     }
 
     function kembaliKeEpisode() {
-      document.getElementById('player-slot').innerHTML = ''; // stop audio: remove the iframe
+      document.getElementById('player-slot').innerHTML = ''; 
       document.getElementById('player-view').classList.remove('active');
       document.getElementById('episode-view').classList.add('active');
       location.hash = currentPeriod;
     }
 
     function kembaliKeMenu() {
-      document.getElementById('player-slot').innerHTML = ''; // stop audio if leaving from player
+      document.getElementById('player-slot').innerHTML = ''; 
       document.getElementById('episode-view').classList.remove('active');
       document.getElementById('player-view').classList.remove('active');
       document.getElementById('menu').classList.remove('active');
@@ -933,7 +1001,7 @@
       renderContinueWatching();
     }
 
-    /* Continue Watching: save/load progress via localStorage */
+    
     function saveProgress() {
       if (!currentPeriod || !currentVideos[currentIndex]) return;
       const v = currentVideos[currentIndex];
@@ -951,7 +1019,7 @@
         if (!list || !list.some(v => v.id === data.id)) { cw.style.display = 'none'; return; }
         const v = list.find(item => item.id === data.id);
         const isFes = v.type === 'fes';
-        // Build episode label
+        
         let epLabel;
         if (isFes) { epLabel = 'FES×LIVE'; }
         else {
@@ -959,7 +1027,7 @@
           epLabel = m ? 'EPISODE ' + m[1] : '';
         }
         const periodLabel = (data.period === 'dream') ? 'Dream Interlude' : 'Term ' + data.period;
-        // Title without prefix
+        
         const cleanTitle = v.title
           .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
           .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
@@ -967,28 +1035,33 @@
           .trim();
         document.getElementById('cw-term').textContent = periodLabel + (isFes ? ' · ' + epLabel : ' · ' + epLabel);
         document.getElementById('cw-title').textContent = isFes ? v.title : cleanTitle;
-        // Thumbnail
+        
         const cwImg = document.getElementById('cw-img');
         let epNo = null;
         if (!isFes) {
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
           epNo = m ? m[1] : null;
         }
+        const cwAllIdx = list.findIndex(x => x.id === v.id);
+        const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
         let arc = null;
-        if (data.period === 'dream') { arc = (v.title.includes('Water') ? '200001' : '200002'); }
-        else if (!isFes && (data.period === '103' || data.period === '104' || data.period === '105')) {
-          arc = data.period + '0' + String(epNo).padStart(2, '0');
+        if (isFes) { arc = 'fes-' + v.id; }
+        else if (data.period === 'dream') { if (!isFes) arc = (v.title.includes('Water') ? '200001' : '200002'); }
+        else if (!isFes && (data.period === '102' || data.period === '103' || data.period === '104' || data.period === '105')) {
+          arc = data.period + '0' + String(epNo ?? cwEpPos).padStart(2, '0');
         }
-        const localThumb = arc ? 'thumbs/' + arc + '.webp' : null;
+        const localExt = (arc.indexOf('fes-') === 0 || arc.indexOf('102') === 0) ? '.jpg' : '.webp';
+        const localThumb = arc ? 'thumbs/' + arc + localExt : null;
         const remoteThumb = arc ? 'https://storage.googleapis.com/llll-card/story/monthly/image_record_monthly_' + arc + '.webp' : null;
-        const ytThumb = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
+        const ytThumb = ytThumbUrl(v.id);
         if (localThumb) {
           cwImg.src = localThumb;
-          cwImg.onerror = function() { this.onerror = null; this.src = remoteThumb || ytThumb; };
+          cwImg.onerror = function() { this.onerror = null; this.src = remoteThumb || ytThumb; ytThumbFallback(this); };
         } else {
           cwImg.src = ytThumb;
+          cwImg.onerror = function() { ytThumbFallback(this); };
         }
-        // Save period+videoId for click handler
+        
         document.getElementById('cw-card').dataset.period = data.period;
         document.getElementById('cw-card').dataset.videoid = data.id;
         cw.style.display = '';
@@ -1003,7 +1076,7 @@
       bukaPlaylist(period);
       let idx = currentVideos.findIndex(v => v.id === videoId);
       if (idx < 0) {
-        // Maybe filtered out by Fes toggle, auto-enable it
+        
         const inAll = allVideos.findIndex(v => v.id === videoId);
         if (inAll >= 0 && !showFes) {
           showFes = true;
@@ -1043,18 +1116,19 @@
       try { localStorage.setItem('linklike-darkmode', document.body.classList.contains('dark-mode') ? '1' : '0'); } catch(e) {}
     }
 
-    // Keyboard navigation inside player view
+    
     document.addEventListener('keydown', (e) => {
       if (!document.getElementById('player-view').classList.contains('active')) return;
       if (e.key === 'ArrowLeft') navEpisode(-1);
       if (e.key === 'ArrowRight') navEpisode(1);
     });
 
-    // Sync the visible view to the URL hash (called on load AND on browser back/forward)
+    
     function applyHash() {
       const h = location.hash.replace(/^#/, '');
+      document.getElementById('player-slot').innerHTML = '';
       if (!h) {
-        // No hash → ensure we're on the menu (used by kembaliKeMenu's replaceState)
+        
         document.getElementById('player-view').classList.remove('active');
         document.getElementById('episode-view').classList.remove('active');
         document.getElementById('menu').classList.remove('active');
@@ -1064,7 +1138,7 @@
       const parts = h.split('/');
       const kode = parts[0];
       if (!playlists[kode]) {
-        // unknown hash → drop back to menu
+        
         document.getElementById('player-view').classList.remove('active');
         document.getElementById('episode-view').classList.remove('active');
         document.getElementById('menu').classList.remove('active');
@@ -1082,7 +1156,7 @@
           window.scrollTo({ top: 0, behavior: 'auto' });
         }
       } else {
-        // hash is just a term → make sure we're on its episode list, not the player
+        
         document.getElementById('player-view').classList.remove('active');
         document.getElementById('episode-view').classList.add('active');
       }
