@@ -211,7 +211,7 @@ def render_term(term, summaries):
     <h2 class="term-title">{h2}</h2>
     <p class="subtitle">{sub}</p>
 {cards_html}
-    <p><a class="watch-btn" href="../#{term}">▶ Open the interactive player</a></p>
+    <p><a class="watch-btn" href="../">▶ Buka web interaktif Link! Like!</a></p>
     <footer>Link! Like! Activity Record — fan archive of Link! Like! Love Live! Hasunosora school idol stories. Not affiliated with the official franchise.</footer>
   </div>
 </body>
@@ -252,7 +252,7 @@ def render_index(summaries):
     <h2 class="term-title">Hasunosora Story Archive</h2>
     <p class="subtitle">Link! Like! Love Live! Hasunosora — every term &amp; Dream Interlude. Read English summaries, then watch on the interactive player.</p>
 {sections_html}
-    <p><a class="watch-btn" href="../">▶ Open the interactive player</a></p>
+    <p><a class="watch-btn" href="../">▶ Buka web interaktif Link! Like!</a></p>
     <footer>Link! Like! Activity Record — fan archive of Link! Like! Love Live! Hasunosora school idol stories. Not affiliated with the official franchise.</footer>
   </div>
 </body>
