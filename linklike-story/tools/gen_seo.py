@@ -138,12 +138,10 @@ def main():
     with open(os.path.join(STORY_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(idx)
 
-    # sitemap: front page + every archive page (Google follows redirect to app)
+    # sitemap: ONLY the front page. Archive pages are noindex+redirect, so they
+    # must NOT be listed here (Google flags a sitemap full of noindex/redirect
+    # URLs as "could not be read"). The front page is the only indexable target.
     urls = [BASE_URL + "/"]
-    for term in ["102", "103", "104", "105", "dream"]:
-        urls.append(BASE_URL + "/" + ("term-dream" if term == "dream" else "term-" + term) + ".html")
-    for key in data:
-        urls.append(BASE_URL + "/story/" + key + ".html")
     locs = "\n".join(f"  <url><loc>{u}</loc></url>" for u in urls)
     sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
