@@ -54,7 +54,12 @@ h2.term-title{font-size:1.6rem;margin:.2em 0}
 .ep-nav a{flex:1;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-decoration:none;color:var(--accent-strong);font-weight:600}
 .ep-nav a.disabled{opacity:.4;pointer-events:none}
 footer{color:var(--muted);font-size:.82rem;text-align:center;margin-top:40px}
+.redirect-note{color:var(--accent-strong);font-size:.9rem;margin:6px 0 0}
 """
+
+SCRIPT_REDIRECT = """  <script>
+    setTimeout(function(){ window.location.replace('../'); }, 3000);
+  </script>"""
 
 def load_summaries():
     with open(os.path.join(LL_DIR, "summaries.json"), encoding="utf-8") as f:
@@ -83,12 +88,15 @@ def episode_title(key, term_meta, ep):
     return f"Hasunosora {term_meta['ord']} Term — Episode {ep}"
 
 def build_head(title, desc, url, og_type="website"):
-    # Canonical points at the interactive front-end so Google treats the
-    # static archive pages as duplicates of the main app (keeps search
-    # traffic landing on the real front page, not the read-only archive).
+    # Canonical + auto-redirect ALL point at the interactive front-end.
+    # User wants Google (and people) to land on the real app, not the
+    # read-only static archive. The static pages still carry the story
+    # text so Googlebot can read keywords, but they bounce to the front
+    # page after 3s (and instantly if JS runs).
     canonical = BASE_URL + "/"
     return f"""  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="3; url={canonical}" />
   <title>{html.escape(title)} | Link! Like! Activity Record</title>
   <meta name="description" content="{html.escape(desc)}" />
   <link rel="canonical" href="{canonical}" />
@@ -160,16 +168,19 @@ def render_episode(key, summaries):
     <div class="breadcrumb">{crumb}</div>
     <h2 class="term-title">{h2}</h2>
     <p class="subtitle">{sub}</p>
-    <p><a class="watch-btn" href="{rel_app}">▶ Buka web interaktif Link! Like!</a></p>
+    <p><a class="watch-btn" href="{rel_app}">&#9654; Open the interactive archive</a></p>
+    <p class="redirect-note">Redirecting you to the interactive archive in a few seconds&hellip;</p>
     <div class="story-body">
 {html.escape(text)}
     </div>
-    <p><a class="watch-btn" href="{rel_app}">▶ Watch / read on the interactive archive</a></p>
+    <p><a class="watch-btn" href="{rel_app}">&#9654; Watch / read on the interactive archive</a></p>
     <div class="ep-nav">{prev_html}{nxt_html}</div>
     <footer>Link! Like! Activity Record — fan archive of Link! Like! Love Live! Hasunosora school idol stories. Not affiliated with the official franchise.</footer>
   </div>
+  {SCRIPT_REDIRECT}
 </body>
-</html>"""
+</html>
+"""
     return body
 
 def render_term(term, summaries):
@@ -211,9 +222,11 @@ def render_term(term, summaries):
     <h2 class="term-title">{h2}</h2>
     <p class="subtitle">{sub}</p>
 {cards_html}
-    <p><a class="watch-btn" href="../">▶ Buka web interaktif Link! Like!</a></p>
+    <p><a class="watch-btn" href="../">&#9654; Open the interactive archive</a></p>
+    <p class="redirect-note">Redirecting you to the interactive archive in a few seconds&hellip;</p>
     <footer>Link! Like! Activity Record — fan archive of Link! Like! Love Live! Hasunosora school idol stories. Not affiliated with the official franchise.</footer>
   </div>
+  {SCRIPT_REDIRECT}
 </body>
 </html>"""
     return body
@@ -252,9 +265,11 @@ def render_index(summaries):
     <h2 class="term-title">Hasunosora Story Archive</h2>
     <p class="subtitle">Link! Like! Love Live! Hasunosora — every term &amp; Dream Interlude. Read English summaries, then watch on the interactive player.</p>
 {sections_html}
-    <p><a class="watch-btn" href="../">▶ Buka web interaktif Link! Like!</a></p>
+    <p><a class="watch-btn" href="../">&#9654; Open the interactive archive</a></p>
+    <p class="redirect-note">Redirecting you to the interactive archive in a few seconds&hellip;</p>
     <footer>Link! Like! Activity Record — fan archive of Link! Like! Love Live! Hasunosora school idol stories. Not affiliated with the official franchise.</footer>
   </div>
+  {SCRIPT_REDIRECT}
 </body>
 </html>"""
     return body
