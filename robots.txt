@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://tybantarnusa.github.io/sitemap.xml
