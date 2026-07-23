@@ -83,11 +83,15 @@ def episode_title(key, term_meta, ep):
     return f"Hasunosora {term_meta['ord']} Term — Episode {ep}"
 
 def build_head(title, desc, url, og_type="website"):
+    # Canonical points at the interactive front-end so Google treats the
+    # static archive pages as duplicates of the main app (keeps search
+    # traffic landing on the real front page, not the read-only archive).
+    canonical = BASE_URL + "/"
     return f"""  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{html.escape(title)} | Link! Like! Activity Record</title>
   <meta name="description" content="{html.escape(desc)}" />
-  <link rel="canonical" href="{url}" />
+  <link rel="canonical" href="{canonical}" />
   <meta property="og:title" content="{html.escape(title)}" />
   <meta property="og:description" content="{html.escape(desc)}" />
   <meta property="og:url" content="{url}" />
@@ -156,6 +160,7 @@ def render_episode(key, summaries):
     <div class="breadcrumb">{crumb}</div>
     <h2 class="term-title">{h2}</h2>
     <p class="subtitle">{sub}</p>
+    <p><a class="watch-btn" href="{rel_app}">▶ Buka web interaktif Link! Like!</a></p>
     <div class="story-body">
 {html.escape(text)}
     </div>
