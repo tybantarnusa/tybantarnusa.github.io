@@ -265,6 +265,10 @@
       transform: scale(1.5);        
       transform-origin: center 38%;
     }
+    .episode-card .thumb.thumb-right {
+      object-position: right center;
+      transform-origin: right center;
+    }
     .episode-card .thumb.thumb-yt {
       object-position: center center;
       transform-origin: center center;
@@ -794,13 +798,15 @@
           ? localThumb + '" onerror="this.onerror=null;this.src=\'' + remoteThumb + '\';this.onerror=function(){ytThumbFallback(this)}"'
           : null;
 
+        const rightClass = (v.id === 'LLuRLXd41YM') ? ' thumb-right' : '';
+
         const card = document.createElement('div');
         card.className = 'episode-card' + (isFes ? ' fes' : '');
         if (v.src === 'drive' || v.src === 'archive') {
           if (arcThumb) {
             
             card.innerHTML =
-              '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="">' +
+              '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="">' +
               '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
               '<div class="ec-name">' + name + '</div>' + '</div>';
           } else {
@@ -813,12 +819,12 @@
         } else if (arcThumb) {
           
           card.innerHTML =
-            '<img class="thumb" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
+            '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
             '<div class="ec-name">' + name + '</div>' + '</div>';
         } else {
           card.innerHTML =
-            '<img class="thumb thumb-yt" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
+            '<img class="thumb thumb-yt' + rightClass + '" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
             '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
             '<div class="ec-name">' + name + '</div>' + '</div>';
         }
@@ -1074,7 +1080,7 @@
         const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
         let arc = null;
         if (isFes) { arc = 'fes-' + v.id; }
-        else if (data.period === 'dream') { if (!isFes) arc = (v.title.includes('Water') ? '200001' : '200002'); }
+        else if (data.period === 'dream') { if (!isFes) arc = '20000' + cwEpPos; }
         else if (!isFes && (data.period === '102' || data.period === '103' || data.period === '104' || data.period === '105')) {
           arc = data.period + '0' + String(epNo ?? cwEpPos).padStart(2, '0');
         }
