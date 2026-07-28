@@ -284,7 +284,6 @@
       background: linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.6) 55%, rgba(0,0,0,0) 100%);
       color: #fff;
       display: flex; flex-direction: column; justify-content: flex-end;
-      border-radius: 0 0 14px 14px;
     }
     .episode-card .ec-ep {
       font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #bcd4f2;
@@ -309,6 +308,16 @@
       transform: translateY(-3px);
     }
     .episode-card.fes .ec-ep { color: #ff9bac; }
+    .episode-card.fes .overlay { bottom: 30px; padding-bottom: 8px; }
+    .episode-card .fes-label {
+      position: absolute; left: -3px; right: -3px; bottom: 0;
+      height: 30px;
+      background: linear-gradient(90deg, #e64980 0%, #9c36b5 50%, #7048e8 100%);
+      color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      display: flex; align-items: center; justify-content: center;
+      text-shadow: 0 1px 2px rgba(60,10,50,.5);
+      z-index: 2;
+    }
 
     
     .player-bar {
@@ -807,26 +816,30 @@
             
             card.innerHTML =
               '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="">' +
-              '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              '<div class="ec-name">' + name + '</div>' + '</div>';
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="ec-name">' + name + '</div>' + '</div>' +
+              (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
           } else {
             
             card.classList.add('thumb-fallback');
             card.innerHTML =
-              '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-              '<div class="ec-name">' + name + '</div>' + '</div>';
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="ec-name">' + name + '</div>' + '</div>' +
+              (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
           }
         } else if (arcThumb) {
           
           card.innerHTML =
             '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
-            '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            '<div class="ec-name">' + name + '</div>' + '</div>';
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="ec-name">' + name + '</div>' + '</div>' +
+            (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
         } else {
           card.innerHTML =
             '<img class="thumb thumb-yt' + rightClass + '" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
-            '<div class="overlay"><div class="ec-ep">' + (isFes ? 'FES×LIVE' : 'EPISODE ' + epNo) + '</div>' +
-            '<div class="ec-name">' + name + '</div>' + '</div>';
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="ec-name">' + name + '</div>' + '</div>' +
+            (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
@@ -1051,12 +1064,14 @@
         if (!list || !list.some(v => v.id === data.id)) { cw.style.display = 'none'; return; }
         const v = list.find(item => item.id === data.id);
         const isFes = v.type === 'fes';
-        
+        const cwAllIdx = list.findIndex(x => x.id === v.id);
+        const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
+
         let epLabel;
         if (isFes) { epLabel = 'FES×LIVE'; }
         else {
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
-          epLabel = m ? 'EPISODE ' + m[1] : '';
+          epLabel = 'EPISODE ' + (m ? m[1] : cwEpPos);
         }
         const periodLabel = (data.period === 'dream') ? 'Dream Interlude' : 'Term ' + data.period;
         
@@ -1076,8 +1091,6 @@
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
           epNo = m ? m[1] : null;
         }
-        const cwAllIdx = list.findIndex(x => x.id === v.id);
-        const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
         let arc = null;
         if (isFes) { arc = 'fes-' + v.id; }
         else if (data.period === 'dream') { if (!isFes) arc = '20000' + cwEpPos; }
