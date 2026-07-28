@@ -452,8 +452,8 @@
       <div class="menu-section">
         <h3 class="section-title">Side Story</h3>
         <div class="menu-grid">
-          <div class="menu-item" onclick="bukaPlaylist('102')"><div class="num">102</div><div class="label">Voiced Novel</div></div>
           <div class="menu-item" onclick="bukaPlaylist('dream')"><div class="num">Dream Interlude</div><div class="label"></div></div>
+          <div class="menu-item" onclick="bukaPlaylist('102')"><div class="num">102 - Shades of Stars</div><div class="label">Voiced Novel</div></div>
         </div>
       </div>
     </div>
@@ -766,6 +766,8 @@
           name = v.title
             .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
             .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
+            .replace(/^Shades of Stars\s+/i, '')
+            .replace(/^Dream Interlude\s+/i, '')
             .replace(/\s*\[ENG SUB\]$/i, '')
             .trim();
         }
@@ -947,6 +949,8 @@
         name = v.title
           .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
           .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
+          .replace(/^Shades of Stars\s+/i, '')
+          .replace(/^Dream Interlude\s+/i, '')
           .replace(/\s*\[ENG SUB\]$/i, '')
           .trim();
       }
@@ -1053,6 +1057,8 @@
         const cleanTitle = v.title
           .replace(/^\d+(?:st|nd|rd|th)\s+(?:Term|Year)\s+/i, '')
           .replace(/(?:Episode|Chapter)\s*\d+\s*/i, '')
+          .replace(/^Shades of Stars\s+/i, '')
+          .replace(/^Dream Interlude\s+/i, '')
           .replace(/\s*\[ENG SUB\]$/i, '')
           .trim();
         document.getElementById('cw-term').textContent = periodLabel + (isFes ? ' · ' + epLabel : ' · ' + epLabel);
