@@ -630,6 +630,8 @@
     let currentVideos = [];
     let allVideos = [];
     let showFes = JSON.parse(localStorage.getItem('linklike-showfes')) ?? true;
+    function fesWord(period) { return (period === 'dream') ? 'LIVE' : 'Fes×LIVE'; }
+    function fesWordUp(period) { return (period === 'dream') ? 'LIVE' : 'FES×LIVE'; }
     let currentIndex = 0;
     let summariesData = {};
     function ytThumbUrl(id){ return 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg'; }
@@ -660,6 +662,9 @@
       const hasFes = allVideos.some(v => v.type === 'fes');
       document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
       document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
+      const fesToggleText = 'Include ' + fesWord(kode);
+      document.querySelector('#fes-toggle-episode .toggle-label').textContent = fesToggleText;
+      document.querySelector('#fes-toggle-player .toggle-label').textContent = fesToggleText;
       document.getElementById('menu').classList.add('active');
       document.getElementById('episode-view').classList.add('active');
       document.getElementById('episode-title').textContent =
@@ -750,8 +755,8 @@
       const hint = document.getElementById('episode-hint');
 
       if (currentVideos.length === 0) {
-        hint.textContent = allVideos.length > 0 ? 'All Fes×LIVE hidden.' : 'The video list will be added here later.';
-        content.innerHTML = '<div class="placeholder-box">' + (allVideos.length > 0 ? 'Fes×LIVE are hidden. Check "Include Fes×LIVE" to show them.' : 'No videos for this term yet.') + '</div>';
+        hint.textContent = allVideos.length > 0 ? 'All ' + fesWord(currentPeriod) + ' hidden.' : 'The video list will be added here later.';
+        content.innerHTML = '<div class="placeholder-box">' + (allVideos.length > 0 ? fesWord(currentPeriod) + ' are hidden. Check "Include ' + fesWord(currentPeriod) + '" to show them.' : 'No videos for this term yet.') + '</div>';
         return;
       }
 
@@ -759,12 +764,13 @@
       const fesCount = currentVideos.filter(v => v.type === 'fes').length;
       const parts = [];
       if (epCount > 0) parts.push(epCount + ' episode' + (epCount > 1 ? 's' : ''));
-      if (fesCount > 0) parts.push(fesCount + ' Fes×LIVE');
+      if (fesCount > 0) parts.push(fesCount + ' ' + fesWord(currentPeriod));
       hint.textContent = parts.join(', ') || '';
       document.getElementById('episode-note').textContent =
         (currentPeriod === '105') ? 'More Fes×LIVE will be added in the future.' : '';
       content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
+      const fesLabel = fesWord(currentPeriod);
       currentVideos.forEach((v, i) => {
         const isFes = (v.type === 'fes');
         const allIdx = allVideos.findIndex(x => x.id === v.id);
@@ -816,30 +822,30 @@
             
             card.innerHTML =
               '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="">' +
-              '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
               '<div class="ec-name">' + name + '</div>' + '</div>' +
-              (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
+              (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
           } else {
             
             card.classList.add('thumb-fallback');
             card.innerHTML =
-              '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
               '<div class="ec-name">' + name + '</div>' + '</div>' +
-              (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
+              (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
           }
         } else if (arcThumb) {
           
           card.innerHTML =
             '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
-            '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
             '<div class="ec-name">' + name + '</div>' + '</div>' +
-            (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
+            (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
         } else {
           card.innerHTML =
             '<img class="thumb thumb-yt' + rightClass + '" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
-            '<div class="overlay">' + (isFes ? '<div class="ec-ep">FES×LIVE</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
             '<div class="ec-name">' + name + '</div>' + '</div>' +
-            (isFes ? '<div class="fes-label">Fes×LIVE</div>' : '');
+            (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
@@ -973,12 +979,17 @@
           .replace(/\s*\[ENG SUB\]$/i, '')
           .trim();
       }
-      document.getElementById('pm-ep').textContent = isFes ? 'FES×LIVE' : 'EPISODE ' + epNo;
+      document.getElementById('pm-ep').textContent = isFes ? fesWordUp(currentPeriod) : 'EPISODE ' + epNo;
       document.getElementById('pm-name').textContent = name;
       const sumEl = document.getElementById('pm-summary');
       let setlistHtml = '';
       if (isFes && v.setlist) {
-        setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : 'song') + '">' + s + '</div>').join('') + '</div>';
+        const items = v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : 'song') + '">' + s + '</div>').join('');
+        if (currentPeriod === 'dream') {
+          setlistHtml = '<div class="sum-label">SETLIST</div><div class="setlist" style="display:flex">' + items + '</div>';
+        } else {
+          setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'▼\':\'▶\'">SETLIST <span class="sl-arrow">▶</span></div><div class="setlist" id="sl-content">' + items + '</div>';
+        }
       } else {
         let sumKey = null;
         if (currentPeriod === 'dream') {
@@ -993,7 +1004,7 @@
       sumEl.innerHTML = setlistHtml;
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
-      document.getElementById('player-counter').textContent = isFes ? 'Fes×LIVE' : (epPos + ' / ' + epCount);
+      document.getElementById('player-counter').textContent = isFes ? fesWord(currentPeriod) : (epPos + ' / ' + epCount);
       const nb = document.getElementById('next-btn');
       const pb = document.getElementById('prev-btn');
       pb.disabled = (currentIndex === 0);
@@ -1068,7 +1079,7 @@
         const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
 
         let epLabel;
-        if (isFes) { epLabel = 'FES×LIVE'; }
+        if (isFes) { epLabel = fesWordUp(data.period); }
         else {
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
           epLabel = 'EPISODE ' + (m ? m[1] : cwEpPos);
