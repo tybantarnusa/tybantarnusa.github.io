@@ -607,7 +607,9 @@
       "dream": [
         { "id": "VzLRAYU-y2k", "title": "Dream Interlude \"Water the flowers\"" },
         { "id": "EdB_cM6AoEk", "type": "fes", "setlist": ["Perennial"], "title": "Perennial / Live Performance Video" },
-        { "id": "LLuRLXd41YM", "title": "Dream Interlude \"Be Cera-fish\"" }
+        { "id": "LLuRLXd41YM", "title": "Dream Interlude \"Be Cera-fish\"" },
+        { "id": "cYsk9l0ENHE", "title": "Dream Interlude \"Haji wa Jinsei no Kakisute\"" },
+        { "id": "byq4j290Aw4", "type": "fes", "start": 826, "setlist": ["Haji wa Jinsei no Kakisute (Hasu no Shoushihenkei Ver.)"], "title": "Haji wa Jinsei no Kakisute / Live Performance" }
       ]
     };
 
@@ -773,7 +775,7 @@
         if (isFes) {
           arc = 'fes-' + v.id;
         } else if (currentPeriod === 'dream') {
-          if (!isFes) arc = (i === 0) ? '200001' : '200002';
+          if (!isFes) arc = '20000' + epPosAll;
         } else if (currentPeriod === '102' || currentPeriod === '103' || currentPeriod === '104' || currentPeriod === '105') {
           if (currentPeriod === '104' && epNo === '13') {
             arc = '105012'; 
@@ -908,7 +910,7 @@
       const isFes = (v.type === 'fes');
       const epMatch = isFes ? null : v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
       const epNo = epMatch ? parseInt(epMatch[1], 10) : null;
-      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && v.id === 'EdB_cM6AoEk');
+      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && (v.id === 'EdB_cM6AoEk' || v.id === 'byq4j290Aw4'));
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
