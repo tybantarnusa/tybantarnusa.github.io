@@ -231,7 +231,8 @@
       width: 100%;
       overflow-x: auto; padding-bottom: 12px;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;   
+      touch-action: pan-x;
+      position: relative;
     }
     .episode-row::-webkit-scrollbar { display: none; }  
     .ep-scrollbar { position: relative; height: 9px; margin: 4px 2px 2px; background: var(--border); border-radius: 5px; }
@@ -293,7 +294,31 @@
       font-size: 17px; margin-top: 7px; line-height: 1.35; font-weight: 600;
       text-shadow: 0 1px 4px rgba(0,0,0,.7);
     }
-    
+
+    .dream-connector {
+      flex: 0 0 auto;
+      width: 16px;
+      margin: 0 -16px;
+      height: 390px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .dream-connector::before {
+      content: '';
+      width: 16px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #4f93d6, #6d4fc4);
+      opacity: .7;
+    }
+    body.dark-mode .dream-connector::before {
+      background: linear-gradient(90deg, #5ea5e8, #7b6fde);
+      opacity: .55;
+    }
+
     .episode-card.fes {
       border: 3px solid transparent; border-radius: 14px;
       box-shadow: 0 4px 24px rgba(255,107,107,.2), 0 0 0 1px rgba(255,107,107,.12);
@@ -849,6 +874,11 @@
         }
         card.addEventListener('click', () => bukaEpisode(i));
         row.appendChild(card);
+        if (currentPeriod === 'dream' && currentVideos.length > i + 1 && currentVideos[i + 1].type === 'fes') {
+          const conn = document.createElement('div');
+          conn.className = 'dream-connector';
+          row.appendChild(conn);
+        }
       });
 
       
