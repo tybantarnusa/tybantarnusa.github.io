@@ -205,6 +205,8 @@
     touch-action: manipulation;
   }
   .cell .tools button:hover { background: rgba(0,0,0,0.85); }
+  .cell .tools button.active { background: var(--accent); }
+  .cell .tools button.active:hover { background: var(--accent-hover); }
   .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
   footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; line-height: 1.7; }
   .update-bar {
@@ -369,8 +371,9 @@
   const MIN_ZOOM = 1;
   const MAX_ZOOM = 5;
 
-  // Each cell holds null or { img, zoom, offsetX, offsetY }.
+  // Each cell holds null or { img, zoom, offsetX, offsetY, colBase, rowBase }.
   // offsetX/offsetY are pan expressed as a fraction of the cell's size.
+  // colBase/rowBase flag the cell as its column's / row's base in simple mode.
   let cells = [];
   let activeCell = -1;
   // Once the user drags the output-width slider, stop auto-defaulting it.
@@ -382,8 +385,6 @@
   let squareColor = '#000000';
   // Blur strength as a percentage of the cell size (0 = sharp cover fill).
   let blurStrength = 4;
-  // The cell data chosen as the base; null means auto (largest image).
-  let baseData = null;
   // True only while a long-press reorder drag is in progress.
   let reordering = false;
 
@@ -403,20 +404,34 @@
     return best;
   }
 
-  // The image that drives the grid shape/size in simple mode:
-  // the user-chosen base if it still exists, otherwise the largest.
-  function baseImage() {
-    if (baseData && cells.indexOf(baseData) !== -1) return baseData.img;
-    return largestImage();
-  }
+  // Simple mode: variable column widths / row heights driven by per-column and
+  // per-row base cells. A column base cell sets its column's width ratio; a row
+  // base cell sets its row's height ratio. Both are solved together so every
+  // base cell's own image fills its cell exactly — contain, no gaps.
+  // Returns { colW, rowH } in ratio units.
+  function computeUnits(cols, rows) {
+    const fb = largestImage();
+    const F = fb ? fb.naturalWidth / fb.naturalHeight : 1;
+    const colW = new Array(cols).fill(F);
+    const rowH = new Array(rows).fill(1);
 
-  // Cell shape: square in square/advanced mode, base image's ratio in simple mode.
-  function currentAspect() {
-    if (mode === 'simple') {
-      const img = baseImage();
-      return img ? img.naturalWidth / img.naturalHeight : 1;
+    const bases = [];
+    for (let i = 0; i < cells.length; i++) {
+      const d = cells[i];
+      if (!d) continue;
+      const ratio = d.img.naturalWidth / d.img.naturalHeight;
+      const c = i % cols, r = Math.floor(i / cols);
+      if (d.colBase) bases.push({ c: c, r: r, ratio: ratio, col: true });
+      if (d.rowBase) bases.push({ c: c, r: r, ratio: ratio, row: true });
     }
-    return 1;
+    // Gauss-Seidel pass: colW[c] = ratio * rowH[r]; rowH[r] = colW[c] / ratio.
+    for (let iter = 0; iter < 6; iter++) {
+      for (const b of bases) {
+        if (b.col) colW[b.c] = b.ratio * rowH[b.r];
+        if (b.row) rowH[b.r] = colW[b.c] / b.ratio;
+      }
+    }
+    return { colW: colW, rowH: rowH };
   }
 
   function clampInt(input) {
@@ -455,24 +470,36 @@
     // Fit cells to the available width, but never below MIN_CELL — past that the
     // grid grows beyond the wrapper and scrolls sideways instead of shrinking.
     const MIN_CELL = 180;
-    const aspect = currentAspect();
     const avail = (gridwrap.clientWidth || 640) - gapPx * (cols + 1);
-    let cellW = Math.floor(avail / cols);
-    if (!isFinite(cellW) || cellW < MIN_CELL) cellW = MIN_CELL;
-    // Keep a usable height too: widen landscape cells so the height stays >= MIN_CELL.
-    if (mode === 'simple' && cellW / aspect < MIN_CELL) cellW = Math.ceil(MIN_CELL * aspect);
 
-    grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
-    if (mode === 'advanced') {
-      grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + cellW + 'px)';
+    let cellW = 0;
+    if (mode === 'simple') {
+      const units = computeUnits(cols, rows);
+      const sum = units.colW.reduce(function (a, b) { return a + b; }, 0);
+      let u = avail / sum;
+      if (!isFinite(u)) u = MIN_CELL;
+      const minColW = Math.min.apply(null, units.colW);
+      const minRowH = Math.min.apply(null, units.rowH);
+      if (u * minColW < MIN_CELL) u = MIN_CELL / minColW;
+      if (u * minRowH < MIN_CELL) u = MIN_CELL / minRowH;
+      grid.style.gridTemplateColumns = units.colW.map(function (w) {
+        return (w * u).toFixed(2) + 'px';
+      }).join(' ');
+      grid.style.gridTemplateRows = units.rowH.map(function (h) {
+        return (h * u).toFixed(2) + 'px';
+      }).join(' ');
+      cellW = units.colW[0] * u;
     } else {
-      grid.style.gridTemplateRows = '';
+      cellW = Math.floor(avail / cols);
+      if (!isFinite(cellW) || cellW < MIN_CELL) cellW = MIN_CELL;
+      grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
+      grid.style.gridTemplateRows = (mode === 'advanced') ? 'repeat(' + rows + ', ' + cellW + 'px)' : '';
     }
 
     grid.innerHTML = '';
     const blurPx = Math.round(cellW * blurStrength / 100);
     for (let i = 0; i < count; i++) {
-      grid.appendChild(makeCell(i, aspect, blurPx));
+      grid.appendChild(makeCell(i, blurPx));
     }
     updateDefaultWidth();
     updateDownloadState();
@@ -488,7 +515,7 @@
       const c = cells[0];
       if (c) baseW = Math.max(c.img.naturalWidth, c.img.naturalHeight);
     } else if (mode === 'simple') {
-      const img = baseImage();
+      const img = largestImage();
       if (img) baseW = img.naturalWidth;
     } else {
       for (const c of cells) {
@@ -502,19 +529,16 @@
     widthVal.textContent = target;
   }
 
-  function makeCell(i, aspect, blurPx) {
+  function makeCell(i, blurPx) {
     const cell = document.createElement('div');
     cell.className = 'cell' + (mode === 'simple' ? ' simple' : mode === 'square' ? ' square' : '');
     cell.dataset.index = i;
-    if (mode !== 'advanced') {
-      cell.style.aspectRatio = (mode === 'simple') ? String(aspect) : '1';
-    }
+    if (mode === 'square') cell.style.aspectRatio = '1';
     const data = cells[i];
 
     let img = null;
     if (data) {
       cell.classList.add('filled');
-      if (mode === 'simple' && data === baseData) cell.classList.add('base');
 
       if (mode === 'square') {
         // Background layer: blurred copy of the image, or a solid fill color.
@@ -544,13 +568,22 @@
       const tools = document.createElement('div');
       tools.className = 'tools';
 
-      const base = document.createElement('button');
-      base.textContent = data === baseData ? '★' : '☆';
-      base.title = 'Use as base size';
-      base.addEventListener('click', function (e) {
+      const colBase = document.createElement('button');
+      colBase.textContent = '↕';
+      colBase.title = 'Set as column base (column width)';
+      if (data.colBase) colBase.classList.add('active');
+      colBase.addEventListener('click', function (e) {
         e.stopPropagation();
-        baseData = (baseData === data) ? null : data;
-        buildGrid();
+        setColBase(i, data);
+      });
+
+      const rowBase = document.createElement('button');
+      rowBase.textContent = '↔';
+      rowBase.title = 'Set as row base (row height)';
+      if (data.rowBase) rowBase.classList.add('active');
+      rowBase.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setRowBase(i, data);
       });
 
       const reset = document.createElement('button');
@@ -576,12 +609,14 @@
       rm.title = 'Remove';
       rm.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (cells[i] === baseData) baseData = null;
         cells[i] = null;
         buildGrid();
       });
 
-      if (mode === 'simple') tools.appendChild(base);
+      if (mode === 'simple') {
+        tools.appendChild(colBase);
+        tools.appendChild(rowBase);
+      }
       if (mode === 'advanced') tools.appendChild(reset);
       tools.appendChild(replace);
       tools.appendChild(rm);
@@ -606,6 +641,29 @@
       });
     }
     return cell;
+  }
+
+  // Simple mode base selection — one base per column / per row. Clicking an
+  // active base again removes it; picking a new one clears the old in that unit.
+  function setColBase(i, data) {
+    const cols = clampInt(colsInput);
+    if (data.colBase) { data.colBase = false; buildGrid(); return; }
+    for (let idx = i % cols; idx < cells.length; idx += cols) {
+      if (cells[idx] && cells[idx] !== data) cells[idx].colBase = false;
+    }
+    data.colBase = true;
+    buildGrid();
+  }
+
+  function setRowBase(i, data) {
+    const cols = clampInt(colsInput);
+    const start = Math.floor(i / cols) * cols;
+    if (data.rowBase) { data.rowBase = false; buildGrid(); return; }
+    for (let idx = start; idx < start + cols; idx++) {
+      if (cells[idx] && cells[idx] !== data) cells[idx].rowBase = false;
+    }
+    data.rowBase = true;
+    buildGrid();
   }
 
   function enablePanZoom(cell, img, i) {
@@ -685,11 +743,12 @@
     });
   }
 
-  // Simple mode: long-press a filled cell (or just drag with a mouse), then drop
-  // it onto another cell to swap. A plain touch-drag scrolls the grid instead.
+  // Simple mode: reorder with a long press (touch) or a drag (mouse). Touch:
+  // holding still for 500ms only "arms" the reorder; moving after that starts
+  // it, so ordinary scroll swipes never drag a photo around.
   function enableReorder(cell, i) {
     let pointerId = null, startX = 0, startY = 0;
-    let dragging = false, pressTimer = null, curX = 0, curY = 0, raf = null;
+    let dragging = false, armed = false, pressTimer = null, curX = 0, curY = 0, raf = null;
 
     function highlight(clientX, clientY) {
       const el = document.elementFromPoint(clientX, clientY);
@@ -712,13 +771,13 @@
       raf = requestAnimationFrame(autoScroll);
     }
 
-    function beginDrag(e) {
+    function beginDrag() {
       dragging = true;
       reordering = true;
       cell.classList.add('dragging');
-      try { cell.setPointerCapture(e.pointerId); } catch (_) {}
+      try { cell.setPointerCapture(pointerId); } catch (_) {}
       if (navigator.vibrate) navigator.vibrate(15);
-      curX = e.clientX; curY = e.clientY;
+      curX = startX; curY = startY;
       if (!raf) raf = requestAnimationFrame(autoScroll);
     }
 
@@ -730,9 +789,10 @@
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       pointerId = e.pointerId;
       startX = curX = e.clientX; startY = curY = e.clientY;
-      dragging = false;
+      dragging = false; armed = false;
       if (e.pointerType !== 'mouse') {
-        pressTimer = setTimeout(function () { pressTimer = null; beginDrag(e); }, 300);
+        // Hold without moving arms the reorder; movement after that drags.
+        pressTimer = setTimeout(function () { pressTimer = null; armed = true; }, 500);
       }
     });
 
@@ -742,7 +802,9 @@
       if (dragging) { highlight(e.clientX, e.clientY); return; }
       const moved = Math.hypot(e.clientX - startX, e.clientY - startY);
       if (e.pointerType === 'mouse') {
-        if (moved > 6 && (e.buttons & 1)) beginDrag(e);
+        if (moved > 6 && (e.buttons & 1)) beginDrag();
+      } else if (armed) {
+        if (moved > 8) beginDrag();
       } else if (pressTimer && moved > 10) {
         cancelPress();
       }
@@ -752,6 +814,7 @@
       if (pointerId !== e.pointerId) return;
       pointerId = null;
       cancelPress();
+      armed = false;
       if (dragging) {
         const target = highlight(e.clientX, e.clientY);
         clearDropTargets();
@@ -803,9 +866,22 @@
     const gap = (mode === 'square') ? 0 : parseInt(gapInput.value, 10);
     const totalW = parseInt(outWidth.value, 10);
 
-    const cellW = (totalW - gap * (cols + 1)) / cols;
-    const cellH = (mode === 'simple') ? cellW / currentAspect() : cellW;
-    const totalH = cellH * rows + gap * (rows + 1);
+    // Column widths and row heights in px — same ratios as the on-screen grid,
+    // only scaled so the total width matches the requested output width.
+    let colPx, rowPx, totalH;
+    if (mode === 'simple') {
+      const units = computeUnits(cols, rows);
+      const sum = units.colW.reduce(function (a, b) { return a + b; }, 0);
+      const scale = (totalW - gap * (cols + 1)) / sum;
+      colPx = units.colW.map(function (w) { return w * scale; });
+      rowPx = units.rowH.map(function (h) { return h * scale; });
+      totalH = rowPx.reduce(function (a, b) { return a + b; }, 0) + gap * (rows + 1);
+    } else {
+      const cellW = (totalW - gap * (cols + 1)) / cols;
+      colPx = new Array(cols).fill(cellW);
+      rowPx = new Array(rows).fill(cellW);
+      totalH = cellW * rows + gap * (rows + 1);
+    }
 
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(totalW);
@@ -815,15 +891,16 @@
     ctx.fillStyle = bgColor.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    let y = gap;
     for (let r = 0; r < rows; r++) {
+      let x = gap;
       for (let c = 0; c < cols; c++) {
         const idx = r * cols + c;
         const data = cells[idx];
-        if (!data) continue;
-        const cellX = gap + c * (cellW + gap);
-        const cellY = gap + r * (cellH + gap);
-        drawCell(ctx, data, cellX, cellY, cellW, cellH);
+        if (data) drawCell(ctx, data, x, y, colPx[c], rowPx[r]);
+        x += colPx[c] + gap;
       }
+      y += rowPx[r] + gap;
     }
     return canvas;
   }
@@ -915,7 +992,6 @@
 
   clearBtn.addEventListener('click', function () {
     cells = cells.map(function () { return null; });
-    baseData = null;
     buildGrid();
   });
 
