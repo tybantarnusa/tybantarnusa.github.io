@@ -718,6 +718,8 @@
     // is min(cellAspect/imgRatio, imgRatio/cellAspect) in 0..1; weight by the
     // cell's relative area so big cells count more. Units are normalized first
     // so a degenerate solver scale can't make the total look artificially small.
+    // A size-spread penalty keeps rows/columns from landing absurdly far apart —
+    // the optimizer shouldn't "hide" bad fits inside tiny cells.
     function totalGap() {
       const units = computeUnits(cols, rows);
       const sumW = units.colW.reduce(function (a, b) { return a + b; }, 0);
@@ -735,6 +737,13 @@
           total += (1 - fit) * nw[c] * nh[r];
         }
       }
+      const SPREAD_CAP = 8;
+      const maxCol = Math.max.apply(null, units.colW);
+      const minCol = Math.min.apply(null, units.colW);
+      const maxRow = Math.max.apply(null, units.rowH);
+      const minRow = Math.min.apply(null, units.rowH);
+      if (maxCol / minCol > SPREAD_CAP) total += (maxCol / minCol - SPREAD_CAP) * 2;
+      if (maxRow / minRow > SPREAD_CAP) total += (maxRow / minRow - SPREAD_CAP) * 2;
       return total;
     }
 
