@@ -385,7 +385,7 @@
     .summary-box:empty { display: none; }
     .summary-box .sum-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
     .setlist { display: flex; flex-direction: column; gap: 6px; }
-    .sl-song { counter-increment: song-num; padding: 8px 12px 8px 36px; background: var(--bg); border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; } .sl-song::before { content: 'M' counter(song-num); position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: #f472b6; opacity: .7; } .sl-mc { text-align: left; padding: 5px 8px; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; opacity: .5; }
+    .sl-song { counter-increment: song-num; padding: 8px 12px 8px 36px; background: var(--bg); border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; } .sl-song::before { content: 'M' counter(song-num); position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: #f472b6; opacity: .7; } .sl-mc { text-align: left; padding: 5px 8px; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; opacity: .5; } .sl-special { padding: 8px 12px; background: var(--bg); border-radius: 8px; font-size: 14px; line-height: 1.4; }
     .sl-toggle { cursor: pointer; user-select: none; } .sl-toggle:hover { opacity: .8; } .sl-arrow { font-size: 10px; margin-left: 6px; } .setlist { display: none; counter-reset: song-num; } .sl-toggle.sl-open + .setlist { display: flex; flex-direction: column; gap: 3px; } .ads-notice {
       margin: 10px 12px 0; padding: 8px 34px 8px 12px;
       background: rgba(255,255,255,.55); border-radius: 8px;
@@ -569,6 +569,7 @@
         { "id": "LxTNiRHsB98", "type": "fes", "start": 597, "setlist": ["Zenhoui Kyun♡", "COMPASS", "Yumewazurai", "MC", "Dream Believers (SAKURA Ver.)", "MC", "Itsudemo, Itsumademo", "MC", "365 Days"], "title": "104th Term Fes×LIVE -Rengesai- (102nd Graduation Live)" }
       ],
       "105": [
+        /* 105th Fes×LIVE timeline: Apr Ep1 OPENING! (CCuUGUfthVA) | Oct Ep7 3rd -Rindou-sai- (9u8KC5XQncE) | after Ep6 Fes×ReC:LIVE Bloom Days Extra Day.1 (GR6jzqgXKQ4) + Day.2 (_WXbw3AEOJ0) | after Ep10 CHAPTER Beyond (uIQrhNFpDiM) */
         
         
         
@@ -584,7 +585,10 @@
         { "id": "0OgN0slD_zU", "title": "105th Term Episode 4 \"Chasing My Sunshine\"" },
         { "id": "GIWQvpR42sM", "title": "105th Term Episode 5 \"Sleeping Beauty of the Sea!\"" },
         { "id": "0LwxZN_s9XY", "title": "105th Term Episode 6 \"Flowers for the Future\"" },
+        { "id": "GR6jzqgXKQ4", "type": "fes", "start": 773, "setlist": ["MC", "Fruit Punch", "Taiyou de Are!", "Nyao Signyal", "Henyoku no Toribaga", "MC", "Hitoyo ni Yume ga Saku You ni"], "title": "105th Term Fes×ReC:LIVE Bloom Days Extra Day.1" },
+        { "id": "_WXbw3AEOJ0", "type": "fes", "start": 773, "setlist": ["MC", "Fruit Punch", "Taiyou de Are!", "Nyao Signyal", "Henyoku no Toribaga", "MC", "Hitoyo ni Yume ga Saku You ni"], "title": "105th Term Fes×ReC:LIVE Bloom Days Extra Day.2" },
         { "id": "FLIWLq5o730", "title": "105th Term Episode 7 \"Proof of my selfish color\"" },
+        { "id": "9u8KC5XQncE", "type": "fes", "start": 3297, "setlist": ["MC", "Dream Believers", "MC", "BLAST!!", "Retrofuture", "37.5℃ no Fantasy", "Ampere", "MC", "DOLLCHESTRA Dance Battle", "MC", "Hajimari no Hane Oto", "MC"], "title": "105th Term Fes×LIVE -Rindou-sai-" },
         { "id": "5QwgpqHTYLc", "title": "105th Term Episode 8 \"A light still distant and faint\"" },
         { "id": "-wV7EAf_MX4", "title": "105th Term Episode 9 \"ALL Link to YOU\"" },
         { "id": "9VDUjJIxfso", "title": "105th Term Episode 10 \"Ergo Ruri.\"" },
@@ -941,7 +945,7 @@
       const sumEl = document.getElementById('pm-summary');
       let setlistHtml = '';
       if (isFes && v.setlist) {
-        setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : 'song') + '">' + s + '</div>').join('') + '</div>';
+        setlistHtml = '<div class="sum-label sl-toggle" id="sl-toggle" onclick="this.classList.toggle(\'sl-open\');this.querySelector(\'.sl-arrow\').textContent=this.classList.contains(\'sl-open\')?\'\u25BC\':\'\u25B6\'">SETLIST <span class="sl-arrow">\u25B6</span></div><div class="setlist" id="sl-content">' + v.setlist.map(s => '<div class="sl-item sl-' + (s.startsWith('MC') || s === 'Interlude' ? 'mc' : (s.endsWith('Dance Battle') ? 'special' : 'song')) + '">' + s + '</div>').join('') + '</div>';
       } else {
         let sumKey = null;
         if (currentPeriod === 'dream') {
