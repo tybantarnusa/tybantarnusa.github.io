@@ -127,6 +127,8 @@
     width: max-content;
   }
   .stage-actions { max-width: 640px; margin-top: 12px; }
+  /* Auto-layout lives in its own toolbar above the grid, not next to Download. */
+  .stage-toolbar { max-width: 640px; margin-bottom: 10px; display: flex; justify-content: flex-end; }
   .cell {
     position: relative;
     background: var(--panel);
@@ -141,10 +143,27 @@
   .cell.filled.dragging { cursor: grabbing; }
   /* Simple mode: fit the whole image, no cropping or transforms. */
   .cell.simple { cursor: pointer; touch-action: auto; }
-  .cell.simple img { object-fit: contain; transform: none !important; }
+  /* position:relative keeps the contained image above the absolute .sq-bg fill. */
+  .cell.simple > img { object-fit: contain; transform: none !important; position: relative; }
   /* Allow the grid to scroll on touch; reordering starts on a long-press. */
   .cell.simple.filled { cursor: grab; touch-action: pan-x pan-y; }
   .cell.simple.filled.dragging { cursor: grabbing; opacity: 0.5; }
+  /* Square mode: 1:1 cells, image contained over a blur/color fill. */
+  .cell.square { cursor: pointer; touch-action: auto; }
+  .cell.square.filled { cursor: grab; touch-action: pan-x pan-y; }
+  .cell.square.filled.dragging { cursor: grabbing; opacity: 0.5; }
+  /* Blur/color gap-fill layer, shared by square and simple modes. */
+  .cell .sq-bg { position: absolute; inset: 0; overflow: hidden; }
+  .cell .sq-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scale(1.2);
+  }
+  .cell.square .sq-fg {
+    position: relative;
+    width: 100%; height: 100%;
+    object-fit: contain;
+  }
   .cell.drop-target { outline: 2px solid var(--accent); outline-offset: -2px; }
   .cell.base { outline: 2px solid var(--accent); outline-offset: -2px; }
   .cell span {
@@ -190,8 +209,28 @@
     touch-action: manipulation;
   }
   .cell .tools button:hover { background: rgba(0,0,0,0.85); }
+  .cell .tools button.active { background: var(--accent); }
+  .cell .tools button.active:hover { background: var(--accent-hover); }
   .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
-  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; line-height: 1.7; }
+  footer {
+    position: relative;
+    margin-top: 0;
+    padding: 8px 24px 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  footer .footer-inner { max-width: 640px; margin: 0 auto; }
+  footer p { margin: 2px 0; }
+  footer .f-name {
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent), #978df0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  footer .footer-note { font-size: 12px; opacity: 0.75; }
   .update-bar {
     position: fixed;
     left: 50%;
@@ -226,7 +265,7 @@
     .controls { width: 100%; }
     .gridwrap { max-width: 100%; }
     .stage-actions { max-width: 100%; }
-    footer { padding: 0 16px 24px; }
+    footer { padding: 8px 16px 28px; }
     /* Bigger touch targets. */
     .cell .tools button { width: 30px; height: 30px; font-size: 16px; }
     input[type="number"] { padding: 10px; font-size: 16px; }
@@ -244,23 +283,25 @@
     <h2>Mode</h2>
     <div class="field">
       <div class="seg">
-        <button id="modeSimple" class="active">Simple</button>
-        <button id="modeAdvanced">Advanced</button>
+        <button id="modeSimple" class="active">Collage</button>
+        <button id="modeSquare">Square</button>
       </div>
     </div>
 
-    <h2>Grid</h2>
-    <div class="field">
-      <label>Columns</label>
-      <input type="number" id="cols" min="1" max="10" value="2">
-    </div>
-    <div class="field">
-      <label>Rows</label>
-      <input type="number" id="rows" min="1" max="10" value="2">
+    <div id="gridOpts">
+      <h2>Grid</h2>
+      <div class="field">
+        <label>Columns</label>
+        <input type="number" id="cols" min="1" max="10" value="2">
+      </div>
+      <div class="field">
+        <label>Rows</label>
+        <input type="number" id="rows" min="1" max="10" value="2">
+      </div>
     </div>
 
     <h2>Style</h2>
-    <div class="field">
+    <div class="field" id="gapField">
       <label>Gap: <span id="gapVal">0</span> px</label>
       <input type="range" id="gap" min="0" max="60" value="0">
     </div>
@@ -268,11 +309,32 @@
       <label>Output width: <span id="widthVal">1200</span> px</label>
       <input type="range" id="outWidth" min="400" max="4000" step="100" value="1200">
     </div>
-    <div class="field">
+    <div class="field" id="bgField">
       <label>Background</label>
       <div class="row">
         <input type="color" id="bgColor" value="#000000">
         <span class="val" id="bgVal">#000000</span>
+      </div>
+    </div>
+
+    <div id="squareOpts" style="display:none">
+      <h2>Gap Fill</h2>
+      <div class="field">
+        <div class="seg">
+          <button id="fillBlur" class="active">Blur</button>
+          <button id="fillColor">Color</button>
+        </div>
+      </div>
+      <div class="field" id="blurField">
+        <label>Blur strength: <span id="blurVal">4</span></label>
+        <input type="range" id="blurStrength" min="0" max="10" value="4">
+      </div>
+      <div class="field" id="sqColorField" style="display:none">
+        <label>Fill color</label>
+        <div class="row">
+          <input type="color" id="sqColor" value="#000000">
+          <span class="val" id="sqVal">#000000</span>
+        </div>
       </div>
     </div>
 
@@ -282,6 +344,9 @@
   </aside>
 
   <main class="stage">
+    <div class="stage-toolbar" id="autoToolbar">
+      <button id="autoLayout" title="Picks the best row/column bases so images touch with as little empty space as possible">Auto layout</button>
+    </div>
     <div class="gridwrap"><div class="grid" id="grid"></div></div>
     <div class="stage-actions">
       <button class="primary" id="download" disabled>Download</button>
@@ -290,8 +355,10 @@
 </div>
 
 <footer>
-  No uploads — everything runs locally on this page.<br>
-  Programmed with vibe by tybantarnusa ft. Claude
+  <div class="footer-inner">
+    <p class="footer-credit">Programmed with vibe by <span class="f-name">tybantarnusa</span> &middot; <span class="f-name">Claude</span> &middot; <span class="f-name">DeepSeek</span> &middot; <span class="f-name">Thya</span></p>
+    <p class="footer-note">No uploads, everything runs locally in your browser.</p>
+  </div>
 </footer>
 
 <input type="file" id="filePicker" accept="image/*" style="display:none">
@@ -312,20 +379,34 @@
   const clearBtn = document.getElementById('clear');
   const filePicker = document.getElementById('filePicker');
   const modeSimpleBtn = document.getElementById('modeSimple');
-  const modeAdvancedBtn = document.getElementById('modeAdvanced');
+  const modeSquareBtn = document.getElementById('modeSquare');
+  const squareOpts = document.getElementById('squareOpts');
+  const bgField = document.getElementById('bgField');
+  const gridOpts = document.getElementById('gridOpts');
+  const gapField = document.getElementById('gapField');
+  const autoBtn = document.getElementById('autoLayout');
+  const autoToolbar = document.getElementById('autoToolbar');
+  const fillBlurBtn = document.getElementById('fillBlur');
+  const fillColorBtn = document.getElementById('fillColor');
+  const blurField = document.getElementById('blurField');
+  const blurStrengthInput = document.getElementById('blurStrength');
+  const blurVal = document.getElementById('blurVal');
+  const sqColor = document.getElementById('sqColor');
+  const sqVal = document.getElementById('sqVal');
+  const sqColorField = document.getElementById('sqColorField');
 
-  const MIN_ZOOM = 1;
-  const MAX_ZOOM = 5;
-
-  // Each cell holds null or { img, zoom, offsetX, offsetY }.
-  // offsetX/offsetY are pan expressed as a fraction of the cell's size.
+  // Each cell holds null or { img, colBase, rowBase }.
   let cells = [];
   let activeCell = -1;
   // Once the user drags the output-width slider, stop auto-defaulting it.
   let userSetWidth = false;
-  let simpleMode = true;
-  // The cell data chosen as the base; null means auto (largest image).
-  let baseData = null;
+  // 'simple' | 'square'
+  let mode = 'simple';
+  // Square mode: how empty cell space is filled — blurred copy or solid color.
+  let squareFill = 'blur';
+  let squareColor = '#000000';
+  // Blur strength as a percentage of the cell size (0 = sharp cover fill).
+  let blurStrength = 4;
   // True only while a long-press reorder drag is in progress.
   let reordering = false;
 
@@ -345,18 +426,47 @@
     return best;
   }
 
-  // The image that drives the grid shape/size in simple mode:
-  // the user-chosen base if it still exists, otherwise the largest.
-  function baseImage() {
-    if (baseData && cells.indexOf(baseData) !== -1) return baseData.img;
-    return largestImage();
-  }
+  // Simple mode: variable column widths / row heights driven by per-column and
+  // per-row base cells. A column base cell sets its column's width ratio; a row
+  // base cell sets its row's height ratio. Both are solved together so every
+  // base cell's own image fills its cell exactly — contain, no gaps.
+  // Returns { colW, rowH } in ratio units.
+  function computeUnits(cols, rows) {
+    const fb = largestImage();
+    const F = fb ? fb.naturalWidth / fb.naturalHeight : 1;
+    const colW = new Array(cols).fill(F);
+    const rowH = new Array(rows).fill(1);
 
-  // Cell shape: square in advanced mode, base image's ratio in simple mode.
-  function currentAspect() {
-    if (!simpleMode) return 1;
-    const img = baseImage();
-    return img ? img.naturalWidth / img.naturalHeight : 1;
+    const bases = [];
+    for (let i = 0; i < cells.length; i++) {
+      const d = cells[i];
+      if (!d) continue;
+      const ratio = d.img.naturalWidth / d.img.naturalHeight;
+      const c = i % cols, r = Math.floor(i / cols);
+      if (d.colBase) bases.push({ c: c, r: r, ratio: ratio, col: true });
+      if (d.rowBase) bases.push({ c: c, r: r, ratio: ratio, row: true });
+    }
+    // Gauss-Seidel pass: colW[c] = ratio * rowH[r]; rowH[r] = colW[c] / ratio.
+    for (let iter = 0; iter < 6; iter++) {
+      for (const b of bases) {
+        if (b.col) colW[b.c] = b.ratio * rowH[b.r];
+        if (b.row) rowH[b.r] = colW[b.c] / b.ratio;
+      }
+    }
+    // Guard against degenerate base cycles: an inconsistent multiplicative
+    // cycle can collapse the units toward zero or blow them up. Fall back to a
+    // sane layout (no bases) so the grid never becomes invisible/exploded.
+    const maxCol = Math.max.apply(null, colW);
+    const minCol = Math.min.apply(null, colW);
+    const maxRow = Math.max.apply(null, rowH);
+    const minRow = Math.min.apply(null, rowH);
+    if (!isFinite(maxCol) || !isFinite(maxRow) ||
+        maxCol / minCol > 1000 || maxRow / minRow > 1000 ||
+        maxCol < 0.05 || maxRow < 0.05) {
+      for (let c = 0; c < cols; c++) colW[c] = F;
+      for (let r = 0; r < rows; r++) rowH[r] = 1;
+    }
+    return { colW: colW, rowH: rowH };
   }
 
   function clampInt(input) {
@@ -367,48 +477,62 @@
     return v;
   }
 
-  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-  function applyTransform(imgEl, data) {
-    imgEl.style.transform =
-      'translate(' + (data.offsetX * 100) + '%, ' + (data.offsetY * 100) + '%) ' +
-      'scale(' + data.zoom + ')';
-  }
-
   function buildGrid() {
-    const cols = clampInt(colsInput);
-    const rows = clampInt(rowsInput);
+    // Square mode is a single-image 1:1 converter — always one cell.
+    const cols = (mode === 'square') ? 1 : clampInt(colsInput);
+    const rows = (mode === 'square') ? 1 : clampInt(rowsInput);
     const count = cols * rows;
 
-    const next = new Array(count).fill(null);
-    for (let i = 0; i < count && i < cells.length; i++) next[i] = cells[i];
-    cells = next;
+    if (mode !== 'square') {
+      const next = new Array(count).fill(null);
+      for (let i = 0; i < count && i < cells.length; i++) next[i] = cells[i];
+      cells = next;
+    }
 
-    const gapPx = parseInt(gapInput.value, 10);
+    const gapPx = (mode === 'square') ? 0 : parseInt(gapInput.value, 10);
     grid.style.gap = gapPx + 'px';
     grid.style.padding = gapPx + 'px';
-    grid.style.background = bgColor.value;
+    grid.style.background = (mode === 'square') ? squareColor : bgColor.value;
 
     // Fit cells to the available width, but never below MIN_CELL — past that the
     // grid grows beyond the wrapper and scrolls sideways instead of shrinking.
     const MIN_CELL = 180;
-    const aspect = currentAspect();
     const avail = (gridwrap.clientWidth || 640) - gapPx * (cols + 1);
-    let cellW = Math.floor(avail / cols);
-    if (!isFinite(cellW) || cellW < MIN_CELL) cellW = MIN_CELL;
-    // Keep a usable height too: widen landscape cells so the height stays >= MIN_CELL.
-    if (simpleMode && cellW / aspect < MIN_CELL) cellW = Math.ceil(MIN_CELL * aspect);
 
-    grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
-    if (simpleMode) {
-      grid.style.gridTemplateRows = '';
+    let cellW = 0;
+    let simpleUnitW = null;
+    if (mode === 'simple') {
+      const units = computeUnits(cols, rows);
+      const sum = units.colW.reduce(function (a, b) { return a + b; }, 0);
+      let u = avail / sum;
+      if (!isFinite(u)) u = MIN_CELL;
+      const minColW = Math.min.apply(null, units.colW);
+      const minRowH = Math.min.apply(null, units.rowH);
+      if (u * minColW < MIN_CELL) u = MIN_CELL / minColW;
+      if (u * minRowH < MIN_CELL) u = MIN_CELL / minRowH;
+      grid.style.gridTemplateColumns = units.colW.map(function (w) {
+        return (w * u).toFixed(2) + 'px';
+      }).join(' ');
+      grid.style.gridTemplateRows = units.rowH.map(function (h) {
+        return (h * u).toFixed(2) + 'px';
+      }).join(' ');
+      simpleUnitW = units.colW.map(function (w) { return w * u; });
+      cellW = units.colW[0] * u;
     } else {
-      grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + cellW + 'px)';
+      cellW = Math.floor(avail / cols);
+      if (!isFinite(cellW) || cellW < MIN_CELL) cellW = MIN_CELL;
+      grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
+      grid.style.gridTemplateRows = '';
     }
 
     grid.innerHTML = '';
+    const blurPx = Math.round(cellW * blurStrength / 100);
     for (let i = 0; i < count; i++) {
-      grid.appendChild(makeCell(i, aspect));
+      // Simple mode cells vary in width — scale the gap-blur per column.
+      const bpx = simpleUnitW
+        ? Math.round(simpleUnitW[i % cols] * blurStrength / 100)
+        : blurPx;
+      grid.appendChild(makeCell(i, bpx));
     }
     updateDefaultWidth();
     updateDownloadState();
@@ -417,15 +541,15 @@
   // Default the output width to the widest source image times the column count.
   function updateDefaultWidth() {
     if (userSetWidth) return;
-    const cols = clampInt(colsInput);
+    const cols = (mode === 'square') ? 1 : clampInt(colsInput);
     let baseW = 0;
-    if (simpleMode) {
-      const img = baseImage();
+    if (mode === 'square') {
+      // A square output should keep the longer side's resolution.
+      const c = cells[0];
+      if (c) baseW = Math.max(c.img.naturalWidth, c.img.naturalHeight);
+    } else if (mode === 'simple') {
+      const img = largestImage();
       if (img) baseW = img.naturalWidth;
-    } else {
-      for (const c of cells) {
-        if (c && c.img.naturalWidth > baseW) baseW = c.img.naturalWidth;
-      }
     }
     if (!baseW) return;
     const target = baseW * cols;
@@ -434,40 +558,71 @@
     widthVal.textContent = target;
   }
 
-  function makeCell(i, aspect) {
+  function makeCell(i, blurPx) {
     const cell = document.createElement('div');
-    cell.className = 'cell' + (simpleMode ? ' simple' : '');
+    cell.className = 'cell' + (mode === 'simple' ? ' simple' : mode === 'square' ? ' square' : '');
     cell.dataset.index = i;
-    if (simpleMode) cell.style.aspectRatio = String(aspect);
+    if (mode === 'square') cell.style.aspectRatio = '1';
     const data = cells[i];
 
     if (data) {
       cell.classList.add('filled');
-      if (simpleMode && data === baseData) cell.classList.add('base');
-      const img = document.createElement('img');
-      img.src = data.img.src;
-      if (!simpleMode) applyTransform(img, data);
-      cell.appendChild(img);
+
+      if (mode === 'square') {
+        // Background layer: blurred copy of the image, or a solid fill color.
+        if (squareFill === 'blur') {
+          const bg = document.createElement('div');
+          bg.className = 'sq-bg';
+          const bgImg = document.createElement('img');
+          bgImg.src = data.img.src;
+          bgImg.style.filter = 'blur(' + blurPx + 'px)';
+          bg.appendChild(bgImg);
+          cell.appendChild(bg);
+        } else {
+          cell.style.background = squareColor;
+        }
+        // Foreground layer: whole image contained, centered.
+        const fg = document.createElement('img');
+        fg.className = 'sq-fg';
+        fg.src = data.img.src;
+        cell.appendChild(fg);
+      } else {
+        // Blur/color gap fill behind the contained image, like square mode.
+        if (squareFill === 'blur') {
+          const bg = document.createElement('div');
+          bg.className = 'sq-bg';
+          const bgImg = document.createElement('img');
+          bgImg.src = data.img.src;
+          bgImg.style.filter = 'blur(' + blurPx + 'px)';
+          bg.appendChild(bgImg);
+          cell.appendChild(bg);
+        } else {
+          cell.style.background = squareColor;
+        }
+        const cimg = document.createElement('img');
+        cimg.src = data.img.src;
+        cell.appendChild(cimg);
+      }
 
       const tools = document.createElement('div');
       tools.className = 'tools';
 
-      const base = document.createElement('button');
-      base.textContent = data === baseData ? '★' : '☆';
-      base.title = 'Use as base size';
-      base.addEventListener('click', function (e) {
+      const colBase = document.createElement('button');
+      colBase.textContent = '↕';
+      colBase.title = 'Set as column base (column width)';
+      if (data.colBase) colBase.classList.add('active');
+      colBase.addEventListener('click', function (e) {
         e.stopPropagation();
-        baseData = (baseData === data) ? null : data;
-        buildGrid();
+        setColBase(i, data);
       });
 
-      const reset = document.createElement('button');
-      reset.textContent = '⤴';
-      reset.title = 'Reset position & zoom';
-      reset.addEventListener('click', function (e) {
+      const rowBase = document.createElement('button');
+      rowBase.textContent = '↔';
+      rowBase.title = 'Set as row base (row height)';
+      if (data.rowBase) rowBase.classList.add('active');
+      rowBase.addEventListener('click', function (e) {
         e.stopPropagation();
-        data.zoom = 1; data.offsetX = 0; data.offsetY = 0;
-        applyTransform(img, data);
+        setRowBase(i, data);
       });
 
       const replace = document.createElement('button');
@@ -484,26 +639,19 @@
       rm.title = 'Remove';
       rm.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (cells[i] === baseData) baseData = null;
         cells[i] = null;
         buildGrid();
       });
 
-      if (simpleMode) tools.appendChild(base);
-      if (!simpleMode) tools.appendChild(reset);
+      if (mode === 'simple') {
+        tools.appendChild(colBase);
+        tools.appendChild(rowBase);
+      }
       tools.appendChild(replace);
       tools.appendChild(rm);
       cell.appendChild(tools);
 
-      if (!simpleMode) {
-        enablePanZoom(cell, img, i);
-        cell.addEventListener('dblclick', function () {
-          data.zoom = 1; data.offsetX = 0; data.offsetY = 0;
-          applyTransform(img, data);
-        });
-      } else {
-        enableReorder(cell, i);
-      }
+      enableReorder(cell, i);
     } else {
       const span = document.createElement('span');
       span.textContent = '+ Add image';
@@ -516,75 +664,119 @@
     return cell;
   }
 
-  function enablePanZoom(cell, img, i) {
-    // Track active pointers so one finger pans and two fingers pinch-zoom.
-    const pointers = new Map();
-    let prevDist = 0, prevMidX = 0, prevMidY = 0;
+  // Simple mode base selection — one base per column / per row. Clicking an
+  // active base again removes it; picking a new one clears the old in that unit.
+  function setColBase(i, data) {
+    const cols = clampInt(colsInput);
+    if (data.colBase) { data.colBase = false; buildGrid(); return; }
+    for (let idx = i % cols; idx < cells.length; idx += cols) {
+      if (cells[idx] && cells[idx] !== data) cells[idx].colBase = false;
+    }
+    data.colBase = true;
+    buildGrid();
+  }
 
-    function twoPointerState() {
-      const pts = [...pointers.values()];
-      return {
-        dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
-        midX: (pts[0].x + pts[1].x) / 2,
-        midY: (pts[0].y + pts[1].y) / 2
-      };
+  function setRowBase(i, data) {
+    const cols = clampInt(colsInput);
+    const start = Math.floor(i / cols) * cols;
+    if (data.rowBase) { data.rowBase = false; buildGrid(); return; }
+    for (let idx = start; idx < start + cols; idx++) {
+      if (cells[idx] && cells[idx] !== data) cells[idx].rowBase = false;
+    }
+    data.rowBase = true;
+    buildGrid();
+  }
+
+  // Auto layout (simple mode): pick the best column/row base cells so every
+  // filled cell fits its image as tightly as possible — minimal empty space.
+  // Coordinate descent: try every candidate in each column, then each row,
+  // keep whatever reduces the weighted total gap, repeat a few times.
+  function autoPickBases() {
+    const cols = clampInt(colsInput);
+    const rows = clampInt(rowsInput);
+    if (mode !== 'simple' || cols * rows === 0) return;
+
+    for (const d of cells) {
+      if (d) { d.colBase = false; d.rowBase = false; }
+    }
+    if (!cells.some(Boolean)) { buildGrid(); return; }
+
+    function clearCol(c) {
+      for (let r = 0; r < rows; r++) {
+        const d = cells[r * cols + c];
+        if (d) d.colBase = false;
+      }
+    }
+    function clearRow(r) {
+      for (let c = 0; c < cols; c++) {
+        const d = cells[r * cols + c];
+        if (d) d.rowBase = false;
+      }
     }
 
-    cell.addEventListener('pointerdown', function (e) {
-      const data = cells[i];
-      if (!data) return;
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      cell.setPointerCapture(e.pointerId);
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      cell.classList.add('dragging');
-      if (pointers.size === 2) {
-        const s = twoPointerState();
-        prevDist = s.dist; prevMidX = s.midX; prevMidY = s.midY;
-      }
-    });
-
-    cell.addEventListener('pointermove', function (e) {
-      const data = cells[i];
-      if (!data || !pointers.has(e.pointerId)) return;
-      const rect = cell.getBoundingClientRect();
-      const p = pointers.get(e.pointerId);
-
-      if (pointers.size === 1) {
-        data.offsetX += (e.clientX - p.x) / rect.width;
-        data.offsetY += (e.clientY - p.y) / rect.height;
-        p.x = e.clientX; p.y = e.clientY;
-        applyTransform(img, data);
-      } else if (pointers.size >= 2) {
-        p.x = e.clientX; p.y = e.clientY;
-        const s = twoPointerState();
-        if (prevDist > 0) {
-          data.zoom = clamp(data.zoom * (s.dist / prevDist), MIN_ZOOM, MAX_ZOOM);
-          data.offsetX += (s.midX - prevMidX) / rect.width;
-          data.offsetY += (s.midY - prevMidY) / rect.height;
-          applyTransform(img, data);
+    // Weighted empty-space total for the current base selection. A cell's fit
+    // is min(cellAspect/imgRatio, imgRatio/cellAspect) in 0..1; weight by the
+    // cell's relative area so big cells count more. Units are normalized first
+    // so a degenerate solver scale can't make the total look artificially small.
+    // A size-spread penalty keeps rows/columns from landing absurdly far apart —
+    // the optimizer shouldn't "hide" bad fits inside tiny cells.
+    function totalGap() {
+      const units = computeUnits(cols, rows);
+      const sumW = units.colW.reduce(function (a, b) { return a + b; }, 0);
+      const sumH = units.rowH.reduce(function (a, b) { return a + b; }, 0);
+      const nw = units.colW.map(function (w) { return w / sumW * cols; });
+      const nh = units.rowH.map(function (h) { return h / sumH * rows; });
+      let total = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const d = cells[r * cols + c];
+          if (!d) continue;
+          const ratio = d.img.naturalWidth / d.img.naturalHeight;
+          const cellAspect = units.colW[c] / units.rowH[r];
+          const fit = Math.min(cellAspect / ratio, ratio / cellAspect);
+          total += (1 - fit) * nw[c] * nh[r];
         }
-        prevDist = s.dist; prevMidX = s.midX; prevMidY = s.midY;
       }
-    });
-
-    function endPointer(e) {
-      if (!pointers.has(e.pointerId)) return;
-      pointers.delete(e.pointerId);
-      if (pointers.size < 2) prevDist = 0;
-      if (pointers.size === 0) cell.classList.remove('dragging');
-      try { cell.releasePointerCapture(e.pointerId); } catch (_) {}
+      const SPREAD_CAP = 8;
+      const maxCol = Math.max.apply(null, units.colW);
+      const minCol = Math.min.apply(null, units.colW);
+      const maxRow = Math.max.apply(null, units.rowH);
+      const minRow = Math.min.apply(null, units.rowH);
+      if (maxCol / minCol > SPREAD_CAP) total += (maxCol / minCol - SPREAD_CAP) * 2;
+      if (maxRow / minRow > SPREAD_CAP) total += (maxRow / minRow - SPREAD_CAP) * 2;
+      return total;
     }
-    cell.addEventListener('pointerup', endPointer);
-    cell.addEventListener('pointercancel', endPointer);
 
-    cell.addEventListener('wheel', function (e) {
-      const data = cells[i];
-      if (!data) return;
-      e.preventDefault();
-      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
-      data.zoom = clamp(data.zoom * factor, MIN_ZOOM, MAX_ZOOM);
-      applyTransform(img, data);
-    }, { passive: false });
+    for (let iter = 0; iter < 4; iter++) {
+      for (let c = 0; c < cols; c++) {
+        const cands = [-1];
+        for (let r = 0; r < rows; r++) if (cells[r * cols + c]) cands.push(r * cols + c);
+        let bestIdx = -1, bestGap = Infinity;
+        clearCol(c);
+        for (const idx of cands) {
+          if (idx >= 0) cells[idx].colBase = true;
+          const g = totalGap();
+          if (g < bestGap) { bestGap = g; bestIdx = idx; }
+          if (idx >= 0) cells[idx].colBase = false;
+        }
+        if (bestIdx >= 0) cells[bestIdx].colBase = true;
+      }
+      for (let r = 0; r < rows; r++) {
+        const cands = [-1];
+        for (let c = 0; c < cols; c++) if (cells[r * cols + c]) cands.push(r * cols + c);
+        let bestIdx = -1, bestGap = Infinity;
+        clearRow(r);
+        for (const idx of cands) {
+          if (idx >= 0) cells[idx].rowBase = true;
+          const g = totalGap();
+          if (g < bestGap) { bestGap = g; bestIdx = idx; }
+          if (idx >= 0) cells[idx].rowBase = false;
+        }
+        if (bestIdx >= 0) cells[bestIdx].rowBase = true;
+      }
+    }
+
+    buildGrid();
   }
 
   function clearDropTargets() {
@@ -593,11 +785,12 @@
     });
   }
 
-  // Simple mode: long-press a filled cell (or just drag with a mouse), then drop
-  // it onto another cell to swap. A plain touch-drag scrolls the grid instead.
+  // Simple mode: reorder with a long press (touch) or a drag (mouse). Touch:
+  // holding still for 500ms only "arms" the reorder; moving after that starts
+  // it, so ordinary scroll swipes never drag a photo around.
   function enableReorder(cell, i) {
     let pointerId = null, startX = 0, startY = 0;
-    let dragging = false, pressTimer = null, curX = 0, curY = 0, raf = null;
+    let dragging = false, armed = false, pressTimer = null, curX = 0, curY = 0, raf = null;
 
     function highlight(clientX, clientY) {
       const el = document.elementFromPoint(clientX, clientY);
@@ -620,13 +813,13 @@
       raf = requestAnimationFrame(autoScroll);
     }
 
-    function beginDrag(e) {
+    function beginDrag() {
       dragging = true;
       reordering = true;
       cell.classList.add('dragging');
-      try { cell.setPointerCapture(e.pointerId); } catch (_) {}
+      try { cell.setPointerCapture(pointerId); } catch (_) {}
       if (navigator.vibrate) navigator.vibrate(15);
-      curX = e.clientX; curY = e.clientY;
+      curX = startX; curY = startY;
       if (!raf) raf = requestAnimationFrame(autoScroll);
     }
 
@@ -638,9 +831,10 @@
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       pointerId = e.pointerId;
       startX = curX = e.clientX; startY = curY = e.clientY;
-      dragging = false;
+      dragging = false; armed = false;
       if (e.pointerType !== 'mouse') {
-        pressTimer = setTimeout(function () { pressTimer = null; beginDrag(e); }, 300);
+        // Hold without moving arms the reorder; movement after that drags.
+        pressTimer = setTimeout(function () { pressTimer = null; armed = true; }, 500);
       }
     });
 
@@ -650,7 +844,9 @@
       if (dragging) { highlight(e.clientX, e.clientY); return; }
       const moved = Math.hypot(e.clientX - startX, e.clientY - startY);
       if (e.pointerType === 'mouse') {
-        if (moved > 6 && (e.buttons & 1)) beginDrag(e);
+        if (moved > 6 && (e.buttons & 1)) beginDrag();
+      } else if (armed) {
+        if (moved > 8) beginDrag();
       } else if (pressTimer && moved > 10) {
         cancelPress();
       }
@@ -660,6 +856,7 @@
       if (pointerId !== e.pointerId) return;
       pointerId = null;
       cancelPress();
+      armed = false;
       if (dragging) {
         const target = highlight(e.clientX, e.clientY);
         clearDropTargets();
@@ -682,7 +879,11 @@
   }
 
   function updateDownloadState() {
-    downloadBtn.disabled = !cells.some(Boolean);
+    if (mode === 'square') {
+      downloadBtn.disabled = !cells[0];
+    } else {
+      downloadBtn.disabled = !cells.some(Boolean);
+    }
   }
 
   filePicker.addEventListener('change', function () {
@@ -693,7 +894,7 @@
     reader.onload = function (e) {
       const img = new Image();
       img.onload = function () {
-        cells[activeCell] = { img: img, zoom: 1, offsetX: 0, offsetY: 0 };
+        cells[activeCell] = { img: img };
         buildGrid();
       };
       img.src = e.target.result;
@@ -702,14 +903,27 @@
   });
 
   function renderCanvas() {
-    const cols = clampInt(colsInput);
-    const rows = clampInt(rowsInput);
-    const gap = parseInt(gapInput.value, 10);
+    const cols = (mode === 'square') ? 1 : clampInt(colsInput);
+    const rows = (mode === 'square') ? 1 : clampInt(rowsInput);
+    const gap = (mode === 'square') ? 0 : parseInt(gapInput.value, 10);
     const totalW = parseInt(outWidth.value, 10);
 
-    const cellW = (totalW - gap * (cols + 1)) / cols;
-    const cellH = simpleMode ? cellW / currentAspect() : cellW;
-    const totalH = cellH * rows + gap * (rows + 1);
+    // Column widths and row heights in px — same ratios as the on-screen grid,
+    // only scaled so the total width matches the requested output width.
+    let colPx, rowPx, totalH;
+    if (mode === 'simple') {
+      const units = computeUnits(cols, rows);
+      const sum = units.colW.reduce(function (a, b) { return a + b; }, 0);
+      const scale = (totalW - gap * (cols + 1)) / sum;
+      colPx = units.colW.map(function (w) { return w * scale; });
+      rowPx = units.rowH.map(function (h) { return h * scale; });
+      totalH = rowPx.reduce(function (a, b) { return a + b; }, 0) + gap * (rows + 1);
+    } else {
+      const cellW = (totalW - gap * (cols + 1)) / cols;
+      colPx = new Array(cols).fill(cellW);
+      rowPx = new Array(rows).fill(cellW);
+      totalH = cellW * rows + gap * (rows + 1);
+    }
 
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(totalW);
@@ -719,47 +933,75 @@
     ctx.fillStyle = bgColor.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    let y = gap;
     for (let r = 0; r < rows; r++) {
+      let x = gap;
       for (let c = 0; c < cols; c++) {
         const idx = r * cols + c;
         const data = cells[idx];
-        if (!data) continue;
-        const cellX = gap + c * (cellW + gap);
-        const cellY = gap + r * (cellH + gap);
-        drawCell(ctx, data, cellX, cellY, cellW, cellH);
+        if (data) drawCell(ctx, data, x, y, colPx[c], rowPx[r]);
+        x += colPx[c] + gap;
       }
+      y += rowPx[r] + gap;
     }
     return canvas;
   }
 
   function drawCell(ctx, data, cellX, cellY, cellW, cellH) {
     const img = data.img;
-    let finalW, finalH, dx, dy;
-
-    if (simpleMode) {
-      // object-fit: contain — whole image fits within the cell, centered.
-      const scale = Math.min(cellW / img.width, cellH / img.height);
-      finalW = img.width * scale;
-      finalH = img.height * scale;
-      dx = cellX + (cellW - finalW) / 2;
-      dy = cellY + (cellH - finalH) / 2;
-    } else {
-      // object-fit: cover, then translate (fraction of cell) + scale about center.
-      const coverScale = Math.max(cellW / img.width, cellH / img.height);
-      finalW = img.width * coverScale * data.zoom;
-      finalH = img.height * coverScale * data.zoom;
-      const centerX = cellX + cellW / 2 + data.offsetX * cellW;
-      const centerY = cellY + cellH / 2 + data.offsetY * cellH;
-      dx = centerX - finalW / 2;
-      dy = centerY - finalH / 2;
-    }
-
     ctx.save();
     ctx.beginPath();
     ctx.rect(cellX, cellY, cellW, cellH);
     ctx.clip();
-    ctx.drawImage(img, dx, dy, finalW, finalH);
+
+    // Fill the leftover space with a blurred copy (or solid color), then
+    // contain the whole image on top — same look as the on-screen grid.
+    if (squareFill === 'blur') {
+      drawBlurredFill(ctx, img, cellX, cellY, cellW, cellH);
+    } else {
+      ctx.fillStyle = squareColor;
+      ctx.fillRect(cellX, cellY, cellW, cellH);
+    }
+    const scale = Math.min(cellW / img.width, cellH / img.height);
+    const finalW = img.width * scale;
+    const finalH = img.height * scale;
+    ctx.drawImage(img, cellX + (cellW - finalW) / 2, cellY + (cellH - finalH) / 2, finalW, finalH);
+
     ctx.restore();
+  }
+
+  // Square mode: fill the cell with a blurred copy of the image (cover-fit).
+  function drawBlurredFill(ctx, img, cellX, cellY, cellW, cellH) {
+    const coverScale = Math.max(cellW / img.width, cellH / img.height);
+    const bw = img.width * coverScale;
+    const bh = img.height * coverScale;
+    const bx = cellX + (cellW - bw) / 2;
+    const by = cellY + (cellH - bh) / 2;
+    const blurPx = Math.round(cellW * blurStrength / 100);
+    if (blurPx <= 0) {
+      ctx.drawImage(img, bx, by, bw, bh);
+      return;
+    }
+    if (ctx.filter) {
+      ctx.save();
+      ctx.filter = 'blur(' + blurPx + 'px)';
+      ctx.drawImage(img, bx, by, bw, bh);
+      ctx.restore();
+    } else {
+      // Fallback (older Safari): downscale to a tiny canvas, then stretch back
+      // with smoothing — a soft wash without ctx.filter support.
+      const div = Math.max(8, blurPx);
+      const off = document.createElement('canvas');
+      off.width = Math.max(2, Math.round(bw / div));
+      off.height = Math.max(2, Math.round(bh / div));
+      const octx = off.getContext('2d');
+      octx.drawImage(img, 0, 0, off.width, off.height);
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(off, bx, by, bw, bh);
+      ctx.restore();
+    }
   }
 
   downloadBtn.addEventListener('click', function () {
@@ -776,18 +1018,24 @@
 
   clearBtn.addEventListener('click', function () {
     cells = cells.map(function () { return null; });
-    baseData = null;
     buildGrid();
   });
 
-  function setMode(simple) {
-    simpleMode = simple;
-    modeSimpleBtn.classList.toggle('active', simple);
-    modeAdvancedBtn.classList.toggle('active', !simple);
+  autoBtn.addEventListener('click', autoPickBases);
+
+  function setMode(m) {
+    mode = m;
+    modeSimpleBtn.classList.toggle('active', m === 'simple');
+    modeSquareBtn.classList.toggle('active', m === 'square');
+    squareOpts.style.display = (m === 'square' || m === 'simple') ? '' : 'none';
+    bgField.style.display = (m === 'square') ? 'none' : '';
+    gridOpts.style.display = (m === 'square') ? 'none' : '';
+    gapField.style.display = (m === 'square') ? 'none' : '';
+    autoToolbar.style.display = (m === 'simple') ? '' : 'none';
     buildGrid();
   }
-  modeSimpleBtn.addEventListener('click', function () { setMode(true); });
-  modeAdvancedBtn.addEventListener('click', function () { setMode(false); });
+  modeSimpleBtn.addEventListener('click', function () { setMode('simple'); });
+  modeSquareBtn.addEventListener('click', function () { setMode('square'); });
 
   window.addEventListener('resize', buildGrid);
 
@@ -803,10 +1051,34 @@
   });
   bgColor.addEventListener('input', function () {
     bgVal.textContent = bgColor.value;
-    grid.style.background = bgColor.value;
+    grid.style.background = (mode === 'square') ? squareColor : bgColor.value;
   });
 
-  setMode(true);
+  function setSquareFill(fill) {
+    squareFill = fill;
+    fillBlurBtn.classList.toggle('active', fill === 'blur');
+    fillColorBtn.classList.toggle('active', fill === 'color');
+    blurField.style.display = (fill === 'blur') ? '' : 'none';
+    sqColorField.style.display = (fill === 'color') ? '' : 'none';
+    buildGrid();
+  }
+  fillBlurBtn.addEventListener('click', function () { setSquareFill('blur'); });
+  fillColorBtn.addEventListener('click', function () { setSquareFill('color'); });
+  blurStrengthInput.addEventListener('input', function () {
+    blurStrength = parseInt(blurStrengthInput.value, 10);
+    blurVal.textContent = blurStrength;
+    buildGrid();
+  });
+  sqColor.addEventListener('input', function () {
+    squareColor = sqColor.value;
+    sqVal.textContent = squareColor;
+    grid.style.background = squareColor;
+    grid.querySelectorAll('.cell.square').forEach(function (c) {
+      c.style.background = squareColor;
+    });
+  });
+
+  setMode('simple');
 })();
 
 if ('serviceWorker' in navigator) {
