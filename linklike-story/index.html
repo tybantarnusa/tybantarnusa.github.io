@@ -627,7 +627,7 @@
            August 2025| Episode 5                                 | 2nd Term Fes×LIVE
            after Ep6                                | Fes×ReC:LIVE Bloom Days Extra Day.1/2 (GR6jzqgXKQ4, _WXbw3AEOJ0)
            October 2025| Episode 7: Proof of Existence in Selfish | 3rd Term Fes×LIVE (-Rindou-sai-) (9u8KC5XQncE)
-           December 2025| Episode 9: ALL Link to YOU            | 4th Term Fes×LIVE
+           December 2025| Episode 9: ALL Link to YOU            | 4th Term Fes×LIVE 〜The Buds after Snowmelt〜 (1eVKgkx814U)
            January 2026| Episode 10: Therefore, Ruri exists.    | (Fes×ReC: LIVE ~Road to Bloom~) (uIQrhNFpDiM)
            March 2026 | Episode 12: Our Constantly Blooming...   | Final Term Fes×LIVE STAGE
            ========================================================================= */
@@ -642,6 +642,7 @@
         { "id": "9u8KC5XQncE", "type": "fes", "start": 3297, "setlist": ["MC", "Dream Believers", "MC", "BLAST!!", "Retrofuture", "37.5℃ no Fantasy", "Ampere", "MC", "DOLLCHESTRA Dance Battle", "MC", "Hajimari no Hane Oto", "MC"], "title": "105th Term Fes×LIVE -Rindou-sai-" },
         { "id": "5QwgpqHTYLc", "title": "105th Term Episode 8 \"A light still distant and faint\"" },
         { "id": "-wV7EAf_MX4", "title": "105th Term Episode 9 \"ALL Link to YOU\"" },
+        { "id": "1eVKgkx814U", "type": "fes", "start": 598, "setlist": ["Otome Anthology", "Vital Sign", "Garando Flash", "Theater Ikizama", "MC", "Yuki Mau Sora to Nibyou no Eien", "MC"], "title": "105th Term Fes×LIVE 〜The Buds after Snowmelt〜" },
         { "id": "9VDUjJIxfso", "title": "105th Term Episode 10 \"Ergo Ruri.\"" },
         { "id": "uIQrhNFpDiM", "type": "fes", "setlist": ["Echoes Beyond", "Dream Believers (103-105th)"], "start": 1270, "title": "105th Term Fes×ReC:LIVE ~Road to Bloom~ CHAPTER Beyond" },
         { "id": "6NYeu9IOGdQ", "title": "105th Term Episode 11 \"I want to bloom, with everyone!\"" },
@@ -652,7 +653,9 @@
         { "id": "EdB_cM6AoEk", "type": "fes", "setlist": ["Perennial"], "title": "Perennial / Live Performance Video" },
         { "id": "LLuRLXd41YM", "title": "Dream Interlude \"Be Cera-fish\"" },
         { "id": "cYsk9l0ENHE", "title": "Dream Interlude \"Haji wa Jinsei no Kakisute\"" },
-        { "id": "byq4j290Aw4", "type": "fes", "start": 826, "setlist": ["Haji wa Jinsei no Kakisute (Hasu no Shoushihenkei Ver.)"], "title": "Haji wa Jinsei no Kakisute / Live Performance" }
+        { "id": "byq4j290Aw4", "type": "fes", "start": 826, "setlist": ["Haji wa Jinsei no Kakisute (Hasu no Shoushihenkei Ver.)"], "title": "Haji wa Jinsei no Kakisute / Live Performance" },
+        { "id": "YM152hdw1hM", "title": "Dream Interlude \"Noto is kind, right down to its soil\"" },
+        { "id": "LNUCL80sq1U", "type": "fes", "mv": true, "setlist": ["Oideyo! Ishikawa Grand Tour Ⅱ"], "title": "Oideyo! Ishikawa Grand Tour Ⅱ / MV" }
       ]
     };
 
@@ -660,8 +663,8 @@
     let currentVideos = [];
     let allVideos = [];
     let showFes = JSON.parse(localStorage.getItem('linklike-showfes')) ?? true;
-    function fesWord(period) { return (period === 'dream') ? 'LIVE' : 'Fes×LIVE'; }
-    function fesWordUp(period) { return (period === 'dream') ? 'LIVE' : 'FES×LIVE'; }
+    function fesWord(period, v) { return (v && v.mv) ? 'MV' : (period === 'dream') ? 'LIVE' : 'Fes×LIVE'; }
+    function fesWordUp(period, v) { return (v && v.mv) ? 'MV' : (period === 'dream') ? 'LIVE' : 'FES×LIVE'; }
     let currentIndex = 0;
     let summariesData = {};
     function ytThumbUrl(id){ return 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg'; }
@@ -692,7 +695,7 @@
       const hasFes = allVideos.some(v => v.type === 'fes');
       document.getElementById('fes-toggle-episode').style.display = hasFes ? '' : 'none';
       document.getElementById('fes-toggle-player').style.display = hasFes ? '' : 'none';
-      const fesToggleText = 'Include ' + fesWord(kode);
+      const fesToggleText = (kode === 'dream') ? 'Include LIVE/MV' : 'Include ' + fesWord(kode);
       document.querySelector('#fes-toggle-episode .toggle-label').textContent = fesToggleText;
       document.querySelector('#fes-toggle-player .toggle-label').textContent = fesToggleText;
       document.getElementById('menu').classList.add('active');
@@ -800,9 +803,9 @@
         (currentPeriod === '105') ? 'More Fes×LIVE will be added in the future.' : '';
       content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
-      const fesLabel = fesWord(currentPeriod);
       currentVideos.forEach((v, i) => {
         const isFes = (v.type === 'fes');
+        const fesLabel = fesWord(currentPeriod, v);
         const allIdx = allVideos.findIndex(x => x.id === v.id);
         const epPosAll = allIdx >= 0 ? allVideos.slice(0, allIdx + 1).filter(x => x.type !== 'fes').length : (i + 1);
         let epNo, name;
@@ -852,14 +855,14 @@
             
             card.innerHTML =
               '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="">' +
-              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod, v) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
               '<div class="ec-name">' + name + '</div>' + '</div>' +
               (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
           } else {
             
             card.classList.add('thumb-fallback');
             card.innerHTML =
-              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+              '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod, v) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
               '<div class="ec-name">' + name + '</div>' + '</div>' +
               (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
           }
@@ -867,13 +870,13 @@
           
           card.innerHTML =
             '<img class="thumb' + rightClass + '" loading="lazy" src="' + arcThumb + '" alt="" onerror="this.onerror=null;this.src=\'' + ytThumb + '\';ytThumbFallback(this)">' +
-            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod, v) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
             '<div class="ec-name">' + name + '</div>' + '</div>' +
             (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
         } else {
           card.innerHTML =
             '<img class="thumb thumb-yt' + rightClass + '" loading="lazy" src="' + ytThumb + '" alt="" onerror="ytThumbFallback(this)">' +
-            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
+            '<div class="overlay">' + (isFes ? '<div class="ec-ep">' + fesWordUp(currentPeriod, v) + '</div>' : '<div class="ec-ep">EPISODE ' + epNo + '</div>') +
             '<div class="ec-name">' + name + '</div>' + '</div>' +
             (isFes ? '<div class="fes-label">' + fesLabel + '</div>' : '');
         }
@@ -1014,7 +1017,7 @@
           .replace(/\s*\[ENG SUB\]$/i, '')
           .trim();
       }
-      document.getElementById('pm-ep').textContent = isFes ? fesWordUp(currentPeriod) : 'EPISODE ' + epNo;
+      document.getElementById('pm-ep').textContent = isFes ? fesWordUp(currentPeriod, v) : 'EPISODE ' + epNo;
       document.getElementById('pm-name').textContent = name;
       const sumEl = document.getElementById('pm-summary');
       let setlistHtml = '';
@@ -1039,7 +1042,7 @@
       sumEl.innerHTML = setlistHtml;
       const epCount = currentVideos.filter(v => v.type !== 'fes').length;
       const epPos = currentVideos.slice(0, currentIndex + 1).filter(v => v.type !== 'fes').length;
-      document.getElementById('player-counter').textContent = isFes ? fesWord(currentPeriod) : (epPos + ' / ' + epCount);
+      document.getElementById('player-counter').textContent = isFes ? fesWord(currentPeriod, v) : (epPos + ' / ' + epCount);
       const nb = document.getElementById('next-btn');
       const pb = document.getElementById('prev-btn');
       pb.disabled = (currentIndex === 0);
@@ -1114,7 +1117,7 @@
         const cwEpPos = cwAllIdx >= 0 ? list.slice(0, cwAllIdx + 1).filter(x => x.type !== 'fes').length : 1;
 
         let epLabel;
-        if (isFes) { epLabel = fesWordUp(data.period); }
+        if (isFes) { epLabel = fesWordUp(data.period, v); }
         else {
           const m = v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
           epLabel = 'EPISODE ' + (m ? m[1] : cwEpPos);
