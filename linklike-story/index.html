@@ -44,11 +44,6 @@
       --text: #d0dbea;
       --muted: #8095b0;
       --border: #2d3750;
-      background:
-        radial-gradient(55rem 40rem at 12% -8%, rgba(31,64,120,.55), transparent 62%),
-        radial-gradient(48rem 36rem at 108% 12%, rgba(76,52,140,.5), transparent 62%),
-        radial-gradient(42rem 42rem at 45% 115%, rgba(110,44,92,.38), transparent 62%),
-        var(--bg);
     }
     body.dark-mode .sl-toggle { cursor: pointer; user-select: none; } .sl-toggle:hover { opacity: .8; } .sl-arrow { font-size: 10px; margin-left: 6px; } .setlist { display: none; counter-reset: song-num; } .sl-toggle.sl-open + .setlist { display: flex; flex-direction: column; gap: 3px; } body.dark-mode .ads-notice { background: rgba(255,255,255,.1); color: #eaf1fb; border: 1px solid rgba(255,255,255,.22); }
     .dm-btn {
@@ -72,14 +67,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      position: relative;
-      isolation: isolate;
-      background:
-        radial-gradient(55rem 40rem at 12% -8%, rgba(122,178,245,.62), transparent 62%),
-        radial-gradient(48rem 36rem at 108% 12%, rgba(146,124,238,.52), transparent 62%),
-        radial-gradient(42rem 42rem at 45% 115%, rgba(246,170,212,.50), transparent 62%),
-        linear-gradient(165deg, #e2f0fd 0%, #ede8fa 55%, #fdeef5 100%);
-      background-attachment: fixed;
+      background: var(--bg);
       color: var(--text);
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       display: flex;
@@ -87,25 +75,6 @@
       align-items: center;
       padding: 18px 24px;
       overflow-x: hidden;   
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background-image:
-        radial-gradient(1.6px 1.6px at 12% 22%, rgba(255,255,255,.6), transparent 100%),
-        radial-gradient(1.3px 1.3px at 27% 64%, rgba(255,255,255,.45), transparent 100%),
-        radial-gradient(1.8px 1.8px at 41% 12%, rgba(255,255,255,.5), transparent 100%),
-        radial-gradient(1.2px 1.2px at 58% 78%, rgba(255,255,255,.4), transparent 100%),
-        radial-gradient(1.5px 1.5px at 74% 34%, rgba(255,255,255,.55), transparent 100%),
-        radial-gradient(1.3px 1.3px at 88% 55%, rgba(255,255,255,.45), transparent 100%),
-        radial-gradient(1.7px 1.7px at 63% 8%, rgba(255,255,255,.35), transparent 100%),
-        radial-gradient(1.4px 1.4px at 35% 90%, rgba(255,255,255,.4), transparent 100%),
-        radial-gradient(1.5px 1.5px at 6% 84%, rgba(255,255,255,.5), transparent 100%),
-        radial-gradient(1.3px 1.3px at 94% 26%, rgba(255,255,255,.42), transparent 100%);
     }
 
     .wrap { width: 100%; max-width: 960px; }
