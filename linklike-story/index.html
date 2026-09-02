@@ -629,7 +629,7 @@
            October 2025| Episode 7: Proof of Existence in Selfish | 3rd Term Fes×LIVE (-Rindou-sai-) (9u8KC5XQncE)
            December 2025| Episode 9: ALL Link to YOU            | 4th Term Fes×LIVE 〜The Buds after Snowmelt〜 (1eVKgkx814U)
            January 2026| Episode 10: Therefore, Ruri exists.    | (Fes×ReC: LIVE ~Road to Bloom~) (uIQrhNFpDiM)
-           March 2026 | Episode 12: Our Constantly Blooming...   | Final Term Fes×LIVE STAGE
+           March 2026 | Episode 12: Our Constantly Blooming...   | Final Term Fes×LIVE STAGE (qGFxoDblabA)
            ========================================================================= */
         { "id": "K2Tnb2-wvdc", "type": "fes", "start": 597, "setlist": ["Izayoi Selene", "MC", "37.5℃ no Fantasy", "I My Mayday", "BLAST!!", "MC", "I Do Me!", "MC"], "title": "105th Term Fes×LIVE -Nadeshiko-sai-" },
         { "id": "0OgN0slD_zU", "title": "105th Term Episode 4 \"Chasing My Sunshine\"" },
@@ -646,7 +646,8 @@
         { "id": "9VDUjJIxfso", "title": "105th Term Episode 10 \"Ergo Ruri.\"" },
         { "id": "uIQrhNFpDiM", "type": "fes", "setlist": ["Echoes Beyond", "Dream Believers (103-105th)"], "start": 1270, "title": "105th Term Fes×ReC:LIVE ~Road to Bloom~ CHAPTER Beyond" },
         { "id": "6NYeu9IOGdQ", "title": "105th Term Episode 11 \"I want to bloom, with everyone!\"" },
-        { "id": "hasu-105-12", "src": "archive", "title": "105th Term Episode 12 \"Our Everblooming Cherry Blossoms\"" }
+        { "id": "hasu-105-12", "src": "archive", "title": "105th Term Episode 12 \"Our Everblooming Cherry Blossoms\"" },
+        { "id": "qGFxoDblabA", "type": "fes", "start": 1475, "setlist": ["EdelinieN", "Tomodachi ni Nareru Basho", "Icy", "Fushigi to Kimi to Library", "MC", "Ima, Kako, Mirai no Sangenshoku", "MC"], "title": "105th Term Final Term Fes×LIVE STAGE" }
       ],
       "dream": [
         { "id": "VzLRAYU-y2k", "title": "Dream Interlude \"Water the flowers\"" },
@@ -799,8 +800,7 @@
       if (epCount > 0) parts.push(epCount + ' episode' + (epCount > 1 ? 's' : ''));
       if (fesCount > 0) parts.push(fesCount + ' ' + fesWord(currentPeriod));
       hint.textContent = parts.join(', ') || '';
-      document.getElementById('episode-note').textContent =
-        (currentPeriod === '105') ? 'More Fes×LIVE will be added in the future.' : '';
+      document.getElementById('episode-note').textContent = '';
       content.innerHTML = '<div class="episode-row"></div><div class="ep-scrollbar"><div class="ep-scrollbar-thumb"></div></div>';
       const row = content.querySelector('.episode-row');
       currentVideos.forEach((v, i) => {
@@ -975,7 +975,7 @@
       const isFes = (v.type === 'fes');
       const epMatch = isFes ? null : v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
       const epNo = epMatch ? parseInt(epMatch[1], 10) : null;
-      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && (v.id === 'EdB_cM6AoEk' || v.id === 'byq4j290Aw4'));
+      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && (v.id === 'EdB_cM6AoEk' || v.id === 'byq4j290Aw4')) || (currentPeriod === '105' && v.id === 'qGFxoDblabA');
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
