@@ -975,7 +975,7 @@
       const isFes = (v.type === 'fes');
       const epMatch = isFes ? null : v.title.match(/(?:Episode|Chapter)\s*(\d+)/i);
       const epNo = epMatch ? parseInt(epMatch[1], 10) : null;
-      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && (v.id === 'EdB_cM6AoEk' || v.id === 'byq4j290Aw4')) || (currentPeriod === '105' && v.id === 'qGFxoDblabA');
+      const showAds = (currentPeriod === '103' && ((!isFes && epNo !== null && epNo <= 10) || (isFes && v.id === 'KBnb1KbeocA'))) || (currentPeriod === 'dream' && (v.id === 'EdB_cM6AoEk' || v.id === 'byq4j290Aw4' || v.id === 'LNUCL80sq1U')) || (currentPeriod === '105' && v.id === 'qGFxoDblabA');
       const playerClass = 'player ' + playerKind + (isFes ? ' fes' : '');
       document.getElementById('player-slot').innerHTML =
         '<div class="' + playerClass + '"><iframe src="' + embedSrc +
