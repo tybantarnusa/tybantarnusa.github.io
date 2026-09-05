@@ -1,0 +1,4 @@
+# Jangan commit file .env (isi kredensial DB) ke repo.
+.env
+.env.*
+!.env.example

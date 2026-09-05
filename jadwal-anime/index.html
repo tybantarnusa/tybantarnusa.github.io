@@ -4,315 +4,939 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jadwal Anime</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --bg: #0a0c10;
+      --bg-2: #0d1016;
+      --surface: #131720;
+      --surface-2: #1a1f2c;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #eceef4;
+      --muted: #8b93a6;
+      --faint: #5b6372;
+      --accent: #ff4d5c;
+      --accent-2: #ff9a3d;
+      --amber: #ffb37a;
+      --accent-soft: rgba(255, 77, 92, 0.12);
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: Calibri, sans-serif;
-      background-color: #1a1a1a;
-      color: #e0e0e0;
       margin: 0;
+      font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    h1 {
-      text-align: center;
+    /* latar glow tipis */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(900px 420px at 50% -10%, rgba(255, 77, 92, 0.10), transparent 60%),
+        radial-gradient(700px 500px at 85% 110%, rgba(255, 154, 61, 0.06), transparent 60%),
+        var(--bg);
     }
 
-    table {
-      width: 80%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background-color: #2a2a2a;
-      table-layout: fixed;
+    /* ===== Topbar ===== */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 24px;
+      background: rgba(10, 12, 16, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
     }
 
-    th, td {
-      border: 1px solid #444;
-      padding: 8px;
-      text-align: left;
-      color: #e0e0e0;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    th {
-      background-color: #3a3a3a;
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 13px;
+      color: #0a0c10;
+      box-shadow: 0 4px 18px rgba(255, 77, 92, 0.35);
     }
 
-    .day-header {
-      background-color: #4a4a4a;
-      font-weight: bold;
-      text-align: center;
+    .brand-name {
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
-    .anime-row:nth-child(even) {
-      background-color: #333;
+    .onair-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      padding: 5px 11px;
+      border: 1px solid rgba(255, 77, 92, 0.35);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      white-space: nowrap;
     }
 
-    .anime-row:nth-child(odd) {
-      background-color: #2a2a2a;
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: pulse 1.8s ease-out infinite;
     }
 
-    .highlighted {
-      background-color: #0066cc !important;
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 77, 92, 0.55); }
+      70% { box-shadow: 0 0 0 7px rgba(255, 77, 92, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 77, 92, 0); }
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .season-pill {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 7px 13px;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: var(--surface);
+      white-space: nowrap;
     }
 
     .refresh-btn {
-      display: block;
-      margin: 10px auto;
-      padding: 8px 16px;
-      background-color: #555;
-      color: #e0e0e0;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 13px;
+      color: #0a0c10;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform 0.15s ease, filter 0.15s ease;
+      white-space: nowrap;
     }
 
-    .refresh-btn:hover {
-      background-color: #666;
+    .refresh-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .refresh-btn:active { transform: translateY(0); }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
     }
 
-    .loading-wrapper, .error-wrapper {
+    /* ===== Next up ===== */
+    .nextup {
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      gap: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 154, 61, 0.28);
+      background: linear-gradient(90deg, rgba(255, 77, 92, 0.10), rgba(255, 154, 61, 0.06));
+      overflow: hidden;
+    }
+
+    .nextup-label {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .nextup-main {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .nextup-time {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .nextup-title {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nextup-count {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    /* ===== Today strip ===== */
+    .today-strip {
+      margin-bottom: 22px;
+    }
+
+    .strip-head {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .strip-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface-2) transparent;
+    }
+
+    .chips::-webkit-scrollbar { height: 6px; }
+    .chips::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 999px; }
+
+    .chip-item {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .chip-item:hover { border-color: var(--border-strong); background: var(--surface-2); }
+
+    .chip-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--amber);
+    }
+
+    .chip-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    /* ===== Day nav ===== */
+    .day-nav {
+      position: sticky;
+      top: 60px;
+      z-index: 40;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 0;
+      margin-bottom: 8px;
+      background: rgba(10, 12, 16, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      scrollbar-width: none;
+    }
+
+    .day-nav::-webkit-scrollbar { display: none; }
+
+    .day-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .day-pill:hover { border-color: var(--border-strong); color: var(--text); }
+
+    .day-pill .pill-count {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--faint);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .day-pill.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: #0a0c10;
+    }
+
+    .day-pill.active .pill-count {
+      background: rgba(0, 0, 0, 0.18);
+      color: #0a0c10;
+    }
+
+    /* ===== Day cards ===== */
+    .schedule { display: flex; flex-direction: column; gap: 18px; }
+
+    .day-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      scroll-margin-top: 124px;
+      transition: border-color 0.2s ease;
+    }
+
+    .day-card.is-today { border-color: rgba(255, 77, 92, 0.35); }
+
+    .day-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-head::before {
+      content: '';
+      width: 4px;
+      height: 26px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    }
+
+    .day-head.is-today::before { height: 34px; }
+
+    .day-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin: 0;
+    }
+
+    .day-count {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--faint);
+      font-weight: 500;
+    }
+
+    .today-tag {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #0a0c10;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding: 5px 11px;
+      border-radius: 999px;
+    }
+
+    .rows { }
+
+    .row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 13px 22px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      transition: background 0.12s ease;
+    }
+
+    .row:last-child { border-bottom: none; }
+
+    .row::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .row:hover { background: var(--surface-2); }
+    .row:hover::before { opacity: 1; }
+
+    .row-time {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--amber);
+    }
+
+    .row-title {
+      font-size: 14.5px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .row-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row-platforms {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .plat-badge {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .plat-badge:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .row-side {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .todo-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-family: var(--display);
+      font-size: 15px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      padding: 0;
+      transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+
+    .todo-btn:hover {
+      color: #0a0c10;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+    }
+
+    .todo-btn.busy { opacity: 0.55; pointer-events: none; }
+    .todo-btn.done {
+      color: #0a0c10;
+      background: #5ad38a;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      max-width: min(90vw, 460px);
+      text-align: center;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { border-color: rgba(255, 77, 92, 0.5); color: #ffb3ba; }
+
+    .chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .chip.airing { color: #ff7a86; background: var(--accent-soft); }
+    .chip.upcoming { color: var(--muted); background: rgba(255, 255, 255, 0.06); }
+    .chip.tba { color: var(--faint); background: rgba(255, 255, 255, 0.04); }
+
+    /* ===== Loading / error ===== */
+    .state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 70px 20px;
+      text-align: center;
     }
 
     .spinner {
       width: 40px;
       height: 40px;
-      border: 4px solid #888;
-      border-top: 4px solid #e0e0e0;
+      border: 4px solid var(--surface-2);
+      border-top: 4px solid var(--accent);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 0.9s linear infinite;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .state-text {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
     }
 
-    .progress-container {
-      width: 100%;
-      background-color: #444;
-      border-radius: 4px;
-      height: 8px;
-      overflow: hidden;
+    .error-text {
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 600;
     }
 
-    .progress-bar {
-      height: 100%;
-      background-color: #66cc66;
-      width: 0;
-      transition: width 0.5s ease;
+    /* ===== Footer ===== */
+    .footer {
+      margin-top: 34px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 12.5px;
+      color: var(--faint);
     }
 
-    .error-message {
-      color: red;
-      text-align: center;
-      font-size: 16px;
+    .footer a { color: var(--muted); text-decoration: none; }
+    .footer a:hover { color: var(--text); }
+
+    @media (max-width: 620px) {
+      .topbar { padding: 0 14px; gap: 10px; }
+      .brand-name { font-size: 15px; }
+      .onair-badge { display: none; }
+      .season-pill { display: none; }
+      .container { padding: 18px 12px 48px; }
+      .row { grid-template-columns: 56px 1fr auto; gap: 12px; padding: 12px 16px; }
+      .day-head { padding: 15px 16px; }
+      .day-name { font-size: 19px; }
+      .nextup-main { flex-wrap: wrap; gap: 4px 10px; }
+      .footer { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
-  <h1>Jadwal Anime</h1>
-  <button class="refresh-btn" onclick="hardRefresh()">Refresh Data</button>
-  <table>
-    <thead>
-      <tr>
-        <th>Judul</th>
-        <th>Jam</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="scheduleBody">
-      <tr><td colspan="3"><div class="loading-wrapper"><div class="spinner"></div></div></td></tr>
-      <tr>
-        <td colspan="3">
-          <div class="progress-container">
-            <div id="progressBar" class="progress-bar"></div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="bg-glow"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">▶</div>
+      <span class="brand-name">Jadwal Anime</span>
+      <span class="onair-badge"><span class="dot"></span>ON AIR</span>
+    </div>
+    <div class="topbar-right">
+      <span id="seasonPill" class="season-pill">—</span>
+      <button class="refresh-btn" onclick="hardRefresh()">Refresh</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div id="nextup" class="nextup" style="display:none">
+      <span class="nextup-label">NEXT UP</span>
+      <div class="nextup-main">
+        <span id="nextupTime" class="nextup-time"></span>
+        <span id="nextupTitle" class="nextup-title"></span>
+      </div>
+      <span id="nextupCount" class="nextup-count"></span>
+    </div>
+
+    <div id="todayStrip" class="today-strip" style="display:none">
+      <div class="strip-head"><span class="dot"></span><span class="strip-label">Today on air</span></div>
+      <div id="todayChips" class="chips"></div>
+    </div>
+
+    <nav id="dayNav" class="day-nav"></nav>
+
+    <main id="schedule" class="schedule"></main>
+
+    <footer class="footer">
+      <span id="footerLeft">Jadwal anime musim ini</span>
+      <span>Jadwal dari <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a> · Platform dari <a href="https://db.silveryasha.id" target="_blank" rel="noopener">db.silveryasha.id</a></span>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
 
   <script>
-    const dayTranslation = {
-      'Mondays': 'Senin',
-      'Tuesdays': 'Selasa',
-      'Wednesdays': 'Rabu',
-      'Thursdays': 'Kamis',
-      'Fridays': 'Jumat',
-      'Saturdays': 'Sabtu',
-      'Sundays': 'Minggu'
+    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const STATUS_MAP = {
+      RELEASING: { label: 'Airing', cls: 'airing' },
+      NOT_YET_RELEASED: { label: 'Upcoming', cls: 'upcoming' },
+      FINISHED: { label: 'Finished', cls: 'upcoming' },
+      CANCELLED: { label: 'Cancelled', cls: 'tba' },
+      HIATUS: { label: 'Hiatus', cls: 'tba' }
     };
 
-    const dayToIndex = {
-      'Sundays': 0,
-      'Mondays': 1,
-      'Tuesdays': 2,
-      'Wednesdays': 3,
-      'Thursdays': 4,
-      'Fridays': 5,
-      'Saturdays': 6
-    };
+    let PLATFORM_DATA = null;
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    const API_URL = 'https://tybantarnusa.com/lab/jadwal-anime/schedule.php';
+    const TODOIST_API_URL = 'https://tybantarnusa.com/lab/jadwal-anime/todoist.php';
+
+    async function fetchSchedule() {
+      const res = await fetch(API_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Backend error');
+      return json;
+    }
+
+    let toastTimer = null;
+    function showToast(msg, isError = false) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast show' + (isError ? ' error' : '');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = 'toast'; }, 2600);
+    }
+
+    async function addToTodoist(anilistId, btn) {
+      if (!btn || btn.classList.contains('busy')) return;
+      btn.classList.add('busy');
+      btn.textContent = '…';
+      try {
+        const res = await fetch(TODOIST_API_URL, {
+          method: 'POST',
+          cache: 'no-store',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ anilist_id: anilistId })
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) throw new Error(json.error || 'HTTP ' + res.status);
+        btn.classList.add('done');
+        btn.textContent = '✓';
+        showToast(json.created ? 'Added: ' + json.content : (json.message || 'Already in Todoist'));
+        setTimeout(() => { btn.classList.remove('done'); btn.textContent = '+'; }, 2400);
+      } catch (err) {
+        showToast('Failed: ' + (err.message || 'unknown'), true);
+      } finally {
+        btn.classList.remove('busy');
+      }
+    }
 
     function getJSTNow() {
       const now = new Date();
       const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      return new Date(utc + 9 * 60 * 60000); // JST = UTC+9
+      return new Date(utc + 9 * 60 * 60000);
     }
 
-    function getNextAnimeDate(dayStr, timeStr) {
-      if (!timeStr || !dayToIndex.hasOwnProperty(dayStr)) return null;
-      const [hour, minute] = timeStr.split(':').map(Number);
-      const now = getJSTNow();
-      const nowDay = now.getDay();
-      const targetDay = dayToIndex[dayStr];
-
-      const diff = (targetDay - nowDay + 7) % 7;
-      const animeDate = new Date(now);
-      animeDate.setDate(now.getDate() + diff);
-      animeDate.setHours(hour, minute, 0, 0);
-
-      if (diff === 0 && animeDate > now) {
-        animeDate.setDate(animeDate.getDate() - 7);
-      } else if (animeDate > now) {
-        animeDate.setDate(animeDate.getDate() - 7);
-      }
-
-      return animeDate;
+    function getJSTParts(airingAt) {
+      const d = new Date(airingAt * 1000);
+      const totalMin = d.getUTCHours() * 60 + d.getUTCMinutes() + 9 * 60;
+      const dayMin = ((totalMin % 1440) + 1440) % 1440;
+      let day = d.getUTCDay() + Math.floor(totalMin / 1440);
+      day = ((day % 7) + 7) % 7;
+      const hh = String(Math.floor(dayMin / 60)).padStart(2, '0');
+      const mm = String(dayMin % 60).padStart(2, '0');
+      return { dayIndex: day, dayName: DAY_NAMES[day], time: hh + ':' + mm };
     }
 
-    async function fetchAllAnimeDataSafe() {
-      const firstRes = await fetch(`https://api.jikan.moe/v4/seasons/now?page=1&limit=25`);
-      const firstJson = await firstRes.json();
-      const totalPages = Math.min(firstJson.pagination.last_visible_page, 10);
-      const allAnime = [...firstJson.data];
+    function processAnime(rawData) {
+      const seen = new Set();
+      const list = [];
+      rawData.forEach(a => {
+        const title = a.title;
+        if (!title || seen.has(title)) return;
+        seen.add(title);
 
-      for (let i = 2; i <= totalPages; i++) {
-        await new Promise(resolve => setTimeout(resolve, 350));
-        try {
-          const res = await fetch(`https://api.jikan.moe/v4/seasons/now?page=${i}&limit=25`);
-          const json = await res.json();
-          allAnime.push(...json.data);
-          updateProgressBar(i, totalPages);
-        } catch (e) {
-          console.warn(`Gagal ambil halaman ${i}:`, e);
+        let dayName = null;
+        let time = 'TBA';
+        const airingAt = a.airingAt || null;
+        if (airingAt) {
+          const p = getJSTParts(airingAt);
+          dayName = p.dayName;
+          time = p.time;
         }
+
+        const st = STATUS_MAP[a.status] || { label: a.status || 'Unknown', cls: 'tba' };
+        list.push({ id: a.id, title, time, dayName, airingAt, status: st.label, statusCls: st.cls });
+      });
+      return list;
+    }
+
+    function groupByDay(list) {
+      const grouped = {};
+      DAY_ORDER.forEach(d => grouped[d] = []);
+      grouped['TBA'] = [];
+      list.forEach(a => {
+        const key = a.dayName || 'TBA';
+        grouped[key].push(a);
+      });
+      for (const d in grouped) {
+        grouped[d].sort((x, y) => {
+          if (x.time === 'TBA') return 1;
+          if (y.time === 'TBA') return -1;
+          return x.time.localeCompare(y.time);
+        });
       }
-
-      return allAnime;
+      return grouped;
     }
 
-    function updateProgressBar(currentPage, totalPages) {
-      const progress = (currentPage / totalPages) * 100;
-      document.getElementById('progressBar').style.width = `${progress}%`;
+    function render(list, seasonInfo) {
+      const grouped = groupByDay(list);
+      const todayName = DAY_NAMES[getJSTNow().getDay()];
+
+      document.getElementById('seasonPill').textContent = `${seasonInfo.season} ${seasonInfo.year}`;
+      document.getElementById('footerLeft').textContent = `${list.length} judul · ${seasonInfo.season} ${seasonInfo.year}`;
+
+      renderNextUp(list);
+      renderTodayStrip(grouped[todayName], todayName);
+      renderNav(grouped, todayName);
+      renderSchedule(grouped, todayName);
     }
 
-    async function loadSchedule(forceRefresh = false) {
-      const tbody = document.getElementById("scheduleBody");
-      tbody.innerHTML = `<tr><td colspan="3"><div class="loading-wrapper"><div class="spinner"></div></div></td></tr>
-                         <tr><td colspan="3"><div class="progress-container"><div id="progressBar" class="progress-bar"></div></div></td></tr>`;
+    function renderNextUp(list) {
+      const el = document.getElementById('nextup');
+      const upcoming = list.filter(a => a.airingAt).sort((a, b) => a.airingAt - b.airingAt);
+      if (!upcoming.length) { el.style.display = 'none'; return; }
+      const next = upcoming[0];
+      window.__nextUp = next;
+      el.style.display = 'flex';
+      document.getElementById('nextupTime').textContent = next.dayName + ' ' + next.time;
+      document.getElementById('nextupTitle').textContent = next.title;
+      tickNextUp();
+    }
+
+    function tickNextUp() {
+      const next = window.__nextUp;
+      const countEl = document.getElementById('nextupCount');
+      if (!next) return;
+      const diff = next.airingAt - Math.floor(Date.now() / 1000);
+      if (diff <= 0) {
+        countEl.textContent = 'AIRING NOW';
+        return;
+      }
+      const h = Math.floor(diff / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      const s = diff % 60;
+      const pad = n => String(n).padStart(2, '0');
+      countEl.textContent = h > 0 ? `in ${h}h ${pad(m)}m ${pad(s)}s` : `in ${pad(m)}m ${pad(s)}s`;
+    }
+
+    function renderTodayStrip(todayList, todayName) {
+      const wrap = document.getElementById('todayStrip');
+      if (!todayList || !todayList.length) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      const chips = document.getElementById('todayChips');
+      chips.innerHTML = '';
+      todayList.forEach(a => {
+        const c = document.createElement('div');
+        c.className = 'chip-item';
+        c.innerHTML = `<span class="chip-time">${a.time}</span><span class="chip-title">${a.title}</span>`;
+        chips.appendChild(c);
+      });
+    }
+
+    function renderNav(grouped, todayName) {
+      const nav = document.getElementById('dayNav');
+      nav.innerHTML = '';
+      [...DAY_ORDER, 'TBA'].forEach(day => {
+        if (!grouped[day] || !grouped[day].length) return;
+        const a = document.createElement('a');
+        a.href = `#day-${day}`;
+        a.className = 'day-pill' + (day === todayName ? ' active' : '');
+        a.innerHTML = `${day} <span class="pill-count">${grouped[day].length}</span>`;
+        nav.appendChild(a);
+      });
+    }
+
+    function renderSchedule(grouped, todayName) {
+      const main = document.getElementById('schedule');
+      main.innerHTML = '';
+      [...DAY_ORDER, 'TBA'].forEach(day => {
+        const shows = grouped[day];
+        if (!shows || !shows.length) return;
+
+        const isToday = day === todayName;
+        const card = document.createElement('section');
+        card.className = 'day-card' + (isToday ? ' is-today' : '');
+        card.id = `day-${day}`;
+
+        const head = document.createElement('div');
+        head.className = 'day-head' + (isToday ? ' is-today' : '');
+        head.innerHTML = `
+          <h2 class="day-name">${day}</h2>
+          <span class="day-count">${shows.length} ${shows.length === 1 ? 'title' : 'titles'}</span>
+          ${isToday ? '<span class="today-tag">TODAY</span>' : ''}
+        `;
+        card.appendChild(head);
+
+        const rows = document.createElement('div');
+        rows.className = 'rows';
+        shows.forEach(a => {
+          const row = document.createElement('div');
+          row.className = 'row';
+
+          let platHtml = '';
+          const plats = (PLATFORM_DATA && PLATFORM_DATA[a.id]) || [];
+          if (plats.length) {
+            platHtml = `<div class="row-platforms">${plats.map(p => {
+              const label = esc(p.platform);
+              const url = esc(p.url);
+              return `<a class="plat-badge" href="${url}" target="_blank" rel="noopener" title="${label} · ${esc(p.status || '')}">${label}</a>`;
+            }).join('')}</div>`;
+          }
+
+          const todoBtn = a.airingAt
+            ? `<button type="button" class="todo-btn" title="Add to Todoist" aria-label="Add to Todoist" onclick="addToTodoist(${a.id}, this)">+</button>`
+            : '';
+
+          row.innerHTML = `
+            <span class="row-time">${esc(a.time)}</span>
+            <span class="row-main">
+              <span class="row-title">${esc(a.title)}</span>
+              ${platHtml}
+            </span>
+            <span class="row-side">
+              <span class="chip ${a.statusCls}">${esc(a.status)}</span>
+              ${todoBtn}
+            </span>
+          `;
+          rows.appendChild(row);
+        });
+        card.appendChild(rows);
+        main.appendChild(card);
+      });
+    }
+
+    let tickTimer = null;
+
+    async function loadSchedule() {
+      const main = document.getElementById('schedule');
+      const nav = document.getElementById('dayNav');
+      const strip = document.getElementById('todayStrip');
+      const nextup = document.getElementById('nextup');
+      nav.innerHTML = '';
+      strip.style.display = 'none';
+      nextup.style.display = 'none';
+      main.innerHTML = `<div class="state"><div class="spinner"></div><div class="state-text">Memuat jadwal...</div></div>`;
 
       try {
-        const cacheKey = "animeSchedule";
-        let animeData = null;
+        const data = await fetchSchedule();
+        PLATFORM_DATA = data.platforms || {};
 
-        if (!forceRefresh) {
-          const cached = localStorage.getItem(cacheKey);
-          if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
-            const now = Date.now();
-            const jstMidnight = new Date(getJSTNow());
-            jstMidnight.setHours(0, 0, 0, 0);
-            if (timestamp >= jstMidnight.getTime() && now >= timestamp) {
-              animeData = data;
-            }
-          }
-        }
-
-        if (!animeData) {
-          animeData = await fetchAllAnimeDataSafe();
-          localStorage.setItem(cacheKey, JSON.stringify({ data: animeData, timestamp: Date.now() }));
-        }
-
-        const uniqueAnime = [];
-        const seen = new Set();
-        animeData.forEach(anime => {
-          const title = anime.titles?.[0]?.title;
-          const time = anime.broadcast?.time;
-          const day = anime.broadcast?.day;
-          const status = anime.status || 'Unknown';
-          if (title && !seen.has(title)) {
-            seen.add(title);
-            uniqueAnime.push({ title, time, day, status });
-          }
-        });
-
-        let latestAired = null;
-        const now = getJSTNow();
-
-        uniqueAnime.forEach(anime => {
-          const date = getNextAnimeDate(anime.day, anime.time);
-          if (date && date <= now) {
-            if (!latestAired || date > latestAired.date) {
-              latestAired = { ...anime, date };
-            }
-          }
-        });
-
-        const grouped = {};
-        uniqueAnime.forEach(anime => {
-          const day = dayTranslation[anime.day] || 'Lainnya';
-          if (!grouped[day]) grouped[day] = [];
-          grouped[day].push(anime);
-        });
-
-        for (const day in grouped) {
-          grouped[day].sort((a, b) => {
-            if (!a.time || !b.time) return 0;
-            return a.time.localeCompare(b.time);
-          });
-        }
-
-        const daysOrder = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu','Lainnya'];
-        tbody.innerHTML = '';
-
-        daysOrder.forEach(day => {
-          if (!grouped[day]) return;
-          const header = document.createElement('tr');
-          header.innerHTML = `<td colspan="3" class="day-header">${day}</td>`;
-          tbody.appendChild(header);
-
-          grouped[day].forEach(anime => {
-            const row = document.createElement('tr');
-            row.className = 'anime-row';
-
-            if (
-              latestAired &&
-              anime.title === latestAired.title &&
-              anime.time === latestAired.time &&
-              anime.status === latestAired.status
-            ) {
-              row.classList.add('highlighted');
-            }
-
-            row.innerHTML = `
-              <td>${anime.title}</td>
-              <td>${anime.time || 'TBA'}</td>
-              <td>${anime.status}</td>
-            `;
-            tbody.appendChild(row);
-          });
-        });
-
+        const seasonInfo = { season: data.season, year: data.year };
+        const list = processAnime(data.anime || []);
+        render(list, seasonInfo);
+        if (tickTimer) clearInterval(tickTimer);
+        tickTimer = setInterval(tickNextUp, 1000);
       } catch (err) {
         console.error('Gagal load data:', err);
-        tbody.innerHTML = `<tr><td colspan="3"><div class="error-wrapper"><div class="error-message">❌ Gagal mengambil data. Coba lagi nanti.</div></div></td></tr>`;
+        main.innerHTML = `<div class="state"><div class="error-text">Gagal mengambil data. Coba lagi nanti.</div></div>`;
       }
     }
 
     function hardRefresh() {
-      loadSchedule(true);
+      loadSchedule();
     }
 
     window.onload = () => loadSchedule();

@@ -1,0 +1,891 @@
+{
+  "generated": "2026-09-05",
+  "season": "SUMMER 2026",
+  "source": "https://db.silveryasha.id/anime/season/2026/Summer",
+  "matched": 68,
+  "total_schedule": 78,
+  "platforms": {
+    "178789": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2411609"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/33521100-debe-4205-889b-38346099aad9"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/G24H1N3MP/"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/ds3kartbap"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztYFBI_bkaDF21nfP_c--FPv"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/80987039"
+      },
+      {
+        "platform": "Vidio",
+        "status": "Jalan",
+        "url": "https://www.vidio.com/premier/5675/"
+      }
+    ],
+    "196187": [
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/82757039"
+      }
+    ],
+    "135865": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLcWpc-sy22u4"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLSX2ZktnEQOE&si=YShemK_-Oco1sLxq"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/9a186584-479a-4ebe-ae77-e85908df85e6"
+      }
+    ],
+    "185874": [
+      {
+        "platform": "Amazon Prime Video",
+        "status": "Jalan",
+        "url": "https://www.primevideo.com/detail/0U0SHH4OQIO8SD6GXYWX93N24X/"
+      },
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLYDN8muP8huc"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLVz5xYUXIegU"
+      },
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2414568"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/68cfff27-e80c-4744-a927-c1ad844b63bc"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00384448"
+      },
+      {
+        "platform": "Disney+",
+        "status": "Jalan",
+        "url": "https://www.hotstar.com/tv/bleach-thousand-year-blood-war/1260118225"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://iq.com/album/1sqlg4ygz59"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/70204957"
+      },
+      {
+        "platform": "Vidio",
+        "status": "Jalan",
+        "url": "https://vidio.com/premier/6353/part+04"
+      }
+    ],
+    "207141": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Drop",
+        "url": "https://youtube.com/playlist?list=PLeab-nOhLGOw&si=uJF4nG6MSjvt0k0K"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Drop",
+        "url": "https://youtube.com/playlist?list=PLCPHXRy_2Uic&si=0_niP-XRpo7-dFsK"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Drop",
+        "url": "https://www.catchplay.com/id/video/978bc2e7-05ff-4564-942f-ce07383d55e2"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1nub7zdw89t"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://www.netflix.com/id/title/82760630"
+      }
+    ],
+    "187538": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/5b8def35-b835-4ce8-b80a-4260f38aaa87"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/id/series/GT00377907"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/am6qsz178h"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLWvtFeKDr_i8"
+      }
+    ],
+    "180136": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2411725"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/19473f71-6d24-4916-8c5c-a347179c0b41"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378018/"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/a5a0t3nwm1"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztbWhdmVP8yU_0qG27x6iX43"
+      }
+    ],
+    "210031": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLHr3g0ivIWN4&si=vxVZptfOBjb7cRKm"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLCLVwHUDEHi0"
+      },
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://bilibili.tv/id/media/2288405"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/7aa8ab66-4c7d-4afa-80e9-a85409f7b949"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00365624/"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/82653227"
+      }
+    ],
+    "103303": [
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://www.netflix.com/id/title/81698957"
+      }
+    ],
+    "187260": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00374354/"
+      }
+    ],
+    "159309": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413722"
+      }
+    ],
+    "177699": [
+      {
+        "platform": "Amazon Prime Video",
+        "status": "Jalan",
+        "url": "https://www.primevideo.com/detail/0MRWXUDE3L303XFEJRNWB20S3O/"
+      }
+    ],
+    "208044": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378115/"
+      }
+    ],
+    "185542": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2411543"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/ea1e2b01-7f35-4b16-ba29-3d7d4c9b295e"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/G8DHV7WJP"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1mqs8x0pgbt"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztY9q0XKsNpDu8hjS3Njnomb"
+      }
+    ],
+    "198946": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLDvQscScOUXg"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLScBPgUTHvYY"
+      },
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413934"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/bcef292f-7991-47ac-bb3b-513c390e878b"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/G8DHV78ZM"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/161wl58egqp"
+      }
+    ],
+    "202269": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLTsUhR_H9p7U&si=zhdVcK2IpOB2QuBe"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLbjNYEFCLyoY"
+      },
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413250"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/3ebe0607-ed05-4667-9ef1-a0cd120232c9"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378087/"
+      }
+    ],
+    "194829": [
+      {
+        "platform": "Amazon Prime Video",
+        "status": "Jalan",
+        "url": "https://www.primevideo.com/detail/0GZCWV7IOJ8M9624JD5A4HA66B"
+      }
+    ],
+    "201514": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://bilibili.tv/id/media/2414293"
+      }
+    ],
+    "190569": [],
+    "199111": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://bilibili.tv/id/media/2414407"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/a26ac458-86bf-4e03-a29e-92ebb5d31701"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GNVHKN94W"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://iq.com/album/2ezajqw297x"
+      },
+      {
+        "platform": "Tropics Anime Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLe71rDHjSttk"
+      }
+    ],
+    "200637": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://bilibili.tv/id/media/2091388"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/994afdb1-0fa8-47be-8c2f-50e693ff41f5"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GNVHKN933/"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLPanbgyToztZjlGG1X58J0dm_4JqGx8DH"
+      }
+    ],
+    "169583": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00378120"
+      }
+    ],
+    "188139": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://bilibili.tv/id/media/2414053"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00371881"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/82931553"
+      }
+    ],
+    "199748": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00371671/"
+      }
+    ],
+    "209983": [
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1a7r5ibbkjl"
+      }
+    ],
+    "204466": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2411889"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/70c0a471-6027-496f-8936-14049062b9e9"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00378081"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztY_RpvSKMw1Nj_tmw8TM91Y"
+      }
+    ],
+    "197715": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00371878"
+      }
+    ],
+    "177637": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00378059"
+      }
+    ],
+    "196218": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413170"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/26ca3e09-bda2-4e28-89ff-756e33dc27e9"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378124/"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1dvhqss9z9l"
+      },
+      {
+        "platform": "Tropics Anime Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLecAMIzJ3KJ4"
+      }
+    ],
+    "128757": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00362362"
+      }
+    ],
+    "198409": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2411817"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/6726d2cd-2c62-4b23-b67a-2e3ce3d7ba96"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/id/series/GT00378122"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/25liakoq52p"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLPanbgyToztb6BNmBqQssmVMlCCoQypVT"
+      }
+    ],
+    "182616": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/91aed642-fb6d-46e8-9522-2e99881bb69d"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GQWH0M19X"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://iq.com/album/1kos8xt3yag"
+      }
+    ],
+    "169582": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378119/"
+      }
+    ],
+    "199066": [
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413807"
+      }
+    ],
+    "186863": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLW7w7NrGJ9As"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLXRAagOwpCvc"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/130d49e2-5734-40b6-b22c-8c9eed2c4051"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378117/"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://iq.com/album/1f14cq7kkxt"
+      }
+    ],
+    "199408": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00379182"
+      }
+    ],
+    "206521": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/c1bd470c-96e3-4002-b121-2c2ff0d8831c"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLPanbgyToztbYCAOhdjT23ZtQizTNg981"
+      }
+    ],
+    "192800": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/id/series/GT00378069/"
+      }
+    ],
+    "194219": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/69cf37eb-6732-4167-b675-71c365ed808e"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00378121"
+      }
+    ],
+    "196219": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378125/"
+      }
+    ],
+    "207674": [],
+    "209504": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLKPqX4UJsUOI&si=6buGNYtmSOyyIu4u"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLU5wczZy8RqU"
+      },
+      {
+        "platform": "Bstation",
+        "status": "Jalan",
+        "url": "https://www.bilibili.tv/id/media/2413390"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/ab2ffa58-3eb9-46ca-a1d3-280632d19baa"
+      }
+    ],
+    "203880": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00377933/"
+      }
+    ],
+    "196356": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/63a85a5c-3a82-42bf-8ca6-5beb14f13e43"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/270mjzjqx0d"
+      },
+      {
+        "platform": "Tropics Anime Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLQUW3hjoC3IM"
+      }
+    ],
+    "208225": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378118"
+      }
+    ],
+    "188525": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/948689f7-6a68-4e82-be15-ef8f920da70d"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztY0QxfQoDPjxbjXhUcgew1W"
+      },
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://netflix.com/id/title/81787975"
+      }
+    ],
+    "207809": [],
+    "204060": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/id/series/GT00378075/"
+      }
+    ],
+    "185875": [
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1ecimlamq9h"
+      }
+    ],
+    "203490": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/85d8c5f4-6d0a-495d-9030-a7238f5539ea"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00371926/"
+      }
+    ],
+    "196017": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://catchplay.com/id/video/8a7a8379-bee5-402c-94d7-9497ff411d71"
+      },
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00378063/"
+      }
+    ],
+    "108992": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00379439"
+      }
+    ],
+    "198376": [
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/ae62244f-6b1f-4d2e-9f18-94b5a3f3a3af"
+      },
+      {
+        "platform": "Muse Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLPanbgyToztZu99mh2W5pfPxBmvmQfX-R"
+      }
+    ],
+    "185692": [
+      {
+        "platform": "Amazon Prime Video",
+        "status": "Jalan",
+        "url": "https://www.primevideo.com/detail/0FE2AB0LVV5MWJ89ZVNG6KSNUC"
+      }
+    ],
+    "209669": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://crunchyroll.com/id/series/GT00365568/"
+      },
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://iq.com/album/1s2lil5jlv5"
+      }
+    ],
+    "206249": [
+      {
+        "platform": "iQIYi",
+        "status": "Jalan",
+        "url": "https://www.iq.com/album/1qxzw6rnxe5"
+      }
+    ],
+    "200230": [
+      {
+        "platform": "Crunchyroll",
+        "status": "Jalan",
+        "url": "https://www.crunchyroll.com/series/GT00378084/"
+      }
+    ],
+    "201667": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLSFfcgIBEqIU"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLbgvBiEuim00"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/336b491d-5e6d-4db8-a090-58a0723f83f4"
+      }
+    ],
+    "169080": [],
+    "202429": [],
+    "213665": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLf6uu4mFo2tQ&si=fVOnvNcsjHgZtgTH"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLZQZWOexOKPw"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/d225f393-fc2b-45cb-b935-fe913d79f3f6"
+      }
+    ],
+    "213666": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://youtube.com/playlist?list=PLMRG8SXjiYaE&si=gPmuM3gPC58XZ3dq"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/ef5e7d9c-75e0-49e5-b997-05814a088b3c"
+      }
+    ],
+    "195833": [],
+    "207254": [
+      {
+        "platform": "Netflix Indonesia",
+        "status": "Jalan",
+        "url": "https://www.netflix.com/id/title/82736186"
+      }
+    ],
+    "209800": [],
+    "213359": [],
+    "208824": [],
+    "213506": [
+      {
+        "platform": "Ani-One Asia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLcPnuVJ3jm6A"
+      },
+      {
+        "platform": "Ani-One Indonesia",
+        "status": "Jalan",
+        "url": "https://www.youtube.com/playlist?list=PLGxNNkCuC4wU"
+      },
+      {
+        "platform": "CATCHPLAY+",
+        "status": "Jalan",
+        "url": "https://www.catchplay.com/id/video/67326c6b-c2f9-4bc5-b277-9c06452fa4da"
+      }
+    ]
+  }
+}
