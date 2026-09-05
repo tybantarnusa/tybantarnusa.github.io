@@ -16,8 +16,26 @@
  * Token Todoist dibaca dari .env (TODOIST_TOKEN), nggak pernah di frontend.
  */
 
+// --- pembatasan origin: cuma https://tybantarnusa.com yang boleh akses ---
+// POST wajib bawa Origin tybantarnusa.com (browser selalu kirim Origin buat POST,
+// jadi request tanpa Origin / Origin lain = bukan dari situs kita, tolak).
+const ALLOWED_ORIGIN = 'https://tybantarnusa.com';
+
+function origin_allowed(): bool {
+    $origin = trim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''));
+    if ($origin === '') return false;
+    return rtrim($origin, '/') === ALLOWED_ORIGIN;
+}
+
+if (!origin_allowed()) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'Forbidden']);
+    exit;
+}
+
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
+header('Vary: Origin');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Cache-Control: no-store');
