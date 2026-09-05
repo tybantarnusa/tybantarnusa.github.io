@@ -33,11 +33,27 @@ if (!origin_allowed()) {
     exit;
 }
 
+// --- token rahasia (header X-Api-Token, dicocokkan sama API_TOKEN di .env) ---
+$env = load_env(__DIR__ . '/.env');
+
+function api_token_ok(array $env): bool {
+    $expected = (string) ($env['API_TOKEN'] ?? '');
+    if ($expected === '') return true; // API_TOKEN belum diset di .env -> token nggak diwajibkan
+    $sent = (string) ($_SERVER['HTTP_X_API_TOKEN'] ?? '');
+    return hash_equals($expected, $sent);
+}
+
+if (!api_token_ok($env)) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'Forbidden']);
+    exit;
+}
+
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
 header('Vary: Origin');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, X-Api-Token');
 header('Cache-Control: no-store');
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {

@@ -2,3 +2,6 @@
 .env
 .env.*
 !.env.example
+
+# Token frontend (jadwal-anime)
+jadwal-anime/config.js

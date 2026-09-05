@@ -660,6 +660,7 @@
 
   <div id="toast" class="toast"></div>
 
+  <script src="config.js"></script>
   <script>
     const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -683,7 +684,10 @@
     const TODOIST_API_URL = 'https://tybantarnusa.com/lab/jadwal-anime/todoist.php';
 
     async function fetchSchedule() {
-      const res = await fetch(API_URL, { cache: 'no-store' });
+      const res = await fetch(API_URL, {
+        cache: 'no-store',
+        headers: { 'X-Api-Token': typeof API_TOKEN !== 'undefined' ? API_TOKEN : '' }
+      });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || 'Backend error');
@@ -707,7 +711,10 @@
         const res = await fetch(TODOIST_API_URL, {
           method: 'POST',
           cache: 'no-store',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Api-Token': typeof API_TOKEN !== 'undefined' ? API_TOKEN : ''
+          },
           body: JSON.stringify({ anilist_id: anilistId })
         });
         const json = await res.json().catch(() => ({}));
