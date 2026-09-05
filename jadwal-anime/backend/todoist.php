@@ -162,16 +162,23 @@ if ($airingAt === null || $airingAt === 0) {
 // Simbol + content
 // ---------------------------------------------------------------------------
 function pick_symbol(array $platforms): string {
+    // Pakai \u{...} biar urutan codepoint presisi — kalau ZWJ (U+200D) ilang,
+    // bendera bajak laut ke-render jadi dua emoji terpisah (bendera + skull).
+    $BSTATION = "\u{1F171}\u{FE0F}";          // 🅱️
+    $MUSE = "\u{1F17C}\u{FE0F}";              // 🅼
+    $ANIONE = "1\u{FE0F}\u{20E3}";            // 1️⃣
+    $PIRATE = "\u{1F3F4}\u{200D}\u{2620}\u{FE0F}"; // 🏴☠️ (flag + ZWJ + skull)
+
     foreach ($platforms as $p) {
-        if (stripos($p, 'Bstation') !== false) return '🅱️';
+        if (stripos($p, 'Bstation') !== false) return $BSTATION;
     }
     foreach ($platforms as $p) {
-        if (stripos($p, 'Muse') !== false) return '🅼';
+        if (stripos($p, 'Muse') !== false) return $MUSE;
     }
     foreach ($platforms as $p) {
-        if (stripos($p, 'Ani-One') !== false) return '1️⃣';
+        if (stripos($p, 'Ani-One') !== false) return $ANIONE;
     }
-    return '🏴☠️';
+    return $PIRATE;
 }
 
 function todoist_due_string(int $airingAt): string {
