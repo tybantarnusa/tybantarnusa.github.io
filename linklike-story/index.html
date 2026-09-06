@@ -444,15 +444,13 @@
       100% { opacity: 0; transform: translateY(-10px); }
     }
     .updated-footer {
-      position: fixed;
-      right: 14px;
-      bottom: 10px;
+      margin-top: 22px;
       font-size: 11px;
       color: var(--muted);
       opacity: .85;
+      text-align: center;
       pointer-events: none;
       user-select: none;
-      z-index: 40;
     }
   </style>
 </head>
@@ -505,6 +503,8 @@
           <div class="menu-item" onclick="bukaPlaylist('102')"><div class="num">102 - Shades of Stars</div><div class="label">Voiced Novel</div></div>
         </div>
       </div>
+
+      <div class="updated-footer">Updated: Sep 6, 2026 20:05 UTC+9</div>
     </div>
 
     
@@ -1267,6 +1267,5 @@
     window.addEventListener('popstate', applyHash);
     applyHash();
   </script>
-  <div class="updated-footer">Updated: Sep 6, 2026 15:34 UTC+9</div>
 </body>
 </html>
