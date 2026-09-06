@@ -831,11 +831,7 @@
         } else if (currentPeriod === 'dream') {
           if (!isFes) arc = '20000' + epPosAll;
         } else if (currentPeriod === '102' || currentPeriod === '103' || currentPeriod === '104' || currentPeriod === '105') {
-          if (currentPeriod === '104' && epNo === '13') {
-            arc = '105012'; 
-          } else {
-            arc = currentPeriod + '0' + String(epNo ?? epPosAll).padStart(2, '0');
-          }
+          arc = currentPeriod + '0' + String(epNo ?? epPosAll).padStart(2, '0');
         }
         const ytThumb = ytThumbUrl(v.id);
         const localExt = (arc.indexOf('fes-') === 0 || arc.indexOf('102') === 0) ? '.jpg' : '.webp';
