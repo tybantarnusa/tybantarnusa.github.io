@@ -443,6 +443,17 @@
       0% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-10px); }
     }
+    .updated-footer {
+      position: fixed;
+      right: 14px;
+      bottom: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: .85;
+      pointer-events: none;
+      user-select: none;
+      z-index: 40;
+    }
   </style>
 </head>
 <body>
@@ -1256,5 +1267,6 @@
     window.addEventListener('popstate', applyHash);
     applyHash();
   </script>
+  <div class="updated-footer">Updated: Sep 6, 2026</div>
 </body>
 </html>
