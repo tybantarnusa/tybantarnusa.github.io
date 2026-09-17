@@ -193,26 +193,71 @@ if ($airingAt === null || $airingAt === 0) {
 }
 
 // ---------------------------------------------------------------------------
-// Simbol + content
+// Kunci pembanding anti duplikat
+// "🅱️ Judul", "1️⃣ Judul", "**Judul**", "judul" -> dianggap judul yang sama.
+// Perlu karena content mentah sering beda walau anime-nya sama:
+//   - simbol bisa ganti kalau daftar platform berubah (Bstation masuk/keluar)
+//   - judul dari AniList bisa berubah kapitalisasi ("Tsuihou sareta" -> "Tsuihou Sareta")
+//   - task lama dari alur lain nggak pakai simbol (atau pakai markdown "**Judul**")
 // ---------------------------------------------------------------------------
-function pick_symbol(array $platforms): string {
-    // Pakai \u{...} biar urutan codepoint presisi — kalau ZWJ (U+200D) ilang,
-    // bendera bajak laut ke-render jadi dua emoji terpisah (bendera + skull).
-    $BSTATION = "\u{1F171}\u{FE0F}";          // 🅱️
-    $MUSE = "\u{1F17C}\u{FE0F}";              // 🅼
-    $ANIONE = "1\u{FE0F}\u{20E3}";            // 1️⃣
-    $PIRATE = "\u{1F3F4}\u{200D}\u{2620}\u{FE0F}"; // 🏴☠️ (flag + ZWJ + skull)
+function dedupe_key(string $s): string {
+    $s = (string) $s;
+    $s = preg_replace('/^[^\p{L}]+/u', '', $s);        // emoji/simbol/angka di depan (🅱️, 1️⃣, **)
+    $s = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $s);   // sisa tanda baca & simbol
+    if (function_exists('iconv')) {
+        $t = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
+        if (is_string($t) && $t !== '') $s = $t;       // é -> e
+    }
+    $s = function_exists('mb_strtolower') ? mb_strtolower($s, 'UTF-8') : strtolower($s);
+    $s = preg_replace('/[^a-z0-9]+/', ' ', $s);
+    return trim(preg_replace('/\s+/', ' ', $s));
+}
 
+// ---------------------------------------------------------------------------
+// Simbol + prioritasnya
+// Prioritas: Bstation 🅱️ (3) > Muse 🅼 (2) > Ani-One 1️⃣ (1) > lainnya 🏴‍☠️ (0).
+// Semua simbol ditulis pakai \u{...} biar urutan codepoint presisi — kalau ZWJ (U+200D)
+// ilang, bendera bajak laut ke-render jadi dua emoji terpisah (bendera + skull).
+// ---------------------------------------------------------------------------
+function symbol_map(): array {
+    return [
+        'bstation' => ["\u{1F171}\u{FE0F}", 3],                  // 🅱️
+        'muse'     => ["\u{1F17C}\u{FE0F}", 2],                  // 🅼
+        'anione'   => ["1\u{FE0F}\u{20E3}", 1],                  // 1️⃣
+        'pirate'   => ["\u{1F3F4}\u{200D}\u{2620}\u{FE0F}", 0],  // 🏴‍☠️
+    ];
+}
+
+function pick_symbol(array $platforms): string {
+    $m = symbol_map();
     foreach ($platforms as $p) {
-        if (stripos($p, 'Bstation') !== false) return $BSTATION;
+        if (stripos($p, 'Bstation') !== false) return $m['bstation'][0];
     }
     foreach ($platforms as $p) {
-        if (stripos($p, 'Muse') !== false) return $MUSE;
+        if (stripos($p, 'Muse') !== false) return $m['muse'][0];
     }
     foreach ($platforms as $p) {
-        if (stripos($p, 'Ani-One') !== false) return $ANIONE;
+        if (stripos($p, 'Ani-One') !== false) return $m['anione'][0];
     }
-    return $PIRATE;
+    return $m['pirate'][0];
+}
+
+// prioritas simbol yang lagi dipakai di sebuah content task; -1 = nggak ada simbol
+function content_symbol_rank(string $content): int {
+    $rank = -1;
+    foreach (symbol_map() as $pair) {
+        if (mb_strpos($content, $pair[0]) !== false) $rank = max($rank, $pair[1]);
+    }
+    return $rank;
+}
+
+// buang simbol di depan/belakang dari content task, sisanya = judul apa adanya punya user
+// (\p{Cf} perlu: ZWJ U+200D di 🏴‍☠️ masuk kategori itu, kalau nggak ke-strip sisanya nyangkut)
+function strip_symbol(string $content): string {
+    $s = preg_replace('/[0-9]\x{FE0F}?\x{20E3}/u', ' ', $content);   // keycap (1️⃣) -> spasi
+    $s = preg_replace('/^[\s\p{So}\p{Sk}\p{P}\p{Mn}\p{Cf}]+/u', '', $s);   // emoji/tanda baca/markdown di depan
+    $s = preg_replace('/[\s\p{So}\p{Sk}\p{Mn}\p{Cf}*_~]+$/u', '', $s);     // emoji/markdown di belakang
+    return trim($s);
 }
 
 function todoist_due_string(int $airingAt): string {
@@ -227,6 +272,7 @@ function todoist_due_string(int $airingAt): string {
 }
 
 $symbol = pick_symbol($platformNames);
+$symbolRank = content_symbol_rank($symbol);
 $content = $symbol . ' ' . $anime['title'];
 $dueString = todoist_due_string((int) $airingAt);
 $projectName = ucfirst(strtolower($anime['season'])); // SUMMER -> Summer
@@ -234,7 +280,7 @@ $projectName = ucfirst(strtolower($anime['season'])); // SUMMER -> Summer
 // ---------------------------------------------------------------------------
 // Todoist client
 // ---------------------------------------------------------------------------
-function todoist_call(string $token, string $method, string $path, array $payload = null): array {
+function todoist_call(string $token, string $method, string $path, ?array $payload = null): array {
     $headers = [
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json',
@@ -267,16 +313,22 @@ if ($projectId === null) {
     respond(['ok' => false, 'error' => "Project Todoist '#{$projectName}' nggak ketemu"]);
 }
 
-// anti duplikat: cek task aktif dengan content sama
-$exists = false;
+// anti duplikat: cek task aktif yang judulnya sama (dibanding pakai dedupe_key,
+// jadi beda simbol / kapitalisasi / tanda baca tetap dianggap sudah ada)
+// + kalau task-nya masih pakai simbol prioritas lebih rendah (misal dulu cuma Ani-One,
+//   sekarang Bstation), simbolnya ditimpa naik ke yang prioritas tinggi.
+$found = null;
+$wantKey = dedupe_key($content);
 $cursor = null;
 for ($page = 0; $page < 8; $page++) {
     $path = '/api/v1/tasks?limit=50' . ($cursor ? '&cursor=' . urlencode($cursor) : '');
     $taskRes = todoist_call($todoistToken, 'GET', $path);
     $tasks = is_array($taskRes['json']) ? ($taskRes['json']['results'] ?? []) : [];
     foreach ($tasks as $t) {
-        if (($t['content'] ?? '') === $content && empty($t['is_deleted'])) {
-            $exists = true;
+        if (!empty($t['is_deleted'])) continue;
+        $taskContent = (string) ($t['content'] ?? '');
+        if ($taskContent === $content || ($wantKey !== '' && dedupe_key($taskContent) === $wantKey)) {
+            $found = ['id' => (string) ($t['id'] ?? ''), 'content' => $taskContent];
             break 2;
         }
     }
@@ -284,8 +336,36 @@ for ($page = 0; $page < 8; $page++) {
     if (!$cursor) break;
 }
 
-if ($exists) {
-    respond(['ok' => true, 'created' => false, 'content' => $content, 'due' => $dueString, 'message' => 'Already in Todoist']);
+if ($found !== null) {
+    $foundRank = content_symbol_rank($found['content']);
+    // cuma naik kalau task-nya UDAH punya simbol yang lebih rendah. Task tanpa simbol
+    // (dibuat manual / alur lain) nggak diapa-apain, biar nggak ngerusak format punya user.
+    if ($foundRank >= 0 && $foundRank < $symbolRank && $found['id'] !== '') {
+        $keepTitle = strip_symbol($found['content']);
+        if ($keepTitle === '') $keepTitle = (string) $anime['title'];
+        $newContent = $symbol . ' ' . $keepTitle;
+        $upd = todoist_call($todoistToken, 'POST', '/api/v1/tasks/' . rawurlencode($found['id']), ['content' => $newContent]);
+        if ($upd['code'] >= 200 && $upd['code'] < 300) {
+            respond([
+                'ok' => true,
+                'created' => false,
+                'updated' => true,
+                'content' => $newContent,
+                'previous' => $found['content'],
+                'due' => $dueString,
+                'message' => 'Symbol upgraded: ' . $found['content'] . '  →  ' . $newContent,
+            ]);
+        }
+        respond([
+            'ok' => true,
+            'created' => false,
+            'updated' => false,
+            'content' => $found['content'],
+            'due' => $dueString,
+            'message' => 'Already in Todoist (gagal update simbol, HTTP ' . $upd['code'] . ')',
+        ]);
+    }
+    respond(['ok' => true, 'created' => false, 'updated' => false, 'content' => $found['content'], 'due' => $dueString, 'message' => 'Already in Todoist']);
 }
 
 // bikin task

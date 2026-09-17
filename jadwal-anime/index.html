@@ -134,17 +134,81 @@
       gap: 12px;
     }
 
-    .season-pill {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: var(--muted);
-      padding: 7px 13px;
+    /* ===== Season switch ===== */
+    .season-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 4px;
       border: 1px solid var(--border-strong);
       border-radius: 999px;
       background: var(--surface);
       white-space: nowrap;
+    }
+
+    .season-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 999px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .season-tab:hover { color: var(--text); }
+
+    .season-tab.active {
+      color: #0a0c10;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .season-tab .tab-tag {
+      font-size: 8.5px;
+      letter-spacing: 1px;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(255, 154, 61, 0.16);
+      color: var(--amber);
+    }
+
+    .season-tab.active .tab-tag {
+      background: rgba(10, 12, 16, 0.22);
+      color: #0a0c10;
+    }
+
+    /* ===== Season note (musim depan) ===== */
+    .season-note {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      padding: 11px 15px;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255, 154, 61, 0.32);
+      background: rgba(255, 154, 61, 0.05);
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .season-note b { color: var(--text); font-weight: 600; }
+
+    .note-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--amber);
     }
 
     .refresh-btn {
@@ -476,6 +540,20 @@
       background: rgba(255, 255, 255, 0.09);
     }
 
+    /* platform resmi tapi belum dikonfirmasi (dari musim depan) */
+    .plat-badge.tentative {
+      color: var(--faint);
+      border-style: dashed;
+      background: transparent;
+      cursor: help;
+    }
+
+    .plat-badge.tentative:hover {
+      color: var(--amber);
+      border-color: rgba(255, 154, 61, 0.45);
+      background: rgba(255, 154, 61, 0.06);
+    }
+
     .row-side {
       display: flex;
       align-items: center;
@@ -604,15 +682,146 @@
     .footer a { color: var(--muted); text-decoration: none; }
     .footer a:hover { color: var(--text); }
 
+    /* ===== Search (client-side, fuzzy) ===== */
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-field {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 44px;
+      padding: 0 12px 0 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .search-field:focus-within {
+      border-color: rgba(255, 77, 92, 0.45);
+      box-shadow: 0 0 0 3px rgba(255, 77, 92, 0.11);
+      background: var(--bg-2);
+    }
+
+    .search-icon {
+      flex-shrink: 0;
+      color: var(--faint);
+      display: block;
+      transition: color 0.15s ease;
+    }
+
+    .search-field:focus-within .search-icon { color: var(--accent); }
+
+    #searchInput {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--display);
+      font-size: 14.5px;
+      font-weight: 500;
+    }
+
+    #searchInput::placeholder { color: var(--faint); font-weight: 400; }
+    #searchInput::-webkit-search-cancel-button,
+    #searchInput::-webkit-search-decoration { -webkit-appearance: none; }
+
+    .search-clear {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      display: none;
+      place-items: center;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-family: var(--display);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .search-clear:hover {
+      color: #0a0c10;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .search-field.has-value .search-clear { display: grid; }
+
+    .search-field.has-query {
+      border-color: rgba(255, 154, 61, 0.35);
+    }
+
+    .search-info {
+      flex-shrink: 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.4px;
+      color: var(--faint);
+      white-space: nowrap;
+    }
+
+    .search-info.empty { color: var(--accent); }
+
+    mark {
+      background: rgba(255, 154, 61, 0.18);
+      color: var(--amber);
+      border-radius: 3px;
+      padding: 0 1px;
+    }
+
+    .row.search-row { grid-template-columns: 96px 1fr auto; }
+
+    .row.search-row .row-time {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .head-tag {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--amber);
+      border: 1px solid rgba(255, 154, 61, 0.35);
+      background: rgba(255, 154, 61, 0.08);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
     @media (max-width: 620px) {
-      .topbar { padding: 0 14px; gap: 10px; }
-      .brand-name { font-size: 15px; }
+      .topbar { padding: 0 12px; gap: 8px; }
+      .brand-name { display: none; }
       .onair-badge { display: none; }
-      .season-pill { display: none; }
+      .season-switch { padding: 3px; }
+      .season-tab { font-size: 10px; letter-spacing: 0.4px; padding: 5px 9px; }
+      .season-tab .tab-year { display: none; }
+      .season-note { font-size: 12px; padding: 10px 12px; }
       .container { padding: 18px 12px 48px; }
       .row { grid-template-columns: 56px 1fr auto; gap: 12px; padding: 12px 16px; }
       .day-head { padding: 15px 16px; }
       .day-name { font-size: 19px; }
+      .search-wrap { gap: 8px; margin-bottom: 16px; }
+      .search-field { height: 40px; padding: 0 10px 0 12px; gap: 8px; }
+      #searchInput { font-size: 13.5px; }
+      .search-info { font-size: 10px; }
+      .row.search-row { grid-template-columns: 76px 1fr auto; }
+      .row.search-row .row-time { font-size: 11.5px; }
       .nextup-main { flex-wrap: wrap; gap: 4px 10px; }
       .footer { flex-direction: column; text-align: center; }
     }
@@ -628,7 +837,7 @@
       <span class="onair-badge"><span class="dot"></span>ON AIR</span>
     </div>
     <div class="topbar-right">
-      <span id="seasonPill" class="season-pill">—</span>
+      <div id="seasonSwitch" class="season-switch" role="tablist" aria-label="Season"></div>
       <button class="refresh-btn" onclick="hardRefresh()">Refresh</button>
     </div>
   </header>
@@ -643,9 +852,20 @@
       <span id="nextupCount" class="nextup-count"></span>
     </div>
 
+    <div id="seasonNote" class="season-note" style="display:none"></div>
+
     <div id="todayStrip" class="today-strip" style="display:none">
       <div class="strip-head"><span class="dot"></span><span class="strip-label">Today on air</span></div>
       <div id="todayChips" class="chips"></div>
+    </div>
+
+    <div class="search-wrap">
+      <div id="searchField" class="search-field">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20.5 20.5 16 16"></path></svg>
+        <input id="searchInput" type="text" placeholder="Search title..." autocomplete="off" spellcheck="false" aria-label="Search title" />
+        <button id="searchClear" class="search-clear" type="button" title="Clear search" aria-label="Clear search">×</button>
+      </div>
+      <span id="searchInfo" class="search-info"></span>
     </div>
 
     <nav id="dayNav" class="day-nav"></nav>
@@ -788,27 +1008,317 @@
       return grouped;
     }
 
-    function render(list, seasonInfo) {
+    // ===== search: client-side + fuzzy, di season yang aktif aja =====
+    // karakter Cyrillic/ª yang nyempil di judul (AniList suka campur) -> huruf latin yang mirip
+    const HOMOGLYPHS = { '\u044f': 'r', '\u043e': 'o', '\u0435': 'e', '\u0430': 'a', '\u0441': 'c',
+      '\u0440': 'p', '\u0445': 'x', '\u0443': 'y', '\u0456': 'i', '\u0455': 's', '\u0458': 'j',
+      '\u043c': 'm', '\u043a': 'k', '\u0442': 't', '\u0432': 'b', '\u043d': 'h', '\u00aa': 'a',
+      '\u00ba': 'o' };
+
+    // normalisasi: huruf kecil, buang diakritik (PokéOki -> pokeoki), seragamkan homoglyph,
+    // sisanya jadi spasi. Judul non-latin (kanji/kana) tetap disimpen hurufnya biar masih bisa dicari.
+    function normStr(s) {
+      let base = String(s ?? '').toLowerCase().normalize('NFKD')
+        .replace(/[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\uFE20-\uFE2F]/g, '')
+        .replace(/\u00df/g, 'ss').replace(/\u00e6/g, 'ae').replace(/\u0153/g, 'oe')
+        .replace(/\u00f8/g, 'o').replace(/\u0142/g, 'l').replace(/\u0111/g, 'd');
+      base = base.replace(/[\u0400-\u04ff\u00aa\u00ba]/g, c => HOMOGLYPHS[c] || ' ');
+      const latin = base.replace(/[^a-z0-9]+/g, ' ').trim();
+      if (latin) return latin;
+      return base.replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+    }
+
+    // panjang awalan yang sama antara 2 kata ("pokemon" vs "pokeoki" -> 4)
+    function sharedPrefix(a, b) {
+      let i = 0;
+      while (i < a.length && i < b.length && a[i] === b[i]) i++;
+      return i;
+    }
+
+    function levDist(a, b) {
+      const m = a.length, n = b.length;
+      if (!m) return n;
+      if (!n) return m;
+      let prev = new Array(n + 1), cur = new Array(n + 1);
+      for (let j = 0; j <= n; j++) prev[j] = j;
+      for (let i = 1; i <= m; i++) {
+        cur[0] = i;
+        for (let j = 1; j <= n; j++) {
+          const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+          cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+        }
+        const tmp = prev; prev = cur; cur = tmp;
+      }
+      return prev[n];
+    }
+
+    function levRatio(a, b) {
+      const max = Math.max(a.length, b.length);
+      return max ? 1 - levDist(a, b) / max : 1;
+    }
+
+    // skor 0 = nggak match; makin gede makin relevan
+    function matchScore(q, title) {
+      if (!q) return 1;
+      const t = normStr(title);
+      if (!t) return 0;
+      if (t === q) return 1000;
+      if (t.indexOf(q) === 0) return 900;
+      const at = t.indexOf(q);
+      if (at > -1) return 820 - Math.min(at, 40);
+
+      const qt = q.split(' ').filter(Boolean);
+      const tt = t.split(' ').filter(Boolean);
+
+      // singkatan: "aot" -> Attack on Titan (inisial prefix kata-katanya)
+      if (qt.length === 1) {
+        const initials = tt.map(w => w.charAt(0)).join('');
+        for (let k = 2; k <= initials.length; k++) {
+          if (q.length >= 2 && initials.slice(0, k) === q) return 780;
+        }
+      }
+
+      // spasi diabaikan: "onepiece" -> One Piece
+      if (q.length >= 5 && t.replace(/ /g, '').indexOf(q) > -1) return 760;
+
+      // semua kata ada di judul, urutan bebas
+      if (qt.length > 1 && qt.every(tok => t.indexOf(tok) > -1)) return 700;
+
+      // fuzzy per kata: tahan typo / potongan kata
+      let sum = 0;
+      for (const tok of qt) {
+        let best = 0;
+        for (const w of tt) {
+          if (w === tok) { best = 1; break; }
+          if (tok.length >= 3 && w.indexOf(tok) === 0) { best = Math.max(best, 0.96); continue; }
+          if (tok.length >= 4 && w.indexOf(tok) > -1) { best = Math.max(best, 0.9); continue; }
+          if (tok.length >= 3 && Math.abs(w.length - tok.length) <= 3) {
+            const r = levRatio(tok, w);
+            if (r >= 0.7) { best = Math.max(best, r * 0.86); continue; }
+          }
+          // awalan kata masih sama walau sisanya beda: "pokemon" vs "pokeoki"
+          if (tok.length >= 5 && sharedPrefix(tok, w) >= 4) best = Math.max(best, 0.72);
+        }
+        if (best < 0.7) return 0;
+        sum += best;
+      }
+      return Math.round(300 + (sum / qt.length) * 250);
+    }
+
+    // daftar hasil diurut skor, lalu jam tayang
+    function searchList(list, query) {
+      const q = normStr(query);
+      if (!q) return [];
+      const out = [];
+      list.forEach(a => {
+        const s = matchScore(q, a.title);
+        if (s > 0) out.push({ a, s });
+      });
+      out.sort((x, y) => y.s - x.s
+        || ((x.a.airingAt || Infinity) - (y.a.airingAt || Infinity))
+        || x.a.title.localeCompare(y.a.title));
+      return out.map(m => m.a);
+    }
+
+    // tebelin bagian judul yang cocok (exact substring per kata)
+    function highlightTitle(title, query) {
+      const tokens = normStr(query).split(' ').filter(t => t.length >= 2);
+      const safe = esc(title);
+      if (!tokens.length) return safe;
+      const re = new RegExp('(' + tokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+      return safe.replace(re, '<mark>$1</mark>');
+    }
+
+    function platformHtml(id) {
+      const plats = (PLATFORM_DATA && PLATFORM_DATA[id]) || [];
+      if (!plats.length) return '';
+      return `<div class="row-platforms">${plats.map(p => {
+        const label = esc(p.platform);
+        const tentative = (p.status === 'Tentatif') || !p.url;
+        const tip = `${label} · ${esc(tentative ? 'not confirmed yet' : (p.status || ''))}`;
+        if (tentative) return `<span class="plat-badge tentative" title="${tip}">${label}</span>`;
+        return `<a class="plat-badge" href="${esc(p.url)}" target="_blank" rel="noopener" title="${tip}">${label}</a>`;
+      }).join('')}</div>`;
+    }
+
+    function buildRow(a, highlightQuery) {
+      const row = document.createElement('div');
+      row.className = 'row' + (highlightQuery ? ' search-row' : '');
+      const timeText = highlightQuery
+        ? (a.dayName ? a.dayName.slice(0, 3) + ' ' + a.time : a.time)
+        : a.time;
+      const todoBtn = a.airingAt
+        ? `<button type="button" class="todo-btn" title="Add to Todoist" aria-label="Add to Todoist" onclick="addToTodoist(${a.id}, this)">+</button>`
+        : '';
+      row.innerHTML = `
+        <span class="row-time">${esc(timeText)}</span>
+        <span class="row-main">
+          <span class="row-title">${highlightQuery ? highlightTitle(a.title, highlightQuery) : esc(a.title)}</span>
+          ${platformHtml(a.id)}
+        </span>
+        <span class="row-side">
+          <span class="chip ${a.statusCls}">${esc(a.status)}</span>
+          ${todoBtn}
+        </span>
+      `;
+      return row;
+    }
+
+    // ===== season state =====
+    const STATE = { data: null, seasons: [], key: null, list: [], query: '' };
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function seasonKey(s) { return s.season + '-' + s.year; }
+
+    function activeSeason() {
+      return STATE.seasons.find(s => seasonKey(s) === STATE.key) || STATE.seasons[0] || null;
+    }
+
+    function seasonName(s) {
+      return s.season.charAt(0).toUpperCase() + s.season.slice(1).toLowerCase();
+    }
+
+    // tanggal (JST) dari unix timestamp
+    function jstDate(unix) {
+      const d = new Date(unix * 1000);
+      return new Date(d.getTime() + d.getTimezoneOffset() * 60000 + 9 * 3600000);
+    }
+
+    function formatDate(unix, withYear = true) {
+      const d = jstDate(unix);
+      return `${MONTHS[d.getMonth()]} ${d.getDate()}` + (withYear ? `, ${d.getFullYear()}` : '');
+    }
+
+    function renderSeasonSwitch() {
+      const el = document.getElementById('seasonSwitch');
+      el.innerHTML = '';
+      STATE.seasons.forEach(s => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'season-tab' + (seasonKey(s) === STATE.key ? ' active' : '');
+        b.innerHTML = `${esc(seasonName(s))}<span class="tab-year">${s.year}</span>`
+          + (s.current ? '' : '<span class="tab-tag">NEXT</span>');
+        b.title = s.current
+          ? `${s.label} · on air now`
+          : `${s.label} · starts ${formatDate(s.startsAt)}`;
+        b.onclick = () => {
+          if (STATE.key === seasonKey(s)) return;
+          STATE.key = seasonKey(s);
+          renderSeason();
+        };
+        el.appendChild(b);
+      });
+    }
+
+    function renderSeason() {
+      const info = activeSeason();
+      if (!info) return;
+      const rows = (STATE.data.anime || []).filter(a =>
+        a.season ? (a.season === info.season && a.year === info.year) : !!info.current
+      );
+      STATE.list = processAnime(rows);
+      renderSeasonSwitch();
+      render(STATE.list, info);
+    }
+
+    function renderSeasonNote(info, list) {
+      const el = document.getElementById('seasonNote');
+      if (info.current) { el.style.display = 'none'; return; }
+      const tba = list.filter(a => !a.airingAt).length;
+      el.style.display = 'flex';
+      el.innerHTML = `
+        <span class="note-tag">Upcoming</span>
+        <span>Starts <b>${formatDate(info.startsAt)}</b> (JST) · day &amp; time below = first episode slot</span>
+        <span>${list.length} titles announced${tba ? ` · ${tba} still TBA` : ''}</span>
+      `;
+    }
+
+    function render(list, info) {
+      const q = STATE.query.trim();
+      if (q) { renderSearch(list, info, q); return; }
+      renderSearchInfo(0, ''); // search dikosongin -> hitungan match jangan ketinggalan
+
       const grouped = groupByDay(list);
-      const todayName = DAY_NAMES[getJSTNow().getDay()];
+      const isCurrent = !!info.current;
+      const todayName = isCurrent ? DAY_NAMES[getJSTNow().getDay()] : null;
 
-      document.getElementById('seasonPill').textContent = `${seasonInfo.season} ${seasonInfo.year}`;
-      document.getElementById('footerLeft').textContent = `${list.length} judul · ${seasonInfo.season} ${seasonInfo.year}`;
+      document.getElementById('footerLeft').textContent = `${list.length} titles · ${info.label}`;
 
-      renderNextUp(list);
-      renderTodayStrip(grouped[todayName], todayName);
+      renderSeasonNote(info, list);
+      renderNextUp(list, isCurrent);
+      if (isCurrent) {
+        renderTodayStrip(grouped[todayName], todayName);
+      } else {
+        document.getElementById('todayStrip').style.display = 'none';
+      }
       renderNav(grouped, todayName);
       renderSchedule(grouped, todayName);
     }
 
-    function renderNextUp(list) {
+    // hasil search: list datar, cuma dari season yang lagi aktif
+    function renderSearch(list, info, query) {
+      const matches = searchList(list, query);
+      const grouped = groupByDay(list);
+      const isCurrent = !!info.current;
+      const todayName = isCurrent ? DAY_NAMES[getJSTNow().getDay()] : null;
+
+      document.getElementById('footerLeft').textContent = `${list.length} titles · ${info.label}`;
+      // next up / today on air / catatan musim tetap tampil biar nggak ada layout jump
+      renderSeasonNote(info, list);
+      renderNextUp(list, isCurrent);
+      if (isCurrent) {
+        renderTodayStrip(grouped[todayName], todayName);
+      } else {
+        document.getElementById('todayStrip').style.display = 'none';
+      }
+      // pill hari disembunyiin: kartu per hari lagi nggak ada, jadi anchor-nya mati
+      document.getElementById('dayNav').innerHTML = '';
+      renderSearchInfo(matches.length, query);
+
+      const main = document.getElementById('schedule');
+      main.innerHTML = '';
+      if (!matches.length) {
+        main.innerHTML = `<div class="state"><div class="state-text">No title matches “${esc(query)}” in ${esc(info.label)}.</div></div>`;
+        return;
+      }
+
+      const card = document.createElement('section');
+      card.className = 'day-card';
+      const head = document.createElement('div');
+      head.className = 'day-head';
+      head.innerHTML = `
+        <h2 class="day-name">Results</h2>
+        <span class="day-count">${matches.length} ${matches.length === 1 ? 'title' : 'titles'} in ${esc(info.label)}</span>
+        <span class="head-tag">SEARCH</span>
+      `;
+      card.appendChild(head);
+
+      const rows = document.createElement('div');
+      rows.className = 'rows';
+      matches.forEach(a => rows.appendChild(buildRow(a, query)));
+      card.appendChild(rows);
+      main.appendChild(card);
+    }
+
+    function renderSearchInfo(count, query) {
+      const el = document.getElementById('searchInfo');
+      if (!query) { el.textContent = ''; el.className = 'search-info'; return; }
+      el.className = 'search-info' + (count ? '' : ' empty');
+      el.textContent = count ? `${count} ${count === 1 ? 'match' : 'matches'}` : 'no match';
+    }
+
+    function renderNextUp(list, isCurrent) {
       const el = document.getElementById('nextup');
+      const label = el.querySelector('.nextup-label');
       const upcoming = list.filter(a => a.airingAt).sort((a, b) => a.airingAt - b.airingAt);
-      if (!upcoming.length) { el.style.display = 'none'; return; }
+      if (!upcoming.length) { el.style.display = 'none'; window.__nextUp = null; return; }
       const next = upcoming[0];
       window.__nextUp = next;
       el.style.display = 'flex';
-      document.getElementById('nextupTime').textContent = next.dayName + ' ' + next.time;
+      label.textContent = isCurrent ? 'NEXT UP' : 'SEASON PREMIERE';
+      document.getElementById('nextupTime').textContent = isCurrent
+        ? next.dayName + ' ' + next.time
+        : next.dayName + ' ' + next.time + ' · ' + formatDate(next.airingAt);
       document.getElementById('nextupTitle').textContent = next.title;
       tickNextUp();
     }
@@ -816,17 +1326,20 @@
     function tickNextUp() {
       const next = window.__nextUp;
       const countEl = document.getElementById('nextupCount');
-      if (!next) return;
+      if (!next || !countEl) return;
       const diff = next.airingAt - Math.floor(Date.now() / 1000);
       if (diff <= 0) {
         countEl.textContent = 'AIRING NOW';
         return;
       }
-      const h = Math.floor(diff / 3600);
+      const pad = n => String(n).padStart(2, '0');
+      const d = Math.floor(diff / 86400);
+      const h = Math.floor((diff % 86400) / 3600);
       const m = Math.floor((diff % 3600) / 60);
       const s = diff % 60;
-      const pad = n => String(n).padStart(2, '0');
-      countEl.textContent = h > 0 ? `in ${h}h ${pad(m)}m ${pad(s)}s` : `in ${pad(m)}m ${pad(s)}s`;
+      if (d > 0) countEl.textContent = `in ${d}d ${pad(h)}h ${pad(m)}m`;
+      else if (h > 0) countEl.textContent = `in ${h}h ${pad(m)}m ${pad(s)}s`;
+      else countEl.textContent = `in ${pad(m)}m ${pad(s)}s`;
     }
 
     function renderTodayStrip(todayList, todayName) {
@@ -879,41 +1392,48 @@
 
         const rows = document.createElement('div');
         rows.className = 'rows';
-        shows.forEach(a => {
-          const row = document.createElement('div');
-          row.className = 'row';
-
-          let platHtml = '';
-          const plats = (PLATFORM_DATA && PLATFORM_DATA[a.id]) || [];
-          if (plats.length) {
-            platHtml = `<div class="row-platforms">${plats.map(p => {
-              const label = esc(p.platform);
-              const url = esc(p.url);
-              return `<a class="plat-badge" href="${url}" target="_blank" rel="noopener" title="${label} · ${esc(p.status || '')}">${label}</a>`;
-            }).join('')}</div>`;
-          }
-
-          const todoBtn = a.airingAt
-            ? `<button type="button" class="todo-btn" title="Add to Todoist" aria-label="Add to Todoist" onclick="addToTodoist(${a.id}, this)">+</button>`
-            : '';
-
-          row.innerHTML = `
-            <span class="row-time">${esc(a.time)}</span>
-            <span class="row-main">
-              <span class="row-title">${esc(a.title)}</span>
-              ${platHtml}
-            </span>
-            <span class="row-side">
-              <span class="chip ${a.statusCls}">${esc(a.status)}</span>
-              ${todoBtn}
-            </span>
-          `;
-          rows.appendChild(row);
-        });
+        shows.forEach(a => rows.appendChild(buildRow(a)));
         card.appendChild(rows);
         main.appendChild(card);
       });
     }
+
+    // ===== search wiring (semua lokal, nggak nembak backend) =====
+    const searchInput = document.getElementById('searchInput');
+    const searchField = document.getElementById('searchField');
+    let searchDebounce = null;
+
+    function applySearch() {
+      const v = searchInput.value;
+      STATE.query = v;
+      searchField.classList.toggle('has-value', !!v);
+      searchField.classList.toggle('has-query', !!v.trim());
+      if (!STATE.data) return;
+      const info = activeSeason();
+      if (info) render(STATE.list, info);
+    }
+
+    function clearSearch() {
+      searchInput.value = '';
+      applySearch();
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(applySearch, 80);
+    });
+
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && searchInput.value) {
+        e.preventDefault();
+        clearSearch();
+      }
+    });
+
+    document.getElementById('searchClear').addEventListener('click', () => {
+      clearSearch();
+      searchInput.focus();
+    });
 
     let tickTimer = null;
 
@@ -922,23 +1442,45 @@
       const nav = document.getElementById('dayNav');
       const strip = document.getElementById('todayStrip');
       const nextup = document.getElementById('nextup');
+      const note = document.getElementById('seasonNote');
       nav.innerHTML = '';
       strip.style.display = 'none';
       nextup.style.display = 'none';
-      main.innerHTML = `<div class="state"><div class="spinner"></div><div class="state-text">Memuat jadwal...</div></div>`;
+      note.style.display = 'none';
+      main.innerHTML = `<div class="state"><div class="spinner"></div><div class="state-text">Loading schedule...</div></div>`;
 
       try {
         const data = await fetchSchedule();
         PLATFORM_DATA = data.platforms || {};
 
-        const seasonInfo = { season: data.season, year: data.year };
-        const list = processAnime(data.anime || []);
-        render(list, seasonInfo);
+        let seasons = Array.isArray(data.seasons) ? data.seasons.slice() : [];
+        if (!seasons.length && data.season && data.year) {
+          // fallback kalau backend lama (cuma 1 musim)
+          seasons = [{
+            season: data.season,
+            year: data.year,
+            label: data.season + ' ' + data.year,
+            current: true,
+            startsAt: 0,
+            count: (data.anime || []).length
+          }];
+        }
+        if (!seasons.some(s => s.current) && seasons.length) seasons[0].current = true;
+        // musim depan yang datanya belum ada jangan ditampilin
+        seasons = seasons.filter(s => s.current || s.count > 0);
+
+        STATE.data = data;
+        STATE.seasons = seasons;
+        if (!STATE.key || !seasons.some(s => seasonKey(s) === STATE.key)) {
+          STATE.key = seasonKey(seasons.find(s => s.current) || seasons[0]);
+        }
+        renderSeason();
+
         if (tickTimer) clearInterval(tickTimer);
         tickTimer = setInterval(tickNextUp, 1000);
       } catch (err) {
         console.error('Gagal load data:', err);
-        main.innerHTML = `<div class="state"><div class="error-text">Gagal mengambil data. Coba lagi nanti.</div></div>`;
+        main.innerHTML = `<div class="state"><div class="error-text">Failed to load schedule. Try again later.</div></div>`;
       }
     }
 

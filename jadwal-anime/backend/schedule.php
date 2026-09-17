@@ -2,14 +2,20 @@
 /**
  * schedule.php — backend jadwal anime + platform streaming.
  *
- * Ambil data dari AniList (daftar anime musim ini) + db.silveryasha.id (platform
+ * Ambil data dari AniList (daftar anime per musim) + db.silveryasha.id (platform
  * streaming resmi), simpen ke MySQL, terus serve sebagai JSON buat frontend.
+ *
+ * Musim yang dilacak:
+ *   - musim SEKARANG (dihitung dari JST), selalu.
+ *   - musim DEPAN, cuma kalau udah deket (NEXT_SEASON_LEAD_DAYS hari sebelum
+ *     musim depan mulai) — biar bisa ngeplan / nambahin ke Todoist lebih awal.
+ * Musim lain yang masih nyangkut di DB dibersihin otomatis.
  *
  * Alur:
  *   - GET : serve dari DB. Ambil data dari sumber (AniList/silveryasha) CUMA kalau
- *           DB belum ada data musim ini, atau data udah basi (> 24 jam, biar
- *           countdown & status tetep akurat). Tombol refresh di frontend TIDAK
- *           maksa fetch ulang — kita nggak mau nyusahin 3rd party.
+ *           DB belum ada data musim itu, atau data musim itu udah basi (> 24 jam,
+ *           biar countdown & status tetep akurat). Tombol refresh di frontend
+ *           TIDAK maksa fetch ulang — kita nggak mau nyusahin 3rd party.
  *
  * .env (letakkan di folder yang sama, JANGAN di public_html kalau bisa):
  *   DB_HOST=localhost      <- di server, bukan IP remote
@@ -64,6 +70,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
 
 const REFRESH_AGE_SECONDS = 86400; // anggap basi kalau > 24 jam sejak fetch terakhir
 const MAX_PAGES = 6;
+// Musim depan mulai ditampilkan kalau tinggal <= 21 hari lagi (3 minggu).
+const NEXT_SEASON_LEAD_DAYS = 21;
 
 function respond(array $data): void {
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -134,7 +142,7 @@ function http_request(string $url, array $opts = []) {
 }
 
 // ---------------------------------------------------------------------------
-// Season (JST)
+// Musim (JST)
 // ---------------------------------------------------------------------------
 function current_season(): array {
     $tz = new DateTimeZone('Asia/Tokyo');
@@ -148,13 +156,54 @@ function current_season(): array {
     return [$season, $year];
 }
 
+function season_month(string $season): int {
+    switch ($season) {
+        case 'SPRING': return 4;
+        case 'SUMMER': return 7;
+        case 'FALL':   return 10;
+        default:       return 1; // WINTER
+    }
+}
+
+function season_after(string $season, int $year): array {
+    switch ($season) {
+        case 'WINTER': return ['SPRING', $year];
+        case 'SPRING': return ['SUMMER', $year];
+        case 'SUMMER': return ['FALL',   $year];
+        default:       return ['WINTER', $year + 1]; // FALL -> Winter tahun depan
+    }
+}
+
+function season_start_ts(string $season, int $year): int {
+    $tz = new DateTimeZone('Asia/Tokyo');
+    $dt = new DateTime(sprintf('%04d-%02d-01 00:00:00', $year, season_month($season)), $tz);
+    return (int) $dt->getTimestamp();
+}
+
+function season_label(string $season, int $year): string {
+    return ucfirst(strtolower($season)) . ' ' . $year;
+}
+
+// Musim yang diserve: musim sekarang + musim depan kalau udah deket.
+function tracked_seasons(): array {
+    list($season, $year) = current_season();
+    $tracked = [['season' => $season, 'year' => $year, 'current' => true]];
+
+    list($nextSeason, $nextYear) = season_after($season, $year);
+    $secondsLeft = season_start_ts($nextSeason, $nextYear) - time();
+    if ($secondsLeft <= NEXT_SEASON_LEAD_DAYS * 86400) {
+        $tracked[] = ['season' => $nextSeason, 'year' => $nextYear, 'current' => false];
+    }
+    return $tracked;
+}
+
 // ---------------------------------------------------------------------------
 // AniList (GraphQL)
 // ---------------------------------------------------------------------------
 function anilist_fetch(string $season, int $year): array {
     $all = [];
     for ($page = 1; $page <= MAX_PAGES; $page++) {
-        $query = "query { Page(page: {$page}, perPage: 50) { media(season: {$season}, seasonYear: {$year}, type: ANIME, isAdult: false, status_in: [RELEASING, NOT_YET_RELEASED], sort: POPULARITY_DESC) { id title { romaji english native } status nextAiringEpisode { airingAt } } pageInfo { hasNextPage } } }";
+        $query = "query { Page(page: {$page}, perPage: 50) { media(season: {$season}, seasonYear: {$year}, type: ANIME, isAdult: false, status_in: [RELEASING, NOT_YET_RELEASED], sort: POPULARITY_DESC) { id title { romaji english native } status nextAiringEpisode { airingAt episode } } pageInfo { hasNextPage } } }";
         $resp = http_request('https://graphql.anilist.co', [
             'method' => 'POST',
             'headers' => ['Content-Type: application/json', 'Accept: application/json'],
@@ -199,14 +248,22 @@ function parse_silveryasha(string $html): array {
         $title = trim($t->item(0)->textContent);
 
         $platforms = [];
-        $chips = $xp->query(".//a[contains(@class,'season-project-chip')]", $card);
+        // Cuma platform resmi (chip yang punya tanda check / "Proyek resmi"):
+        //   - <a class="season-project-chip ...">        -> udah konfirmasi, ada link
+        //   - <span class="season-project-chip--tentative ..."> -> belum konfirmasi
+        //     (biasanya muncul di musim depan yang belum jalan), status "Tentatif"
+        // Chip fansub ("Grup Penggarap") nggak punya check -> di-skip.
+        $chips = $xp->query(
+            ".//a[contains(@class,'season-project-chip')][.//svg[contains(@class,'season-project-chip__check')]]"
+            . " | .//span[contains(@class,'season-project-chip--tentative')][.//svg[contains(@class,'season-project-chip__check')]]",
+            $card
+        );
         foreach ($chips as $chip) {
-            // cuma platform resmi (punya tanda check)
-            $check = $xp->query(".//svg[contains(@class,'season-project-chip__check')]", $chip);
-            if ($check->length === 0) continue;
             $lbl = $xp->query(".//*[contains(@class,'season-project-chip__label')]", $chip);
             $name = $lbl->length ? trim($lbl->item(0)->textContent) : '';
+            if ($name === '') continue;
             $status = trim(str_replace('Status:', '', (string) $chip->getAttribute('title')));
+            if ($status === '') $status = 'Tentatif';
             $url = (string) $chip->getAttribute('href');
             $platforms[] = ['platform' => $name, 'status' => $status, 'url' => $url];
         }
@@ -226,10 +283,17 @@ function norm_title(string $s): string {
 }
 
 function dedupe_platforms(array $plats): array {
+    // prioritas kalau platform yang sama muncul lebih dari sekali:
+    // "Jalan" (paling oke) > status lain (Tamat/Drop) > "Tentatif" (belum konfirmasi)
+    $rank = function (string $status): int {
+        if ($status === 'Jalan') return 3;
+        if ($status === 'Tentatif') return 1;
+        return 2;
+    };
     $out = [];
     foreach ($plats as $p) {
         $name = $p['platform'];
-        if (!isset($out[$name]) || ($p['status'] === 'Jalan' && $out[$name]['status'] !== 'Jalan')) {
+        if (!isset($out[$name]) || $rank((string) $p['status']) > $rank((string) $out[$name]['status'])) {
             $out[$name] = $p;
         }
     }
@@ -353,7 +417,8 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS `{$tblAnime}` (
     season VARCHAR(20) NOT NULL,
     season_year INT NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (anilist_id)
+    PRIMARY KEY (anilist_id),
+    KEY idx_season (season, season_year)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
 $pdo->exec("CREATE TABLE IF NOT EXISTS `{$tblPlatforms}` (
@@ -385,84 +450,140 @@ function set_meta(PDO $pdo, string $tbl, string $k, string $v): void {
     $st->execute([$k, $v]);
 }
 
-// --- tentukan season sekarang ---
+// --- musim yang dilacak (sekarang + depan kalau udah deket) ---
 list($season, $year) = current_season();
+$tracked = tracked_seasons();
 
-// --- apakah perlu ambil data dari sumber? ---
-// Fetch dari AniList/silveryasha CUMA kalau: (1) DB belum ada data musim ini,
-// atau (2) data udah basi (lewat REFRESH_AGE_SECONDS). Nggak ada param yang bisa
-// maksa fetch manual dari luar — tombol refresh di frontend cuma baca DB.
-$st = $pdo->prepare("SELECT COUNT(*) FROM `{$tblAnime}` WHERE season = ? AND season_year = ?");
-$st->execute([$season, $year]);
-$existing = (int) $st->fetchColumn();
+// --- fetch dari sumber cuma kalau perlu, per musim ---
+// Nggak ada param yang bisa maksa fetch manual dari luar — tombol refresh di
+// frontend cuma baca DB. Kita juga nggak mau nyusahin AniList/silveryasha.
+$refreshedSeasons = [];
 
-$last = (int) (get_meta($pdo, $tblMeta, 'last_refresh') ?? 0);
-$needRefresh = ($existing === 0) || ((time() - $last) >= REFRESH_AGE_SECONDS);
+foreach ($tracked as $t) {
+    $s = $t['season'];
+    $y = (int) $t['year'];
 
-$refreshed = false;
+    $st = $pdo->prepare("SELECT COUNT(*) FROM `{$tblAnime}` WHERE season = ? AND season_year = ?");
+    $st->execute([$s, $y]);
+    $existing = (int) $st->fetchColumn();
 
-if ($needRefresh) {
-    $anilist = anilist_fetch($season, $year);
+    $metaKey = 'last_refresh:' . $s . ':' . $y;
+    $last = (int) (get_meta($pdo, $tblMeta, $metaKey) ?? 0);
+    $needRefresh = ($existing === 0) || ((time() - $last) >= REFRESH_AGE_SECONDS);
+    if (!$needRefresh) continue;
 
+    $anilist = anilist_fetch($s, $y);
     // jangan timpa data lama kalau fetch gagal (anilist kosong)
-    if (!empty($anilist)) {
-        $sil = silveryasha_fetch($season, $year);
-        $platformsMap = match_platforms($anilist, $sil);
+    if (empty($anilist)) continue;
 
-        $pdo->beginTransaction();
-        $pdo->exec("DELETE FROM `{$tblPlatforms}`");
-        $pdo->exec("DELETE FROM `{$tblAnime}`");
+    $sil = silveryasha_fetch($s, $y);
+    $platformsMap = match_platforms($anilist, $sil);
 
-        $insA = $pdo->prepare("INSERT INTO `{$tblAnime}` (anilist_id, title, status, airing_at, season, season_year) VALUES (?, ?, ?, ?, ?, ?)");
-        $insP = $pdo->prepare("INSERT INTO `{$tblPlatforms}` (anilist_id, platform, status, url) VALUES (?, ?, ?, ?)");
+    // id yang lama buat musim ini (buat bersihin platform-nya)
+    $st = $pdo->prepare("SELECT anilist_id FROM `{$tblAnime}` WHERE season = ? AND season_year = ?");
+    $st->execute([$s, $y]);
+    $oldIds = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
 
-        foreach ($anilist as $a) {
-            $id = (int) $a['id'];
-            $title = $a['title']['romaji'] ?: ($a['title']['english'] ?: ($a['title']['native'] ?? ''));
-            $status = $a['status'] ?? '';
-            $airingAt = null;
-            if (!empty($a['nextAiringEpisode']['airingAt'])) {
-                $airingAt = (int) $a['nextAiringEpisode']['airingAt'];
-            }
-            $insA->execute([$id, $title, $status, $airingAt, $season, $year]);
-
-            foreach ($platformsMap[(string) $id] ?? [] as $p) {
-                $insP->execute([$id, $p['platform'], $p['status'], $p['url']]);
-            }
-        }
-
-        $pdo->commit();
-        set_meta($pdo, $tblMeta, 'last_refresh', (string) time());
-        $refreshed = true;
+    $pdo->beginTransaction();
+    if ($oldIds) {
+        $in = implode(',', $oldIds);
+        $pdo->exec("DELETE FROM `{$tblPlatforms}` WHERE anilist_id IN ({$in})");
     }
+    $pdo->exec("DELETE FROM `{$tblAnime}` WHERE season = " . $pdo->quote($s) . " AND season_year = {$y}");
+
+    $insA = $pdo->prepare("INSERT INTO `{$tblAnime}` (anilist_id, title, status, airing_at, season, season_year)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE title = VALUES(title), status = VALUES(status), airing_at = VALUES(airing_at)");
+    $insP = $pdo->prepare("INSERT INTO `{$tblPlatforms}` (anilist_id, platform, status, url) VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE status = VALUES(status), url = VALUES(url)");
+
+    foreach ($anilist as $a) {
+        $id = (int) $a['id'];
+        $title = $a['title']['romaji'] ?: ($a['title']['english'] ?: ($a['title']['native'] ?? ''));
+        $status = $a['status'] ?? '';
+        $airingAt = null;
+        if (!empty($a['nextAiringEpisode']['airingAt'])) {
+            $airingAt = (int) $a['nextAiringEpisode']['airingAt'];
+        }
+        $insA->execute([$id, $title, $status, $airingAt, $s, $y]);
+
+        foreach ($platformsMap[(string) $id] ?? [] as $p) {
+            $insP->execute([$id, $p['platform'], $p['status'], $p['url']]);
+        }
+    }
+
+    $pdo->commit();
+    set_meta($pdo, $tblMeta, $metaKey, (string) time());
+    set_meta($pdo, $tblMeta, 'last_refresh', (string) time()); // info global
+    $refreshedSeasons[] = season_label($s, $y);
+}
+
+// --- buang musim lama yang udah nggak dilacak ---
+$conds = [];
+foreach ($tracked as $t) {
+    $conds[] = "(season = " . $pdo->quote($t['season']) . " AND season_year = " . (int) $t['year'] . ")";
+}
+$st = $pdo->query("SELECT anilist_id FROM `{$tblAnime}` WHERE NOT (" . implode(' OR ', $conds) . ")");
+$staleIds = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
+if ($staleIds) {
+    $pdo->exec("DELETE FROM `{$tblPlatforms}` WHERE anilist_id IN (" . implode(',', $staleIds) . ")");
+    $pdo->exec("DELETE FROM `{$tblAnime}` WHERE anilist_id IN (" . implode(',', $staleIds) . ")");
 }
 
 // --- serve dari DB ---
-$st = $pdo->prepare("SELECT anilist_id, title, status, airing_at FROM `{$tblAnime}` WHERE season = ? AND season_year = ?");
-$st->execute([$season, $year]);
-$animeRows = $st->fetchAll();
-
-$platformRows = $pdo->query("SELECT anilist_id, platform, status, url FROM `{$tblPlatforms}`")->fetchAll();
-
-if (empty($animeRows)) {
-    respond(['ok' => false, 'error' => 'Data belum tersedia, coba refresh lagi nanti.']);
-}
-
+$seasonsOut = [];
 $anime = [];
-foreach ($animeRows as $r) {
-    $anime[] = [
-        'id' => (int) $r['anilist_id'],
-        'title' => $r['title'],
-        'status' => $r['status'],
-        'airingAt' => $r['airing_at'] !== null ? (int) $r['airing_at'] : null,
+$animeIds = [];
+
+foreach ($tracked as $t) {
+    $s = $t['season'];
+    $y = (int) $t['year'];
+
+    $st = $pdo->prepare("SELECT anilist_id, title, status, airing_at FROM `{$tblAnime}` WHERE season = ? AND season_year = ? ORDER BY anilist_id");
+    $st->execute([$s, $y]);
+    $rows = $st->fetchAll();
+
+    foreach ($rows as $r) {
+        $id = (int) $r['anilist_id'];
+        $animeIds[$id] = true;
+        $anime[] = [
+            'id' => $id,
+            'title' => $r['title'],
+            'status' => $r['status'],
+            'airingAt' => $r['airing_at'] !== null ? (int) $r['airing_at'] : null,
+            'season' => $s,
+            'year' => $y,
+        ];
+    }
+
+    $seasonsOut[] = [
+        'season' => $s,
+        'year' => $y,
+        'label' => season_label($s, $y),
+        'current' => (bool) $t['current'],
+        'startsAt' => season_start_ts($s, $y),
+        'count' => count($rows),
     ];
 }
 
+$currentCount = 0;
+foreach ($seasonsOut as $so) {
+    if ($so['current']) $currentCount = $so['count'];
+}
+
+if (empty($anime) || $currentCount === 0) {
+    respond(['ok' => false, 'error' => 'Data belum tersedia, coba refresh lagi nanti.']);
+}
+
+$platformRows = $pdo->query("SELECT anilist_id, platform, status, url FROM `{$tblPlatforms}`")->fetchAll();
+
 $platforms = [];
 foreach ($platformRows as $r) {
-    $id = (string) $r['anilist_id'];
-    if (!isset($platforms[$id])) $platforms[$id] = [];
-    $platforms[$id][] = [
+    $id = (int) $r['anilist_id'];
+    if (!isset($animeIds[$id])) continue; // jangan serve platform musim lama
+    $key = (string) $id;
+    if (!isset($platforms[$key])) $platforms[$key] = [];
+    $platforms[$key][] = [
         'platform' => $r['platform'],
         'status' => $r['status'],
         'url' => $r['url'],
@@ -473,7 +594,8 @@ respond([
     'ok' => true,
     'season' => $season,
     'year' => $year,
-    'refreshed' => $refreshed,
+    'refreshed' => $refreshedSeasons,
+    'seasons' => $seasonsOut,
     'anime' => $anime,
     'platforms' => $platforms,
 ]);
